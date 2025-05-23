@@ -1,0 +1,32 @@
+.action-button-container {
+  display: flex;
+  gap: 4px;
+
+  &.vertical {
+    flex-direction: column;
+  }
+
+  .ant-btn {
+    transition: all 0.3s;
+
+    &:hover {
+      transform: scale(1.05);
+    }
+  }
+}
+
+// Dark mode support
+html.dark {
+  .action-button-container {
+    .ant-btn-default {
+      background-color: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.12);
+      color: rgba(255, 255, 255, 0.85);
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.12);
+        border-color: rgba(255, 255, 255, 0.15);
+      }
+    }
+  }
+}

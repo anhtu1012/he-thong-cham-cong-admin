@@ -1,0 +1,16 @@
+{
+  "Profile": {
+    "changepass": "Change password"
+  },
+  "Ctable": {
+    "total": "Total",
+    "stt": "No.",
+    "columns": "Columns",
+    "columnVisibility": "Column Visibility",
+    "selectAll": "Chọn tất cả",
+    "actions": "Action",
+    "showHideColumns": "Column",
+    "import": "Import",
+    "export": "Export"
+  }
+}

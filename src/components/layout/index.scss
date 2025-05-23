@@ -1,0 +1,12 @@
+@use "@/styles/variables" as vars;
+
+$primary-color: #00bcd4;
+$secondary-color: #ff6600;
+$dark-text: #ffff;
+$light-text: #333333;
+$background-light: #f8f8f8;
+$background-white: #ffffff;
+$accent-color: #ff9900;
+
+html.dark {
+}

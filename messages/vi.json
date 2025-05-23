@@ -1,0 +1,16 @@
+{
+  "Profile": {
+    "changepass": "Thay đổi mật khẩu"
+  },
+  "Ctable": {
+    "total": "Tổng",
+    "stt": "STT",
+    "columns": "Cột",
+    "columnVisibility": "Hiển thị cột",
+    "selectAll": "Chọn tất cả",
+    "actions": "Công cụ",
+    "showHideColumns": "Điều chỉnh column",
+    "import": "Xuất Excel",
+    "export": "Xuất Csv"
+  }
+}
