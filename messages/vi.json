@@ -12,5 +12,18 @@
     "showHideColumns": "Điều chỉnh column",
     "import": "Xuất Excel",
     "export": "Xuất Csv"
+  },
+  "DanhMucChucVu": {
+    "maChucVu": "Mã chức vụ",
+    "tenChucVu": "Tên chức vụ",
+    "luongCoBan": "Lương cơ bản",
+    "phuCap": "Phụ cấp",
+    "luongTangCa": "Lương tăng ca",
+    "phiDiMuon": "Phí đi muộn",
+    "timKiem": "Tìm kiếm...",
+    "themMoi": "Thêm người dùng mới",
+    "xemChiTiet": "Xem thông tin chi tiết",
+    "chinhSua": "Chỉnh sửa thông tin người dùng",
+    "xoa": "Xóa người dùng"
   }
 }

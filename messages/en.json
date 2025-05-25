@@ -7,10 +7,23 @@
     "stt": "No.",
     "columns": "Columns",
     "columnVisibility": "Column Visibility",
-    "selectAll": "Chọn tất cả",
+    "selectAll": "Chosse All",
     "actions": "Action",
     "showHideColumns": "Column",
     "import": "Import",
     "export": "Export"
+  },
+  "DanhMucChucVu": {
+    "maChucVu": "Position Code",
+    "tenChucVu": "Position Name",
+    "luongCoBan": "Basic Salary",
+    "phuCap": "Allowance",
+    "luongTangCa": "Overtime Salary",
+    "phiDiMuon": "Late Fee",
+    "timKiem": "Search...",
+    "themMoi": "Add new user",
+    "xemChiTiet": "View details",
+    "chinhSua": "Edit user information",
+    "xoa": "Delete user"
   }
 }
