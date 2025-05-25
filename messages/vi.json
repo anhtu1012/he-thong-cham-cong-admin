@@ -25,5 +25,25 @@
     "xemChiTiet": "Xem thông tin chi tiết",
     "chinhSua": "Chỉnh sửa thông tin người dùng",
     "xoa": "Xóa người dùng"
+  },
+  "DanhMucDon": {
+    "maDon": "Mã đơn",
+    "tieuDe": "Tiêu đề",
+    "moTa": "Mô tả",
+    "nguoiDuyet": "Người duyệt",
+    "timKiem": "Tìm kiếm...",
+    "themMoi": "Thêm đơn mới",
+    "xemChiTiet": "Xem thông tin chi tiết",
+    "chinhSua": "Chỉnh sửa thông tin đơn",
+    "xoa": "Xóa đơn",
+    "capNhat": "Cập nhật",
+    "huy": "Hủy",
+    "vuilongNhapMaDon": "Vui lòng nhập mã đơn!",
+    "nhapMaDon": "Nhập mã đơn (VD: DON001)",
+    "vuilongNhapTieuDe": "Vui lòng nhập tiêu đề đơn!",
+    "nhapTieuDe": "Nhập tiêu đề đơn",
+    "nhapMoTa": "Nhập mô tả đơn",
+    "vuilongChonNguoiDuyet": "Vui lòng chọn người duyệt!",
+    "chonNguoiDuyet": "Chọn người duyệt"
   }
 }
