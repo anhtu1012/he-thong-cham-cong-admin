@@ -45,5 +45,32 @@
     "nhapMoTa": "Enter form description",
     "vuilongChonNguoiDuyet": "Please select role permission!",
     "chonNguoiDuyet": "Select role permission"
+  },
+  "DanhMucCaLam": {
+    "maCaLam": "Shift Code",
+    "tenCaLam": "Shift Name",
+    "gioBatDau": "Start Time",
+    "gioKetThuc": "End Time",
+    "soGioLam": "Working Hours",
+    "thoiGianTre": "Delay Time",
+    "timKiem": "Search...",
+    "themMoi": "Add new shift",
+    "xemChiTiet": "View details",
+    "chinhSua": "Edit shift information",
+    "xoa": "Delete shift",
+    "capNhat": "Update",
+    "huy": "Cancel",
+    "vuilongNhapMaCaLam": "Please enter shift code!",
+    "nhapMaCaLam": "Enter shift code (e.g. CA001)",
+    "vuilongNhapTenCaLam": "Please enter shift name!",
+    "nhapTenCaLam": "Enter shift name",
+    "vuilongChonGioBatDau": "Please select start time!",
+    "chonGioBatDau": "Select start time",
+    "vuilongChonGioKetThuc": "Please select end time!",
+    "chonGioKetThuc": "Select end time",
+    "vuilongNhapSoGioLam": "Please enter working hours!",
+    "nhapSoGioLam": "Enter working hours",
+    "vuilongChonThoiGianTre": "Please select delay time!",
+    "chonThoiGianTre": "Select delay time"
   }
 }

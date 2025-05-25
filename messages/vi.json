@@ -45,5 +45,32 @@
     "nhapMoTa": "Nhập mô tả đơn",
     "vuilongChonNguoiDuyet": "Vui lòng chọn người duyệt!",
     "chonNguoiDuyet": "Chọn người duyệt"
+  },
+  "DanhMucCaLam": {
+    "maCaLam": "Mã ca làm",
+    "tenCaLam": "Tên ca làm",
+    "gioBatDau": "Giờ bắt đầu",
+    "gioKetThuc": "Giờ kết thúc",
+    "soGioLam": "Số giờ làm",
+    "thoiGianTre": "Thời gian trễ",
+    "timKiem": "Tìm kiếm...",
+    "themMoi": "Thêm ca làm mới",
+    "xemChiTiet": "Xem thông tin chi tiết",
+    "chinhSua": "Chỉnh sửa thông tin ca làm",
+    "xoa": "Xóa ca làm",
+    "capNhat": "Cập nhật",
+    "huy": "Hủy",
+    "vuilongNhapMaCaLam": "Vui lòng nhập mã ca làm!",
+    "nhapMaCaLam": "Nhập mã ca làm (VD: CA001)",
+    "vuilongNhapTenCaLam": "Vui lòng nhập tên ca làm!",
+    "nhapTenCaLam": "Nhập tên ca làm",
+    "vuilongChonGioBatDau": "Vui lòng chọn giờ bắt đầu!",
+    "chonGioBatDau": "Chọn giờ bắt đầu",
+    "vuilongChonGioKetThuc": "Vui lòng chọn giờ kết thúc!",
+    "chonGioKetThuc": "Chọn giờ kết thúc",
+    "vuilongNhapSoGioLam": "Vui lòng nhập số giờ làm!",
+    "nhapSoGioLam": "Nhập số giờ làm",
+    "vuilongChonThoiGianTre": "Vui lòng chọn thời gian trễ!",
+    "chonThoiGianTre": "Chọn thời gian trễ"
   }
 }
