@@ -25,5 +25,25 @@
     "xemChiTiet": "View details",
     "chinhSua": "Edit user information",
     "xoa": "Delete user"
+  },
+  "DanhMucDon": {
+    "maDon": "Form Code",
+    "tieuDe": "Title",
+    "moTa": "Description",
+    "nguoiDuyet": "Role Permission",
+    "timKiem": "Search...",
+    "themMoi": "Add new form",
+    "xemChiTiet": "View details",
+    "chinhSua": "Edit form information",
+    "xoa": "Delete form",
+    "capNhat": "Update",
+    "huy": "Cancel",
+    "vuilongNhapMaDon": "Please enter form code!",
+    "nhapMaDon": "Enter form code (e.g. DON001)",
+    "vuilongNhapTieuDe": "Please enter form title!",
+    "nhapTieuDe": "Enter form title",
+    "nhapMoTa": "Enter form description",
+    "vuilongChonNguoiDuyet": "Please select role permission!",
+    "chonNguoiDuyet": "Select role permission"
   }
 }
