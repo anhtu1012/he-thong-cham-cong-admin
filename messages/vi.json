@@ -108,5 +108,25 @@
     "nhapKinhDo": "Nhập kinh độ (VD: 105.8542)",
     "vuilongNhapMaDoanhNghiep": "Vui lòng nhập mã doanh nghiệp!",
     "nhapMaDoanhNghiep": "Nhập mã doanh nghiệp"
+  },
+  "DanhMucCongTy": {
+    "maCongTy": "Mã công ty",
+    "tenCongTy": "Tên công ty",
+    "moTa": "Mô tả",
+    "ngayThanhLap": "Ngày thành lập",
+    "timKiem": "Tìm kiếm...",
+    "themMoi": "Thêm công ty mới",
+    "xemChiTiet": "Xem thông tin chi tiết",
+    "chinhSua": "Chỉnh sửa thông tin công ty",
+    "xoa": "Xóa công ty",
+    "capNhat": "Cập nhật",
+    "huy": "Hủy",
+    "vuilongNhapMaCongTy": "Vui lòng nhập mã công ty!",
+    "nhapMaCongTy": "Nhập mã công ty (VD: CT001)",
+    "vuilongNhapTenCongTy": "Vui lòng nhập tên công ty!",
+    "nhapTenCongTy": "Nhập tên công ty",
+    "nhapMoTa": "Nhập mô tả công ty",
+    "vuilongChonNgayThanhLap": "Vui lòng chọn ngày thành lập!",
+    "chonNgayThanhLap": "Chọn ngày thành lập"
   }
 }

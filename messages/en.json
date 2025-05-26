@@ -76,7 +76,7 @@
   "DanhMucChiNhanh": {
     "maChiNhanh": "Branch Code",
     "tenChiNhanh": "Branch Name",
-    "diaChi": "Address ID",
+    "diaChi": "Address",
     "maViTri": "Place ID",
     "thanhPho": "City",
     "quan": "District",
@@ -108,5 +108,25 @@
     "nhapKinhDo": "Enter longitude (e.g. 105.8542)",
     "vuilongNhapMaDoanhNghiep": "Please enter company code!",
     "nhapMaDoanhNghiep": "Enter company code"
+  },
+  "DanhMucCongTy": {
+    "maCongTy": "Company Code",
+    "tenCongTy": "Company Name",
+    "moTa": "Description",
+    "ngayThanhLap": "Establishment Date",
+    "timKiem": "Search...",
+    "themMoi": "Add new company",
+    "xemChiTiet": "View details",
+    "chinhSua": "Edit company information",
+    "xoa": "Delete company",
+    "capNhat": "Update",
+    "huy": "Cancel",
+    "vuilongNhapMaCongTy": "Please enter company code!",
+    "nhapMaCongTy": "Enter company code (e.g. CT001)",
+    "vuilongNhapTenCongTy": "Please enter company name!",
+    "nhapTenCongTy": "Enter company name",
+    "nhapMoTa": "Enter company description",
+    "vuilongChonNgayThanhLap": "Please select establishment date!",
+    "chonNgayThanhLap": "Select establishment date"
   }
 }
