@@ -108,10 +108,16 @@ const SiderComponent: React.FC<SiderProps> = ({ collapsed }) => {
       "data-index": 4,
     },
     {
+      key: "/admin/quan-li-don",
+      icon: <FileTextOutlined />,
+      label: "Quản lí đơn",
+      "data-index": 5,
+    },
+    {
       key: "danh-muc",
       icon: <AppstoreOutlined />,
       label: "Danh mục",
-      "data-index": 5,
+      "data-index": 6,
       children: [
         {
           key: "/admin/danh-muc/don",
@@ -132,7 +138,7 @@ const SiderComponent: React.FC<SiderProps> = ({ collapsed }) => {
           key: "/admin/danh-muc/chi-nhanh",
           icon: <BranchesOutlined />,
           label: "Chi nhánh",
-        },      
+        },
       ],
     },
   ];
