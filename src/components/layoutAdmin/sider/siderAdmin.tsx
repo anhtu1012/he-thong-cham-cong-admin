@@ -132,12 +132,7 @@ const SiderComponent: React.FC<SiderProps> = ({ collapsed }) => {
           key: "/admin/danh-muc/chi-nhanh",
           icon: <BranchesOutlined />,
           label: "Chi nhánh",
-        },
-        {
-          key: "/admin/danh-muc/cong-ty",
-          icon: <ApartmentOutlined />,
-          label: "Công ty",
-        },
+        },      
       ],
     },
   ];

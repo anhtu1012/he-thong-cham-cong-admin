@@ -6,20 +6,22 @@ import { setAuthData } from "@/lib/store/slices/loginSlice";
 import AuthServices from "@/services/auth/api.service";
 import { getCookie } from "@/utils/client/getCookie";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
-import { Button, Card, Form, Input, Space, Typography } from "antd";
+import { Button, Checkbox, Form, Input, Typography } from "antd";
 import { useForm } from "antd/es/form/Form";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 import "./login.scss";
+import backgroundImage from "../../../public/assets/image/BackgroundFaceAI.png";
 
 interface LoginForm {
   username: string;
   password: string;
 }
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 const LoginPage: React.FC = () => {
   const [isLogin, setIsLogin] = useState(false);
@@ -84,62 +86,94 @@ const LoginPage: React.FC = () => {
 
   return (
     <div className="login-container">
-      <Card className="login-card">
-        <Title level={2} className="login-title">
-          Login
-        </Title>
-        <Form
-          name="login"
-          form={signInForm}
-          initialValues={{ remember: true }}
-          onFinish={onFinish}
-          layout="vertical"
-          size="large"
-        >
-          <Form.Item
-            name="username"
-            rules={[{ required: true, message: "Please input your username!" }]}
-          >
-            <Input
-              prefix={<UserOutlined className="site-form-item-icon" />}
-              placeholder="Username"
-              disabled={isLogin || isNavigating}
-            />
-          </Form.Item>
+      <div className="login-left">
+        <div className="login-form">
+          <Title level={1} className="login-title">
+            Get Started Now
+          </Title>
+          <Text className="login-subtitle">
+            Enter your credentials to access your account
+          </Text>
 
-          <Form.Item
-            name="password"
-            rules={[{ required: true, message: "Please input your password!" }]}
+          <Form
+            name="login"
+            form={signInForm}
+            initialValues={{ remember: true }}
+            onFinish={onFinish}
+            layout="vertical"
+            size="large"
+            style={{ width: "100%" }}
           >
-            <Input.Password
-              prefix={<LockOutlined className="site-form-item-icon" />}
-              placeholder="Password"
-              disabled={isLogin || isNavigating}
-            />
-          </Form.Item>
-
-          <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              className="login-form-button"
-              loading={isLogin || isNavigating}
-              block
+            <Form.Item
+              label="Name"
+              name="username"
+              rules={[
+                { required: true, message: "Please input your username!" },
+              ]}
             >
-              {isLogin
-                ? "Đang đăng nhập..."
-                : isNavigating
-                ? "Đang chuyển trang..."
-                : "Đăng nhập"}
-            </Button>
-          </Form.Item>
+              <Input
+                prefix={<UserOutlined className="site-form-item-icon" />}
+                placeholder="Enter your username"
+                disabled={isLogin || isNavigating}
+              />
+            </Form.Item>
 
-          <Space direction="vertical" align="center" style={{ width: "100%" }}>
-            <Link href="/register">Don't have an account? Register now</Link>
-            <Link href="/forgot-password">Forgot password?</Link>
-          </Space>
-        </Form>
-      </Card>
+            <Form.Item
+              label="Password"
+              name="password"
+              rules={[
+                { required: true, message: "Please input your password!" },
+              ]}
+            >
+              <Input.Password
+                prefix={<LockOutlined className="site-form-item-icon" />}
+                placeholder="Enter your password"
+                disabled={isLogin || isNavigating}
+              />
+            </Form.Item>
+
+            <div className="login-links">
+              <Form.Item name="remember" valuePropName="checked" noStyle>
+                <Checkbox className="login-checkbox">
+                  I agree to the Terms & Privacy
+                </Checkbox>
+              </Form.Item>
+              <Link href="/forgot-password" className="login-forgot">
+                Forgot password?
+              </Link>
+            </div>
+
+            <Form.Item>
+              <Button
+                type="primary"
+                htmlType="submit"
+                className="login-form-button"
+                loading={isLogin || isNavigating}
+                block
+              >
+                {isLogin
+                  ? "Đang đăng nhập..."
+                  : isNavigating
+                  ? "Đang chuyển trang..."
+                  : "Đăng Nhập"}
+              </Button>
+            </Form.Item>
+          </Form>
+        </div>
+      </div>
+      <div className="login-right">
+        <div className="image-container">
+          <Image
+            src={backgroundImage}
+            alt="Facial Recognition"
+            className="background-image"
+            width={1000}
+            height={1000}
+            style={{ width: "100%", height: "auto" }}
+            priority
+          />
+        </div>
+      </div>
     </div>
   );
 };
