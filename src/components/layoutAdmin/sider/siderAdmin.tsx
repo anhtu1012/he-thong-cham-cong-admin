@@ -9,9 +9,7 @@ import {
   DashboardOutlined,
   FileTextOutlined,
   FormOutlined,
-  ScheduleOutlined,
   SettingOutlined,
-  TeamOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import { Layout, Menu } from "antd";
@@ -90,28 +88,22 @@ const SiderComponent: React.FC<SiderProps> = ({ collapsed }) => {
       "data-index": 1,
     },
     {
-      key: "/admin/quan-li-phong-ban",
-      icon: <TeamOutlined />,
-      label: "Quản lý phòng ban",
-      "data-index": 2,
-    },
-    {
-      key: "/admin/quan-li-ca-lam",
-      icon: <ScheduleOutlined />,
-      label: "Quản lý ca làm",
-      "data-index": 3,
-    },
-    {
       key: "/admin/quan-li-cham-cong",
       icon: <ClockCircleOutlined />,
       label: "Quản lý chấm công",
-      "data-index": 4,
+      "data-index": 2,
+    },
+    {
+      key: "/admin/quan-li-don",
+      icon: <FileTextOutlined />,
+      label: "Quản lí đơn",
+      "data-index": 3,
     },
     {
       key: "danh-muc",
       icon: <AppstoreOutlined />,
       label: "Danh mục",
-      "data-index": 5,
+      "data-index": 4,
       children: [
         {
           key: "/admin/danh-muc/don",
@@ -132,11 +124,6 @@ const SiderComponent: React.FC<SiderProps> = ({ collapsed }) => {
           key: "/admin/danh-muc/chi-nhanh",
           icon: <BranchesOutlined />,
           label: "Chi nhánh",
-        },
-        {
-          key: "/admin/danh-muc/cong-ty",
-          icon: <ApartmentOutlined />,
-          label: "Công ty",
         },
       ],
     },

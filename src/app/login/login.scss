@@ -1,25 +1,121 @@
 .login-container {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background-color: #f0f2f5;
-  padding: 20px;
+  height: 100vh;
+  width: 100%;
 }
 
-.login-card {
-  width: 100%;
-  max-width: 400px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
+.login-left {
+  flex: 1;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-right {
+  flex: 1;
+  background-color: #384fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.image-container {
+  width: 70vw;
+  max-width: 70%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: -80px;
+}
+
+.background-image {
+  object-fit: contain !important;
+  max-width: 100% !important;
+  height: auto !important;
 }
 
 .login-title {
-  text-align: center;
-  margin-bottom: 24px !important;
+  font-size: 32px !important;
+  font-weight: 600 !important;
+  margin-bottom: 8px !important;
+}
+
+.login-subtitle {
+  margin-bottom: 40px;
+  color: #666;
+}
+
+.login-form {
+  width: 100%;
+  max-width: 450px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin: 0 auto;
 }
 
 .login-form-button {
-  margin-top: 16px;
-  height: 40px;
+  height: 50px !important;
+  background-color: #384fff !important;
+  border-color: #384fff !important;
+  font-weight: 500;
+  margin-top: 24px;
+  border-radius: 10px !important;
+}
+
+.login-form-button:hover {
+  background-color: #2a3fd8 !important;
+  border-color: #2a3fd8 !important;
+}
+
+.login-divider {
+  margin: 24px 0;
+  color: #999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-links {
+  margin-top: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.login-checkbox {
+  display: flex;
+  align-items: center;
+}
+
+.ant-input,
+.ant-input-password {
+  height: 50px !important;
+  border-radius: 10px !important;
+}
+
+.ant-input-affix-wrapper {
+  height: 50px !important;
+  border-radius: 10px !important;
+  padding: 0 11px;
+}
+
+.ant-input-affix-wrapper > input.ant-input {
+  height: 48px !important;
+}
+
+.ant-form-item {
+  margin-bottom: 20px;
+}
+
+.ant-form-item-label {
+  font-weight: 500;
+}
+
+.login-forgot {
+  color: #384fff;
 }
