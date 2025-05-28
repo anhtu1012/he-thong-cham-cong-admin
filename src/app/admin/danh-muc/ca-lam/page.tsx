@@ -120,7 +120,7 @@ const DanhMucCaLamManagementPage = () => {
 
   useEffect(() => {
     getData(currentPage, pageSize, quickSearch);
-  }, [allData, currentPage, pageSize, quickSearch]);
+  }, [allData, currentPage, pageSize, quickSearch, getData]);
 
   const handleBeforeExport = async (): Promise<CaLamItem[]> => {
     setLoading(true);

@@ -1,26 +1,29 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import React, { useState } from "react";
+import ActionButton from "@/components/basicUI/ActionButton";
+import Ctable from "@/components/basicUI/Ctable";
+import { formatDayDDMMYYYY } from "@/utils/client/dayFormatter";
 import {
-  Input,
-  Button,
-  Space,
-  DatePicker,
-  Tag,
-  Select,
-  Modal,
-  Descriptions,
+  CalendarOutlined,
+  InfoCircleOutlined,
+  SearchOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
+import {
   Card,
-  Row,
   Col,
+  DatePicker,
+  Input,
+  Modal,
+  Row,
+  Select,
+  Space,
+  Tag,
   Typography,
 } from "antd";
-import { SearchOutlined, PlusOutlined, InfoCircleOutlined, UserOutlined, CalendarOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
-import Ctable from "@/components/basicUI/Ctable";
-import ActionButton from "@/components/basicUI/ActionButton";
-import { formatDayDDMMYYYY } from "@/utils/client/dayFormatter";
-
+import { useState } from "react";
 
 dayjs.extend(isBetween);
 
@@ -133,15 +136,15 @@ const columns = [
 ];
 
 function QuanLiChamCong() {
-  const [loading, setLoading] = useState(false);
-  const [search, setSearch] = useState("");
+  const [loading] = useState<boolean>(false);
+  const [search, setSearch] = useState<string>("");
   const [dateRange, setDateRange] = useState<any>(null);
   const [status, setStatus] = useState<string | undefined>(undefined);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [_, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [totalItems, setTotalItems] = useState(mockData.length);
+  const [totalItems] = useState(mockData.length);
 
-  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [viewModalOpen, setViewModalOpen] = useState<boolean>(false);
   const [selectedRecord, setSelectedRecord] = useState<any>(null);
 
   // Lọc dữ liệu mẫu theo tìm kiếm và bộ lọc
@@ -162,7 +165,7 @@ function QuanLiChamCong() {
   const handleBeforeExport = async () => {
     return filteredData;
   };
-  const actionColumn = () => ({
+  const actionColumn = (): any => ({
     render: (record: any) => (
       <ActionButton
         record={record}
@@ -231,12 +234,8 @@ function QuanLiChamCong() {
         scroll={{ x: 900 }}
       />
 
-    <Modal
-        title={
-          <Title level={4}>
-            Thông tin chi tiết chấm công
-          </Title>
-        }
+      <Modal
+        title={<Title level={4}>Thông tin chi tiết chấm công</Title>}
         open={viewModalOpen}
         onCancel={() => setViewModalOpen(false)}
         footer={null}
@@ -245,8 +244,7 @@ function QuanLiChamCong() {
         style={{ padding: 16 }}
       >
         {selectedRecord && (
-          <Card
-          >
+          <Card>
             <Space direction="vertical" size={16} style={{ width: "100%" }}>
               {/* Employee Information */}
               <div>
@@ -287,7 +285,9 @@ function QuanLiChamCong() {
                 <Row gutter={[16, 8]}>
                   <Col span={12}>
                     <Text strong>Ca làm: </Text>
-                    <Text>{selectedRecord.shift || "Ca sáng (08:00 - 17:00)"}</Text>
+                    <Text>
+                      {selectedRecord.shift || "Ca sáng (08:00 - 17:00)"}
+                    </Text>
                   </Col>
                   <Col span={12}>
                     <Text strong>Ngày: </Text>
