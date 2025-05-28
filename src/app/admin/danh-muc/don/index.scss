@@ -1,1 +1,186 @@
-/* Styles for Don management page */
+@import "../../../../styles/variables.scss";
+
+// Dark mode styles for DonForm
+html.dark {
+  // Input fields
+  .ant-input,
+  .ant-input-affix-wrapper {
+    background-color: $background-color-dark-light;
+    border-color: $border-color-dark;
+    color: $text-color-dark;
+
+    &:hover {
+      border-color: $border-color-dark;
+      background-color: darken($background-color-dark-light, 3%);
+    }
+
+    &:focus,
+    &.ant-input-affix-wrapper-focused {
+      border-color: $primary-color-dark;
+      background-color: $background-color-dark-light;
+      box-shadow: 0 0 0 2px rgba(9, 109, 217, 0.2);
+    }
+
+    .ant-input {
+      background-color: transparent;
+    }
+
+    .anticon {
+      color: $text-color-secondary-dark;
+    }
+  }
+
+  // Select
+  .ant-select {
+    .ant-select-selector {
+      background-color: $background-color-dark-light;
+      border-color: $border-color-dark;
+      color: $text-color-dark;
+
+      &:hover {
+        background-color: darken($background-color-dark-light, 3%);
+        border-color: $border-color-dark;
+      }
+    }
+
+    .ant-select-arrow {
+      color: $text-color-secondary-dark;
+    }
+
+    &:hover .ant-select-selector {
+      background-color: darken($background-color-dark-light, 3%);
+      border-color: $border-color-dark;
+    }
+
+    &.ant-select-focused .ant-select-selector {
+      border-color: $primary-color-dark;
+      background-color: $background-color-dark-light;
+      box-shadow: 0 0 0 2px rgba(9, 109, 217, 0.2);
+    }
+  }
+
+  // Form labels
+  .ant-form-item-label > label {
+    color: $text-color-dark;
+  }
+
+  // Form required mark
+  .ant-form-item-required::before {
+    color: $error-color !important;
+  }
+
+  // TextArea
+  textarea.ant-input {
+    background-color: $background-color-dark-light;
+    border-color: $border-color-dark;
+    color: $text-color-dark;
+
+    &:hover {
+      border-color: $border-color-dark;
+      background-color: darken($background-color-dark-light, 3%);
+    }
+
+    &:focus {
+      border-color: $primary-color-dark;
+      background-color: $background-color-dark-light;
+      box-shadow: 0 0 0 2px rgba(9, 109, 217, 0.2);
+    }
+  }
+
+  // Divider in the form
+  .ant-divider {
+    border-color: $border-color-dark;
+  }
+
+  // Loading spinner
+  .ant-spin {
+    color: $primary-color-dark;
+
+    .ant-spin-dot-item {
+      background-color: $primary-color-dark;
+    }
+  }
+
+  // Nút trong form
+  .ant-btn {
+    &-primary {
+      &:hover,
+      &:focus {
+        background-color: darken($primary-color-dark, 5%);
+        border-color: darken($primary-color-dark, 5%);
+      }
+    }
+
+    &-default {
+      &:hover,
+      &:focus {
+        background-color: rgba(0, 0, 0, 0.1);
+        border-color: $border-color-dark;
+        color: $text-color-dark;
+      }
+    }
+  }
+
+  // Dropdown menu
+  .ant-select-dropdown {
+    background-color: $background-color-dark;
+    border-color: $border-color-dark;
+
+    .ant-select-item {
+      color: $text-color-dark;
+
+      &:hover {
+        background-color: darken($background-color-dark-light, 3%);
+      }
+
+      &-option-selected {
+        background-color: $background-color-dark-light;
+
+        &:hover {
+          background-color: darken($background-color-dark-light, 3%);
+        }
+      }
+    }
+  }
+
+  // Form Modal backdrop và overlay
+  .ant-modal-mask {
+    background-color: rgba(0, 0, 0, 0.65);
+  }
+
+  // Modal styling
+  .ant-modal {
+    .ant-modal-content {
+      background-color: $background-color-dark;
+      box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.48),
+        0 6px 16px 0 rgba(0, 0, 0, 0.32), 0 9px 28px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .ant-modal-header {
+      background-color: $background-color-dark;
+      border-bottom-color: $border-color-dark;
+
+      .ant-modal-title {
+        color: $text-color-dark;
+      }
+    }
+
+    .ant-modal-close {
+      color: $text-color-secondary-dark;
+
+      &:hover {
+        color: $text-color-dark;
+      }
+    }
+
+    .ant-modal-body {
+      background-color: $background-color-dark;
+      color: $text-color-dark;
+    }
+
+    .ant-modal-footer {
+      background-color: $background-color-dark;
+      border-top-color: $border-color-dark;
+    }
+  }
+}

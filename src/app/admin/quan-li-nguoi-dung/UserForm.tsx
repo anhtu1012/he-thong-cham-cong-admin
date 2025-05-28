@@ -30,6 +30,7 @@ import dayjs from "dayjs";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import styles from "../../../components/styles/styles.module.scss";
+import "./index.scss";
 
 const { Option } = Select;
 

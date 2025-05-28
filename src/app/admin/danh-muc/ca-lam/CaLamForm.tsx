@@ -14,6 +14,7 @@ import {
 import React from "react";
 import { useTranslations } from "next-intl";
 import dayjs from "dayjs";
+import "./index.scss";
 
 interface CaLamFormProps {
   form: FormInstance;

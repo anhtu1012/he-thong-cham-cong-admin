@@ -1,1 +1,311 @@
+@import "../../../../styles/variables.scss";
+
 /* Styles for Ca làm management page */
+
+// Dark mode styles for CaLamForm
+html.dark {
+  // Input fields
+  .ant-input,
+  .ant-input-affix-wrapper {
+    background-color: $background-color-dark-light;
+    border-color: $border-color-dark;
+    color: $text-color-dark;
+
+    &:hover {
+      border-color: $border-color-dark;
+      background-color: darken($background-color-dark-light, 3%);
+    }
+
+    &:focus,
+    &.ant-input-affix-wrapper-focused {
+      border-color: $primary-color-dark;
+      background-color: $background-color-dark-light;
+      box-shadow: 0 0 0 2px rgba(9, 109, 217, 0.2);
+    }
+
+    .ant-input {
+      background-color: transparent;
+    }
+
+    .anticon {
+      color: $text-color-secondary-dark;
+    }
+  }
+
+  // InputNumber
+  .ant-input-number {
+    background-color: $background-color-dark-light;
+    border-color: $border-color-dark;
+    color: $text-color-dark;
+
+    .ant-input-number-input {
+      background-color: transparent;
+      color: $text-color-dark;
+    }
+
+    .ant-input-number-handler-wrap {
+      background-color: $background-color-dark;
+      border-color: $border-color-dark;
+    }
+
+    .ant-input-number-handler {
+      border-color: $border-color-dark;
+
+      &:hover .ant-input-number-handler-up-inner,
+      &:hover .ant-input-number-handler-down-inner {
+        color: $primary-color-dark;
+      }
+    }
+
+    .ant-input-number-handler-up-inner,
+    .ant-input-number-handler-down-inner {
+      color: $text-color-secondary-dark;
+    }
+
+    &:hover {
+      border-color: $border-color-dark;
+      background-color: darken($background-color-dark-light, 3%);
+    }
+
+    &.ant-input-number-focused {
+      border-color: $primary-color-dark;
+      background-color: $background-color-dark-light;
+      box-shadow: 0 0 0 2px rgba(9, 109, 217, 0.2);
+    }
+
+    // Prefix icon
+    .anticon {
+      color: $text-color-secondary-dark;
+    }
+  }
+
+  // DatePicker - đặc biệt cho CaLamForm
+  .ant-picker {
+    background-color: $background-color-dark-light;
+    border-color: $border-color-dark;
+    color: $text-color-dark;
+
+    .ant-picker-input > input {
+      color: $text-color-dark;
+    }
+
+    .ant-picker-suffix,
+    .ant-picker-clear {
+      color: $text-color-secondary-dark;
+
+      &:hover {
+        color: $text-color-dark;
+      }
+    }
+
+    &:hover {
+      border-color: $border-color-dark;
+      background-color: darken($background-color-dark-light, 3%);
+    }
+
+    &.ant-picker-focused {
+      border-color: $primary-color-dark;
+      background-color: $background-color-dark-light;
+      box-shadow: 0 0 0 2px rgba(9, 109, 217, 0.2);
+    }
+
+    // DatePicker dropdown
+    &-dropdown {
+      background-color: $background-color-dark;
+      border-color: $border-color-dark;
+      box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.48),
+        0 6px 16px 0 rgba(0, 0, 0, 0.32), 0 9px 28px 8px rgba(0, 0, 0, 0.2);
+
+      .ant-picker-panel-container {
+        background-color: $background-color-dark;
+        border-color: $border-color-dark;
+      }
+
+      .ant-picker-header {
+        color: $text-color-dark;
+        border-bottom-color: $border-color-dark;
+
+        .ant-picker-header-view {
+          color: $text-color-dark;
+        }
+
+        button {
+          color: $text-color-secondary-dark;
+
+          &:hover {
+            color: $primary-color-dark;
+          }
+        }
+      }
+
+      .ant-picker-cell {
+        color: $text-color-secondary-dark;
+
+        &-in-view {
+          color: $text-color-dark;
+        }
+
+        &-selected .ant-picker-cell-inner {
+          background-color: $primary-color-dark;
+          color: #fff;
+        }
+
+        &:hover:not(.ant-picker-cell-selected) .ant-picker-cell-inner {
+          background-color: darken($background-color-dark-light, 3%);
+        }
+      }
+
+      .ant-picker-time-panel-column {
+        &::-webkit-scrollbar {
+          width: 8px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+          background-color: $border-color-dark;
+          border-radius: 4px;
+        }
+
+        &::-webkit-scrollbar-track {
+          background-color: $background-color-dark-light;
+        }
+      }
+
+      .ant-picker-time-panel-cell {
+        color: $text-color-dark;
+
+        &-selected {
+          background-color: $background-color-dark-light;
+        }
+
+        &:hover:not(.ant-picker-time-panel-cell-selected) {
+          background-color: darken($background-color-dark-light, 3%);
+        }
+      }
+
+      .ant-picker-footer {
+        border-top-color: $border-color-dark;
+      }
+
+      .ant-picker-now-btn {
+        color: $primary-color-dark;
+
+        &:hover {
+          color: $primary-color-light;
+        }
+      }
+
+      .ant-picker-ok {
+        .ant-btn-primary {
+          background-color: $primary-color-dark;
+          border-color: $primary-color-dark;
+
+          &:hover {
+            background-color: $primary-color-light;
+            border-color: $primary-color-light;
+          }
+        }
+      }
+    }
+  }
+
+  // TimePicker - đặc biệt cho CaLamForm
+  .ant-picker-time-panel {
+    background-color: $background-color-dark;
+
+    .ant-picker-time-panel-cell-inner {
+      color: $text-color-dark;
+    }
+
+    .ant-picker-time-panel-cell-selected .ant-picker-time-panel-cell-inner {
+      background-color: $background-color-dark-light;
+    }
+
+    .ant-picker-header {
+      border-bottom-color: $border-color-dark;
+
+      .ant-picker-header-view {
+        color: $text-color-dark;
+      }
+    }
+  }
+
+  // Form labels
+  .ant-form-item-label > label {
+    color: $text-color-dark;
+  }
+
+  // Form required mark
+  .ant-form-item-required::before {
+    color: $error-color !important;
+  }
+
+  // Divider in the form
+  .ant-divider {
+    border-color: $border-color-dark;
+  }
+
+  // Loading spinner
+  .ant-spin {
+    color: $primary-color-dark;
+
+    .ant-spin-dot-item {
+      background-color: $primary-color-dark;
+    }
+  }
+
+  // Nút trong form
+  .ant-btn {
+    &-primary {
+      &:hover,
+      &:focus {
+        background-color: darken($primary-color-dark, 5%);
+        border-color: darken($primary-color-dark, 5%);
+      }
+    }
+
+    &-default {
+      &:hover,
+      &:focus {
+        background-color: rgba(0, 0, 0, 0.1);
+        border-color: $border-color-dark;
+        color: $text-color-dark;
+      }
+    }
+  }
+
+  // Modal styling
+  .ant-modal {
+    .ant-modal-content {
+      background-color: $background-color-dark;
+      box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.48),
+        0 6px 16px 0 rgba(0, 0, 0, 0.32), 0 9px 28px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .ant-modal-header {
+      background-color: $background-color-dark;
+      border-bottom-color: $border-color-dark;
+
+      .ant-modal-title {
+        color: $text-color-dark;
+      }
+    }
+
+    .ant-modal-close {
+      color: $text-color-secondary-dark;
+
+      &:hover {
+        color: $text-color-dark;
+      }
+    }
+
+    .ant-modal-body {
+      background-color: $background-color-dark;
+      color: $text-color-dark;
+    }
+
+    .ant-modal-footer {
+      background-color: $background-color-dark;
+      border-top-color: $border-color-dark;
+    }
+  }
+}
