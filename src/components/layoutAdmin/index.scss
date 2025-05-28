@@ -449,7 +449,32 @@
   }
 }
 
-// New styles for admin content layout
+// Main layout container
+.main-layout {
+  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
+}
+
+// Inner layout
+.inner-layout {
+  height: calc(100vh - 64px);
+}
+
+// Content layout
+.content-layout {
+  margin-left: 80px;
+  margin-top: 54px;
+  transition: margin 0.2s;
+  height: calc(100vh - 54px);
+  overflow: hidden;
+
+  &.expanded {
+    margin-left: 240px;
+  }
+}
+
+// Admin content wrapper
 .admin-content-wrapper {
   padding: 16px 24px;
   overflow: initial;
