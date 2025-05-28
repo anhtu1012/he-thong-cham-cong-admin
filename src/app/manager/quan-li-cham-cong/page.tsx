@@ -140,7 +140,9 @@ function QuanLiChamCong() {
   const [search, setSearch] = useState<string>("");
   const [dateRange, setDateRange] = useState<any>(null);
   const [status, setStatus] = useState<string | undefined>(undefined);
-  const [_, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
+  console.log(currentPage);
+  
   const [pageSize, setPageSize] = useState(10);
   const [totalItems] = useState(mockData.length);
 
