@@ -11,6 +11,7 @@ import {
 import { Col, Form, FormInstance, Input, Row, InputNumber } from "antd";
 import React from "react";
 import { useTranslations } from "next-intl";
+import "./index.scss";
 
 interface ChiNhanhFormProps {
   form: FormInstance;
