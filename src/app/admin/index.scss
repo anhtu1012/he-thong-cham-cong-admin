@@ -110,3 +110,127 @@
     opacity: 1 !important;
   }
 }
+
+// Admin Dashboard Styles
+.admin-dashboard {
+  .dashboard-greeting {
+    margin-bottom: 24px;
+  }
+
+  .stat-cards {
+    margin-bottom: 24px;
+
+    .stat-card {
+      height: 100%;
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+    }
+  }
+
+  .chart-section {
+    margin-bottom: 24px;
+
+    .chart-card {
+      height: 100%;
+
+      .ant-card-head {
+        padding: 0 16px;
+
+        .ant-card-head-title {
+          padding: 16px 0;
+          font-size: 16px;
+        }
+      }
+
+      .ant-card-body {
+        padding: 16px;
+      }
+    }
+  }
+
+  .recent-activities {
+    .ant-list-item {
+      padding: 12px 0;
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.02);
+      }
+
+      .ant-list-item-meta-title {
+        margin-bottom: 4px;
+      }
+
+      .ant-list-item-meta-description {
+        color: rgba(0, 0, 0, 0.45);
+      }
+    }
+  }
+}
+
+// Dark mode styles
+html.dark {
+  .admin-dashboard {
+    .stat-card {
+      background-color: var(--background-color-dark-light);
+      border-color: var(--border-color-dark);
+
+      .ant-statistic-title {
+        color: var(--text-color-secondary-dark);
+      }
+
+      .ant-statistic-content {
+        color: var(--text-color-dark);
+      }
+    }
+
+    .chart-card {
+      background-color: var(--background-color-dark-light);
+      border-color: var(--border-color-dark);
+
+      .ant-card-head {
+        background-color: var(--background-color-dark-light);
+        border-color: var(--border-color-dark);
+
+        .ant-card-head-title {
+          color: var(--text-color-dark);
+        }
+      }
+    }
+
+    .recent-activities {
+      .ant-card {
+        background-color: var(--background-color-dark-light);
+        border-color: var(--border-color-dark);
+      }
+
+      .ant-card-head {
+        background-color: var(--background-color-dark-light);
+        border-color: var(--border-color-dark);
+
+        .ant-card-head-title {
+          color: var(--text-color-dark);
+        }
+      }
+
+      .ant-list-item {
+        border-bottom-color: var(--border-color-dark);
+
+        &:hover {
+          background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .ant-list-item-meta-title a {
+          color: var(--text-color-dark);
+        }
+
+        .ant-list-item-meta-description {
+          color: var(--text-color-secondary-dark);
+        }
+      }
+    }
+  }
+}

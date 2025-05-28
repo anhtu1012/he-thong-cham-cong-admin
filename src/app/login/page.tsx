@@ -103,6 +103,7 @@ const LoginPage: React.FC = () => {
             layout="vertical"
             size="large"
             style={{ width: "100%" }}
+            className="login-form-container"
           >
             <Form.Item
               label="Name"
