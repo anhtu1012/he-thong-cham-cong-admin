@@ -80,9 +80,9 @@ const SiderHrComponent: React.FC<SiderProps> = ({ collapsed }) => {
       "data-index": 1,
     },
     {
-      key: "/hr/quan-li-cham-cong",
+      key: "/hr/quan-li-don",
       icon: <ClockCircleOutlined />,
-      label: "Quản lý chấm công",
+      label: "Quản lý đơn",
       "data-index": 2,
     },
     {
