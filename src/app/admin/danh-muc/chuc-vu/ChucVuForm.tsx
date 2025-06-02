@@ -8,6 +8,7 @@ import {
 } from "@ant-design/icons";
 import { Col, Form, FormInstance, Input, InputNumber, Row, Select } from "antd";
 import React from "react";
+import "./index.scss";
 
 interface ChucVuFormProps {
   form: FormInstance;
