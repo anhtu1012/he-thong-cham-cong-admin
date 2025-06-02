@@ -639,7 +639,7 @@ const QuanLiNhanVienPage = () => {
           showActions
           actionColumn={actionColumn}
           stickyHeader
-          tableId="admin_quan_li_nguoi_dung"
+          tableId="manager_quan_li_nguoi_dung"
           onBeforeExport={handleBeforeExport}
         />
       </div>
