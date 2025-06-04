@@ -63,11 +63,13 @@ const LoginPage: React.FC = () => {
       dispatch(setAuthData(res));
       toast.success("Đăng nhập thành công"); //t("success")
       setIsNavigating(true);
-      if (res.userProfile.role === "R1") {
+      console.log("Login successful:", res.userProfile.roleCode);
+
+      if (res.userProfile.roleCode === "R1") {
         router.push("/admin");
-      } else if (res.userProfile.role === "R2") {
+      } else if (res.userProfile.roleCode === "R2") {
         router.push("/hr");
-      } else if (res.userProfile.role === "R3") {
+      } else if (res.userProfile.roleCode === "R3") {
         router.push("/manager");
       } else {
         router.push("/");

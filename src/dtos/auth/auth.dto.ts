@@ -5,6 +5,7 @@ import { z } from "zod";
  */
 export const UserInforSchema = z.object({
   id: z.string().or(z.bigint()), // Support both string and BigInt representations
+  code: z.string(),
   userName: z.string(),
   password: z.string().optional(), // Optional as it may not be returned in responses
   roleCode: z.string(),
@@ -20,6 +21,7 @@ export const UserInforSchema = z.object({
   contract: z.string(),
   branchCode: z.string(),
   managedBy: z.string(),
+  branchName: z.string(),
   createdAt: z.string().or(z.date()).optional(),
   createdBy: z.string(),
   updatedAt: z.string().or(z.date()).optional(),

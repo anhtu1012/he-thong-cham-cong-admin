@@ -15,14 +15,17 @@ import AuthServices from "@/services/auth/api.service";
 import SelectServices from "@/services/select/select.service";
 import { getChangedValues } from "@/utils/client/compareHelpers";
 import { handleFormErrors } from "@/utils/client/formHelpers";
-import { CalendarOutlined } from "@ant-design/icons";
-import { Button, Col, Form, Row, Space, Switch, Tag } from "antd";
+import { CalendarOutlined, EyeFilled } from "@ant-design/icons";
+import { Button, Col, Form, Row, Space, Switch, Tag, Tooltip } from "antd";
 import type { UploadFile } from "antd/es/upload/interface";
 import dayjs from "dayjs";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import styles from "../../../components/styles/styles.module.scss";
 import UserForm from "./UserForm";
+import UserContactForm from "./UserContactForm";
+import QuanLyHopDongServices from "@/services/admin/quan-li-nguoi-dung/quan-li-hop-dong.service";
+import { UserContractItem } from "@/dtos/quan-li-nguoi-dung/contracts/contract.dto";
 
 interface FormValues {
   role?: string;
@@ -36,6 +39,7 @@ const UserManagementPage = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingUser, setEditingUser] = useState<any>(null);
   const [form] = Form.useForm<any>();
+  const [formValues] = Form.useForm<UserContractItem>();
   const [formFilter] = Form.useForm<FormValues>();
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
@@ -46,6 +50,10 @@ const UserManagementPage = () => {
   const [brands, setBrands] = useState<any[]>([]);
   const [positions, setPositions] = useState<any[]>([]);
   const [editLoading, setEditLoading] = useState(false);
+  const [isContactModalVisible, setIsContactModalVisible] = useState(false);
+  const [isViewMode, setIsViewMode] = useState(false);
+  const [selectedContact, setSelectedContact] = useState<any>(null);
+  const [contactLoading, setContactLoading] = useState(false);
 
   // Watch for role changes in the form
   const selectedRole = Form.useWatch("role", formFilter);
@@ -177,6 +185,46 @@ const UserManagementPage = () => {
       setLoading(false);
     }
   };
+  /**
+   * Xử lý chuyển từ chế độ xem sang chế độ chỉnh sửa
+   * Logic đơn giản hóa, chỉ đổi trạng thái
+   */
+  const handleSwitchToEditMode = () => {
+    setIsViewMode(false);
+  };
+
+  /**
+   * Xử lý hiển thị modal thông tin hợp đồng
+   * @param record Thông tin người dùng
+   */
+  const handleContact = async (record: UserInfor) => {
+    try {
+      setContactLoading(true);
+      setSelectedContact(null); // Reset dữ liệu hợp đồng cũ
+      setIsContactModalVisible(true); // Hiển thị modal trước để người dùng thấy loading
+
+      // Lấy thông tin hợp đồng từ API
+      const contact = await QuanLyHopDongServices.getContractsByUserCode(
+        record.code
+      );
+
+      // Kiểm tra nếu có dữ liệu hợp đồng, hiển thị dạng xem
+      // Ngược lại, hiển thị form thêm mới
+      if (contact.id) {
+        setSelectedContact(contact);
+        setIsViewMode(true);
+      } else {
+        setIsViewMode(false);
+      }
+    } catch (error) {
+      console.error("Error fetching contact information:", error);
+      toast.error("Lỗi khi tải thông tin hợp đồng!");
+      setIsContactModalVisible(false);
+    } finally {
+      setContactLoading(false);
+    }
+  };
+
   const columns = useMemo(
     () => [
       {
@@ -203,14 +251,28 @@ const UserManagementPage = () => {
         width: 150,
       },
       {
-        title: "Chi nhánh",
-        dataIndex: "branchCode",
-        key: "branchCode",
+        title: "Hợp đồng",
+        dataIndex: "contact",
+        key: "contact",
         width: 150,
-        render: (branchCode: string) => {
-          const branch = brands.find((item) => item.value === branchCode);
-          return <span>{branch ? branch.label : branchCode}</span>;
-        },
+        render: (__: any, record: any) => (
+          <Tooltip title="Xem thông tin hợp đồng">
+            <Button
+              type="link"
+              icon={<EyeFilled />}
+              onClick={() => handleContact(record)}
+            >
+              Xem
+            </Button>
+          </Tooltip>
+        ),
+      },
+
+      {
+        title: "Chi nhánh",
+        dataIndex: "branchName",
+        key: "branchName",
+        width: 150,
       },
       {
         title: "Chức vụ",
@@ -279,13 +341,6 @@ const UserManagementPage = () => {
           return <span>{dayjs(text).format("DD/MM/YYYY")}</span>;
         },
       },
-      {
-        title: "Hợp đồng",
-        dataIndex: "contact",
-        key: "contact",
-        width: 150,
-      },
-
       {
         title: "Trạng thái",
         dataIndex: "isActive",
@@ -519,6 +574,11 @@ const UserManagementPage = () => {
   const resetFilters = () => {
     form.resetFields();
   };
+  const handleCloseContactModal = () => {
+    setIsContactModalVisible(false);
+    setSelectedContact(null);
+  };
+
   return (
     <>
       {" "}
@@ -656,6 +716,24 @@ const UserManagementPage = () => {
         brands={brands}
         positions={positions}
         handleUploadChange={handleUploadChange}
+      />
+      {/* UserContactForm với các prop đã tối ưu */}
+      <UserContactForm
+        isViewMode={isViewMode}
+        isVisible={isContactModalVisible}
+        onCancel={handleCloseContactModal}
+        loading={contactLoading}
+        contactData={selectedContact}
+        positions={positions}
+        branches={brands}
+        managers={[]} // Cần bổ sung dữ liệu managers nếu có
+        form={formValues}
+        onSwitchToEditMode={handleSwitchToEditMode}
+        handleSubmit={() => {
+          toast.success("Cập nhật hợp đồng thành công!");
+          handleCloseContactModal();
+          // Có thể reload dữ liệu nếu cần
+        }}
       />
     </>
   );

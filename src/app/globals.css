@@ -35,10 +35,6 @@ html.dark {
   --border-color: #434343;
 }
 
-html {
-  overflow: hidden;
-}
-
 * {
   margin: 0;
   padding: 0;

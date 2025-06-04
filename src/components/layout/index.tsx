@@ -11,13 +11,9 @@ const { Content } = Layout;
 
 interface MainLayoutProps {
   children: React.ReactNode;
-  showFooter?: boolean;
 }
 
-const MainLayout: React.FC<MainLayoutProps> = ({
-  children,
-  showFooter = true,
-}) => {
+const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   useEffect(() => {
     initializeTheme();
   }, []);
@@ -26,7 +22,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
     <Layout className="main-layout">
       <HeaderComponent />
       <Content className="main-content">{children}</Content>
-      {showFooter && <FooterComponent />}
+      <FooterComponent />
     </Layout>
   );
 };
