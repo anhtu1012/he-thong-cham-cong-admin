@@ -13,23 +13,23 @@ html.dark {
   color-scheme: dark;
 }
 
-// Layout styles
-.main-layout {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto; /* Thêm overflow để cho phép scroll */
-}
+// // Layout styles
+// .main-layout {
+//   min-height: 100vh;
+//   display: flex;
+//   flex-direction: column;
+//   overflow-y: auto; /* Thêm overflow để cho phép scroll */
+// }
 
-.main-content {
-  flex: 1;
-  padding: 24px;
-  overflow-y: auto; /* Thêm overflow để cho phép scroll */
+// .main-content {
+//   flex: 1;
+//   padding: 24px;
+//   overflow-y: auto; /* Thêm overflow để cho phép scroll */
 
-  @media (max-width: vars.$screen-md) {
-    padding: 16px;
-  }
-}
+//   @media (max-width: vars.$screen-md) {
+//     padding: 16px;
+//   }
+// }
 
 // Header styles
 .site-header {

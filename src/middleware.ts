@@ -4,7 +4,7 @@ export function middleware(req: NextRequest) {
   const token = req.cookies.get("token")?.value;
 
   if (!token) {
-    return NextResponse.redirect(new URL("/login", req.url));
+    return NextResponse.redirect(new URL("/", req.url));
   }
   // decode token, nếu lỗi thì đưa về login
   try {
@@ -14,11 +14,11 @@ export function middleware(req: NextRequest) {
     const currentTime = Math.floor(Date.now() / 1000);
     if (!payload.exp || payload.exp < currentTime) {
       console.log("Token expired. Redirecting to login.");
-      return NextResponse.redirect(new URL("/login", req.url));
+      return NextResponse.redirect(new URL("/", req.url));
     }
   } catch (error) {
     console.log("Middleware Token Error:" + error);
-    return NextResponse.redirect(new URL("/login", req.url));
+    return NextResponse.redirect(new URL("/", req.url));
   }
 
   return NextResponse.next();

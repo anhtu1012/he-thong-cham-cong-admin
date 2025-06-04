@@ -259,7 +259,10 @@ export default function Page() {
             <Title level={3} className="app-title">
               Tải ứng dụng của chúng tôi
             </Title>
-            <Paragraph className="app-description" style={{ textAlign: 'left', width: '100%', maxWidth: '445px' }}>
+            <Paragraph
+              className="app-description"
+              style={{ textAlign: "left", width: "100%", maxWidth: "445px" }}
+            >
               Chấm công dễ dàng từ điện thoại của bạn với ứng dụng di động tiện
               lợi. Nhận diện khuôn mặt, GPS, và nhiều tính năng khác ngay trong
               tầm tay bạn.

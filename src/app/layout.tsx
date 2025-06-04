@@ -1,13 +1,12 @@
+import "@/app/globals.css";
+import { AntdRegistry } from "@ant-design/nextjs-registry";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { ThemeProvider } from "next-themes";
-import "@/app/globals.css";
-import { AntdRegistry } from "@ant-design/nextjs-registry";
-import { ReduxProvider } from "./StoreProvider";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AntdThemeProvider from "./AntdThemeProvider";
-import MainLayout from "@/components/layout";
+import { ReduxProvider } from "./StoreProvider";
 // import BubbleCursor from "@/components/BubbleCursor";
 
 export default async function RootLayout({
@@ -29,9 +28,7 @@ export default async function RootLayout({
           <ThemeProvider>
             <ReduxProvider>
               <AntdThemeProvider>
-                <AntdRegistry>
-                  <MainLayout>{children}</MainLayout>
-                </AntdRegistry>
+                <AntdRegistry>{children}</AntdRegistry>
               </AntdThemeProvider>
               <ToastContainer />
             </ReduxProvider>
