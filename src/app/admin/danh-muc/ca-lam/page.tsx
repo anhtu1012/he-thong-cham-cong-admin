@@ -314,7 +314,7 @@ const DanhMucCaLamManagementPage = () => {
         />
       ),
     }),
-    [t]
+    [showModal, handleDelete]
   );
 
   const handlePageChange = (page: number, size: number) => {
