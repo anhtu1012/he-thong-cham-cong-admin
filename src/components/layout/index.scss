@@ -9,4 +9,251 @@ $background-white: #ffffff;
 $accent-color: #ff9900;
 
 html.dark {
+  // Dark mode styles here
+  color-scheme: dark;
+}
+
+// Layout styles
+.main-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto; /* Thêm overflow để cho phép scroll */
+}
+
+.main-content {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto; /* Thêm overflow để cho phép scroll */
+
+  @media (max-width: vars.$screen-md) {
+    padding: 16px;
+  }
+}
+
+// Header styles
+.site-header {
+  background-color: #f0f2f5;
+  padding: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  z-index: 100;
+  transition: all 0.3s ease;
+
+  &.sticky {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    animation: slideDown 0.5s;
+  }
+
+  @keyframes slideDown {
+    from {
+      transform: translateY(-100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  .header-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 64px;
+    padding: 0;
+  }
+
+  .logo-container {
+    display: flex;
+    align-items: center;
+
+    .logo {
+      display: flex;
+      align-items: center;
+      color: vars.$primary-color;
+      font-size: 20px;
+      font-weight: bold;
+      text-decoration: none;
+
+      img {
+        height: 36px;
+      }
+
+      .logo-text {
+        margin-left: 8px;
+      }
+    }
+  }
+
+  .desktop-menu {
+    display: flex;
+    align-items: center;
+
+    @media (max-width: vars.$screen-md) {
+      display: none;
+    }
+
+    .nav-link,
+    .nav-dropdown-link {
+      margin: 0 16px;
+      color: vars.$text-color;
+      font-size: 16px;
+      cursor: pointer;
+
+      &:hover {
+        color: vars.$primary-color;
+      }
+    }
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+
+    .language-button {
+      margin-right: 8px;
+      color: vars.$text-color;
+
+      &:hover {
+        color: vars.$primary-color;
+      }
+    }
+
+    .login-button {
+      margin-right: 8px;
+      color: vars.$text-color;
+
+      &:hover {
+        color: vars.$primary-color;
+      }
+    }
+
+    .mobile-menu-button {
+      display: none;
+
+      @media (max-width: vars.$screen-md) {
+        display: block;
+      }
+    }
+  }
+
+  .mobile-menu {
+    display: none;
+
+    @media (max-width: vars.$screen-md) {
+      display: block;
+      background-color: #f0f2f5;
+      border-top: 1px solid #e8e8e8;
+    }
+  }
+}
+
+// Footer styles
+.site-footer {
+  background-color: #2c3e50;
+  padding: 60px 0 20px;
+  color: #f5f5f5;
+
+  .footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .footer-links {
+    margin-bottom: 40px;
+
+    h4 {
+      color: #ffffff;
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+
+    .footer-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+
+      li {
+        margin-bottom: 12px;
+
+        a {
+          color: #cccccc;
+          text-decoration: none;
+          transition: color 0.3s;
+
+          &:hover {
+            color: #ffffff;
+          }
+        }
+      }
+    }
+  }
+
+  .footer-bottom {
+    padding-top: 20px;
+
+    .maximize-text {
+      display: block;
+      font-size: 16px;
+      margin-bottom: 20px;
+      text-align: center;
+      color: #ffffff;
+    }
+
+    .social-links {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+
+      .social-link {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 40px;
+        height: 40px;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        margin: 0 8px;
+        color: #ffffff;
+        transition: all 0.3s;
+
+        &:hover {
+          background-color: vars.$primary-color;
+          transform: translateY(-3px);
+        }
+      }
+    }
+
+    .footer-bottom-divider {
+      background-color: rgba(255, 255, 255, 0.1);
+      margin: 20px 0;
+    }
+
+    .copyright-row {
+      .copyright-text {
+        color: #aaaaaa;
+      }
+
+      .language-button {
+        color: #cccccc;
+
+        &:hover {
+          color: #ffffff;
+        }
+      }
+
+      .legal-link {
+        color: #cccccc;
+        margin-left: 16px;
+
+        &:hover {
+          color: #ffffff;
+        }
+      }
+    }
+  }
 }
