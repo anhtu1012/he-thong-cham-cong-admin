@@ -1,16 +1,7 @@
 "use client";
 
-import React from "react";
-import {
-  Button,
-  Typography,
-  Row,
-  Col,
-  Card,
-  Collapse,
-  Divider,
-  Image,
-} from "antd";
+import React, { useEffect } from "react";
+import { Typography, Row, Col, Card, Collapse, Image } from "antd";
 import {
   CheckCircleOutlined,
   FileTextOutlined,
@@ -19,6 +10,8 @@ import {
 } from "@ant-design/icons";
 import Link from "next/link";
 import "./index.scss";
+import AOS from "aos";
+import "aos/dist/aos.css";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -74,33 +67,6 @@ const features = [
   },
 ];
 
-const testimonials = [
-  {
-    quote:
-      "Thật sự tuyệt vời. Rất dễ sử dụng. Chế độ ngoại tuyến rất hữu ích. Giải quyết mọi vấn đề với máy chấm công sinh trắc học.",
-    author: "Nguyễn Văn A",
-    position: "Giám đốc, Tổ chức Xã hội",
-  },
-  {
-    quote:
-      "Rất hài lòng với hệ thống. Dễ dàng điều hướng và hỗ trợ khách hàng xuất sắc. Dễ dàng check-in và check-out. Báo cáo rất dễ yêu cầu và tùy chỉnh.",
-    author: "Trần Thị B",
-    position: "PR Manager",
-  },
-  {
-    quote:
-      "Phần mềm nhận diện khuôn mặt thực sự tốt và rất dễ sử dụng. Giao diện thân thiện, tốc độ nhanh và độ chính xác cao. 10/10.",
-    author: "Lê Văn C",
-    position: "Giám đốc, Nội thất",
-  },
-  {
-    quote:
-      "Hệ thống chấm công khuôn mặt tốt nhất. Báo cáo đến tài khoản outlook tất cả các trường hợp không khớp và có tùy chọn xem hình ảnh với vị trí địa lý chính xác.",
-    author: "Phạm Văn D",
-    position: "Giáo sư, Quản lý Giáo dục",
-  },
-];
-
 const faqs = [
   {
     question: "Hệ thống chấm công nhận diện khuôn mặt là gì?",
@@ -148,121 +114,24 @@ const benefits = [
 ];
 
 export default function Page() {
+  useEffect(() => {
+    AOS.init({
+      duration: 800,
+      once: false,
+      mirror: true,
+    });
+  }, []);
+
   return (
     <div className="home-page">
-      {/* Hero Section */}
+      {/* Hero Section with Mobile App Introduction */}
       <section className="hero-section full-height">
         <div className="hero-content-wrapper">
-          <div className="hero-content">
+          <div className="hero-content" data-aos="fade-right">
             <Title level={1}>
-              Hệ Thống Chấm Công Nhận Diện Khuôn Mặt MIỄN PHÍ 100%
+              Ứng dụng di động - Chấm công mọi lúc mọi nơi
             </Title>
             <Paragraph className="hero-description">
-              Chuyển đổi quản lý chấm công bằng cách tích hợp nhận diện khuôn
-              mặt tiên tiến với camera cho việc điểm danh nhân viên hiệu quả và
-              không tiếp xúc. Miễn phí cho người dùng không giới hạn!
-            </Paragraph>
-            <Link href="/register">
-              <Button type="primary" size="large" className="hero-button">
-                BẮT ĐẦU NGAY - HOÀN TOÀN MIỄN PHÍ
-              </Button>
-            </Link>
-          </div>
-
-          <div className="hero-image-container">
-            <div className="hero-image-placeholder">
-              <Image
-                src="/assets/image/homeimage/3Facial-recognition (1).png"
-                alt="Chấm công trên điện thoại"
-                width="100%"
-                height="auto"
-                preview={false}
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="benefits-container">
-          <Title level={2} className="section-title">
-            Lợi ích của hệ thống chấm công nhận diện khuôn mặt
-          </Title>
-
-          <Row gutter={[24, 24]} className="benefits-row">
-            {benefits.map((benefit, index) => (
-              <Col xs={24} sm={12} md={6} key={index}>
-                <Card className="benefit-card">
-                  <Title level={3} className="benefit-title">
-                    {benefit.title}
-                  </Title>
-                  <Text className="benefit-description">
-                    {benefit.description}
-                  </Text>
-                </Card>
-              </Col>
-            ))}
-          </Row>
-        </div>
-
-        <div className="hero-scroll-down">
-          <div className="scroll-arrow"></div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="features-section">
-        <Title level={2} className="section-title">
-          Chấm công thông minh hơn, nhanh hơn với nhận diện khuôn mặt - hãy thử
-          ngay!
-        </Title>
-
-        {features.map((feature, index) => (
-          <Row
-            key={index}
-            className={`feature-row ${index % 2 === 1 ? "reverse" : ""}`}
-            gutter={[48, 0]}
-            align="middle"
-          >
-            <Col xs={24} md={12} className="feature-image-col">
-              <div className="feature-image-placeholder">
-                <Image
-                  src={feature.image}
-                  alt={feature.title}
-                  width="100%"
-                  height="auto"
-                  preview={false}
-                />
-              </div>
-            </Col>
-            <Col xs={24} md={12} className="feature-content-col">
-              <Title level={3} className="feature-title">
-                {feature.title}
-              </Title>
-              <Title level={4} className="feature-subtitle">
-                {feature.subtitle}
-              </Title>
-              <Paragraph className="feature-description">
-                {feature.description}
-              </Paragraph>
-            </Col>
-          </Row>
-        ))}
-      </section>
-
-      {/* Mobile App Section */}
-      <section className="mobile-app-section">
-        <Title level={2} className="section-title">
-          Ứng dụng di động - Chấm công mọi lúc mọi nơi
-        </Title>
-
-        <Row gutter={[48, 0]} align="middle">
-          <Col xs={24} md={12} className="app-content-col">
-            <Title level={3} className="app-title">
-              Tải ứng dụng của chúng tôi
-            </Title>
-            <Paragraph
-              className="app-description"
-              style={{ textAlign: "left", width: "100%", maxWidth: "445px" }}
-            >
               Chấm công dễ dàng từ điện thoại của bạn với ứng dụng di động tiện
               lợi. Nhận diện khuôn mặt, GPS, và nhiều tính năng khác ngay trong
               tầm tay bạn.
@@ -274,6 +143,8 @@ export default function Page() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="store-button"
+                data-aos="zoom-in"
+                data-aos-delay="200"
               >
                 <Image
                   src="/assets/image/homeimage/English-10.png.webp"
@@ -290,6 +161,8 @@ export default function Page() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="store-button"
+                data-aos="zoom-in"
+                data-aos-delay="300"
               >
                 <Image
                   src="/assets/image/homeimage/English-9.png.webp"
@@ -301,10 +174,10 @@ export default function Page() {
                 />
               </Link>
             </div>
-          </Col>
+          </div>
 
-          <Col xs={24} md={12} className="app-image-col">
-            <div className="app-image-placeholder">
+          <div className="hero-image-container" data-aos="fade-left">
+            <div className="hero-image-placeholder">
               <Image
                 src="/assets/image/homeimage/GPSFR-New-York-833x1024-1.png"
                 alt="Mobile App"
@@ -313,46 +186,109 @@ export default function Page() {
                 preview={false}
               />
             </div>
-          </Col>
-        </Row>
+          </div>
+        </div>
+
+        <div className="benefits-container">
+          <Title level={2} className="section-title" data-aos="fade-up">
+            Lợi ích của hệ thống chấm công nhận diện khuôn mặt
+          </Title>
+
+          <Row gutter={[24, 24]} className="benefits-row">
+            {benefits.map((benefit, index) => (
+              <Col
+                xs={24}
+                sm={12}
+                md={6}
+                key={index}
+                data-aos="fade-up"
+                data-aos-delay={index * 100}
+              >
+                <Card className="benefit-card">
+                  <Title level={3} className="benefit-title">
+                    {benefit.title}
+                  </Title>
+                  <Text className="benefit-description">
+                    {benefit.description}
+                  </Text>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+        </div>
+
+        <div
+          className="hero-scroll-down"
+          data-aos="fade-up"
+          data-aos-delay="800"
+        >
+          <div className="scroll-arrow"></div>
+        </div>
       </section>
 
-      {/* Testimonials Section */}
-      <section className="testimonials-section">
-        <Title level={2} className="section-title">
-          Vô số người dùng yêu thích hệ thống chấm công nhận diện khuôn mặt của
-          chúng tôi
+      {/* Features Section */}
+      <section className="features-section">
+        <Title level={2} className="section-title" data-aos="fade-up">
+          Chấm công thông minh hơn, nhanh hơn với nhận diện khuôn mặt - hãy thử
+          ngay!
         </Title>
 
-        <Row gutter={[24, 24]} className="testimonials-container">
-          {testimonials.map((testimonial, index) => (
-            <Col xs={24} sm={12} md={12} lg={6} key={index}>
-              <Card className="testimonial-card">
-                <Title level={3} className="testimonial-title">
-                  &ldquo;{testimonial.quote}&rdquo;
-                </Title>
-                <Divider className="testimonial-divider" />
-                <Text strong className="testimonial-author">
-                  {testimonial.author}
-                </Text>
-                <Text className="testimonial-position">
-                  {testimonial.position}
-                </Text>
-              </Card>
+        {features.map((feature, index) => (
+          <Row
+            key={index}
+            className={`feature-row ${index % 2 === 1 ? "reverse" : ""}`}
+            gutter={[48, 0]}
+            align="middle"
+          >
+            <Col
+              xs={24}
+              md={12}
+              className="feature-image-col"
+              data-aos={index % 2 === 0 ? "fade-right" : "fade-left"}
+            >
+              <div className="feature-image-placeholder">
+                <Image
+                  src={feature.image}
+                  alt={feature.title}
+                  width="100%"
+                  height="auto"
+                  preview={false}
+                />
+              </div>
             </Col>
-          ))}
-        </Row>
+            <Col
+              xs={24}
+              md={12}
+              className="feature-content-col"
+              data-aos={index % 2 === 0 ? "fade-left" : "fade-right"}
+            >
+              <Title level={3} className="feature-title">
+                {feature.title}
+              </Title>
+              <Title level={4} className="feature-subtitle">
+                {feature.subtitle}
+              </Title>
+              <Paragraph className="feature-description">
+                {feature.description}
+              </Paragraph>
+            </Col>
+          </Row>
+        ))}
       </section>
 
       {/* FAQ Section */}
       <section className="faq-section">
-        <Title level={2} className="section-title">
+        <Title level={2} className="section-title" data-aos="fade-up">
           Câu hỏi thường gặp
         </Title>
-        <Text className="faq-subtitle">Một số câu hỏi thường được hỏi...</Text>
+        <Text className="faq-subtitle" data-aos="fade-up" data-aos-delay="100">
+          Một số câu hỏi thường được hỏi...
+        </Text>
 
         <Collapse
           className="faq-collapse"
+          data-aos="fade-up"
+          data-aos-delay="200"
           items={faqs.map((faq, index) => ({
             key: index,
             label: faq.question,
