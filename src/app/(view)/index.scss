@@ -1,5 +1,18 @@
 @use "@/styles/variables" as vars;
 
+// AOS animation overrides
+[data-aos] {
+  transition-timing-function: ease-out;
+
+  &[data-aos][data-aos-duration="500"] {
+    transition-duration: 500ms;
+  }
+
+  &[data-aos][data-aos-duration="800"] {
+    transition-duration: 800ms;
+  }
+}
+
 .home-page {
   max-width: 1200px;
   margin: 0 auto;
@@ -9,6 +22,8 @@
   section {
     margin-bottom: 80px;
     width: 100%;
+    // Add perspective for better 3D animations
+    perspective: 1000px;
   }
 
   .section-title {
@@ -55,6 +70,7 @@
       flex-direction: column;
       justify-content: center;
       align-items: flex-start; /* Thay đổi từ center sang flex-start */
+      transition: all 0.3s ease;
 
       @media (max-width: vars.$screen-md) {
         padding-right: 0;
@@ -80,17 +96,26 @@
         width: 100%; /* Đảm bảo chiều rộng tối đa */
       }
 
-      .hero-button {
-        height: 48px;
-        font-size: 16px;
-        padding: 0 32px;
-        background-color: vars.$primary-color;
-        border-color: vars.$primary-color;
-        font-weight: bold;
+      .app-download-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-top: 20px;
 
-        &:hover {
-          background-color: darken(vars.$primary-color, 10%);
-          border-color: darken(vars.$primary-color, 10%);
+        .store-button {
+          text-decoration: none;
+          display: block;
+          transition: all 0.5s ease;
+
+          &:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+          }
+
+          .store-image {
+            border-radius: 8px;
+            object-fit: contain;
+          }
         }
       }
     }
@@ -99,6 +124,7 @@
       flex: 1;
       position: relative;
       z-index: 1;
+      transition: all 0.3s ease;
 
       .hero-image-placeholder {
         background-color: transparent;
@@ -110,6 +136,11 @@
         align-items: center;
         justify-content: center;
         padding: 0;
+        transition: transform 0.5s ease;
+
+        &:hover {
+          transform: scale(1.02);
+        }
 
         img {
           max-width: 100%;
@@ -173,7 +204,7 @@
   .benefit-card {
     height: 100%;
     border-radius: 8px;
-    transition: all 0.3s ease;
+    transition: all 0.5s ease;
 
     &:hover {
       transform: translateY(-5px);
@@ -198,8 +229,6 @@
     padding: 40px 0;
 
     .feature-row {
-      margin-bottom: 80px;
-
       &.reverse {
         flex-direction: row-reverse;
 
@@ -224,6 +253,11 @@
         align-items: center;
         justify-content: center;
         padding: 0;
+        transition: transform 0.5s ease;
+
+        &:hover {
+          transform: scale(1.05);
+        }
 
         img {
           max-width: 100%;
@@ -279,129 +313,6 @@
     }
   }
 
-  // Mobile App Section
-  .mobile-app-section {
-    padding: 40px 0;
-    text-align: left; /* Đảm bảo tất cả nội dung trong section này đều căn lề trái */
-
-    .app-content-col {
-      text-align: left; /* Thêm căn lề trái cho cả container */
-
-      .app-title {
-        font-size: 28px;
-        margin-bottom: 16px;
-        color: vars.$text-color;
-        text-align: left; /* Đảm bảo tiêu đề căn lề trái */
-      }
-
-      .app-description {
-        font-size: 16px;
-        margin-bottom: 32px;
-        color: rgba(vars.$text-color, 0.8);
-        text-align: left; /* Đảm bảo căn lề trái */
-        margin-left: 0; /* Đảm bảo không có margin bên trái */
-        margin-right: 0; /* Đảm bảo không có margin bên phải */
-        width: 100%; /* Sử dụng toàn bộ chiều rộng */
-        max-width: 445px; /* Đặt chiều rộng tối đa 445px giống các phần khác */
-        display: block; /* Đảm bảo hiển thị dưới dạng block */
-      }
-
-      .app-download-buttons {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 20px;
-
-        .store-button {
-          text-decoration: none;
-          display: block;
-          transition: all 0.3s ease;
-
-          &:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-          }
-
-          .store-image {
-            border-radius: 8px;
-            object-fit: contain;
-          }
-        }
-      }
-    }
-
-    .app-image-col {
-      .app-image-placeholder {
-        background-color: #f0f0f0;
-        border-radius: 8px;
-        overflow: hidden;
-        text-align: center;
-        height: auto;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 0;
-
-        img {
-          max-width: 100%;
-          height: auto;
-          display: block;
-          border-radius: 8px;
-        }
-      }
-    }
-  }
-
-  // Testimonials Section
-  .testimonials-section {
-    padding: 40px 0;
-
-    .testimonials-container {
-      .testimonial-card {
-        height: 100%;
-        min-height: 280px; /* Reduced from 320px */
-        display: flex;
-        flex-direction: column;
-        position: relative;
-        padding: 24px; /* Consistent padding */
-
-        .testimonial-title {
-          font-size: 18px;
-          line-height: 1.5;
-          color: vars.$text-color;
-          flex: 1;
-          display: -webkit-box;
-          -webkit-line-clamp: 5;
-          -webkit-box-orient: vertical;
-          line-clamp: 5;
-          overflow: hidden;
-          text-align: left; /* Đảm bảo văn bản căn lề trái */
-          margin-bottom: 16px; /* Consistent spacing */
-        }
-
-        .testimonial-divider {
-          margin: 16px 0; /* Restore original margin */
-        }
-
-        .author-info-container {
-          margin-top: 16px; /* Add spacing between divider and author info */
-        }
-
-        .testimonial-author {
-          display: block;
-          margin-bottom: 4px;
-          font-weight: 600;
-          text-align: left; /* Đảm bảo văn bản căn lề trái */
-        }
-
-        .testimonial-position {
-          color: rgba(vars.$text-color, 0.6);
-          font-size: 14px;
-          text-align: left; /* Đảm bảo văn bản căn lề trái */
-        }
-      }
-    }
-  }
-
   // FAQ Section
   .faq-section {
     padding: 40px 0;
@@ -416,17 +327,29 @@
 
     .faq-collapse {
       background-color: transparent;
+      transition: all 0.5s ease;
 
       .ant-collapse-item {
         margin-bottom: 16px;
         border-radius: 4px;
         overflow: hidden;
         border: 1px solid #f0f0f0;
+        transition: all 0.3s ease;
+
+        &:hover {
+          border-color: rgba(vars.$primary-color, 0.3);
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
 
         .ant-collapse-header {
           font-weight: 600;
           padding: 16px 24px;
           background-color: #f9f9f9;
+          transition: background-color 0.3s ease;
+
+          &:hover {
+            background-color: rgba(vars.$primary-color, 0.05);
+          }
         }
 
         .ant-collapse-content-box {

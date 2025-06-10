@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Layout, Menu, Button, Dropdown, Space } from "antd";
-import { DownOutlined, MenuOutlined } from "@ant-design/icons";
+import { Layout, Menu, Button } from "antd";
+import { MenuOutlined, MoonOutlined, SunOutlined } from "@ant-design/icons";
 import Link from "next/link";
 import "./index.scss";
+import LocaleSwitcher from "../changeLanguage";
 
 const { Header } = Layout;
 
@@ -16,6 +17,7 @@ interface HeaderProps {
 const HeaderComponent: React.FC<HeaderProps> = () => {
   const [mobileMenuVisible, setMobileMenuVisible] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -26,35 +28,28 @@ const HeaderComponent: React.FC<HeaderProps> = () => {
       }
     };
 
+    // Check initial dark mode state
+    const isDark = document.documentElement.classList.contains("dark");
+    setIsDarkMode(isDark);
+
     window.addEventListener("scroll", handleScroll);
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
-  const productItems = [
-    { key: "attendance", label: <Link href="/attendance">Chấm Công</Link> },
-    {
-      key: "time-tracking",
-      label: <Link href="/time-tracking">Theo Dõi Thời Gian</Link>,
-    },
-    {
-      key: "face-recognition",
-      label: <Link href="/face-recognition">Nhận Diện Khuôn Mặt</Link>,
-    },
-    { key: "timesheet", label: <Link href="/timesheet">Bảng Chấm Công</Link> },
-  ];
+  const handleDarkModeToggle = () => {
+    document.documentElement.classList.toggle("dark");
+    setIsDarkMode(!isDarkMode);
+  };
 
-  const solutionsItems = [
-    { key: "education", label: <Link href="/education">Giáo Dục</Link> },
-    { key: "construction", label: <Link href="/construction">Xây Dựng</Link> },
-    { key: "healthcare", label: <Link href="/healthcare">Y Tế</Link> },
-    { key: "enterprise", label: <Link href="/enterprise">Doanh Nghiệp</Link> },
-  ];
-
-  const languageItems = [
-    { key: "vi", label: "Tiếng Việt" },
-    { key: "en", label: "English" },
+  const navItems = [
+    { key: "home", label: "Trang chủ", path: "/" },
+    { key: "about", label: "Giới thiệu", path: "/about" },
+    { key: "solutions", label: "Giải pháp", path: "/solutions" },
+    { key: "pricing", label: "Báo giá", path: "/pricing" },
+    { key: "blog", label: "Blog", path: "/blog" },
+    { key: "contact", label: "Liên hệ", path: "/contact" },
   ];
 
   const toggleMobileMenu = () => {
@@ -66,50 +61,20 @@ const HeaderComponent: React.FC<HeaderProps> = () => {
       <div className="header-container">
         <div className="logo-container">
           <Link href="/" className="logo">
-            <span className="logo-text">HỆ THỐNG CHẤM CÔNG</span>
+            <span className="logo-text">ATTS</span>
           </Link>
         </div>
 
         <div className="desktop-menu">
-          <Dropdown menu={{ items: productItems }} placement="bottomLeft">
-            <span className="nav-dropdown-link">
-              <Space>
-                Sản Phẩm
-                <DownOutlined />
-              </Space>
-            </span>
-          </Dropdown>
-
-          <Dropdown menu={{ items: solutionsItems }} placement="bottomLeft">
-            <span className="nav-dropdown-link">
-              <Space>
-                Giải Pháp
-                <DownOutlined />
-              </Space>
-            </span>
-          </Dropdown>
-
-          <Link href="/integrations" className="nav-link">
-            Tích Hợp
-          </Link>
-
-          <Link href="/resources" className="nav-link">
-            Tài Nguyên
-          </Link>
+          {navItems.map((item) => (
+            <Link href={item.path} className="nav-link" key={item.key}>
+              {item.label}
+            </Link>
+          ))}
         </div>
 
         <div className="header-actions">
-          <Dropdown menu={{ items: languageItems }} placement="bottomRight">
-            <Button type="text" className="language-button">
-              <span>VI | EN</span>
-            </Button>
-          </Dropdown>
-
-          <Link href="/login">
-            <Button type="text" className="login-button">
-              Đăng Nhập
-            </Button>
-          </Link>
+          <LocaleSwitcher />
 
           <Button
             type="text"
@@ -119,30 +84,23 @@ const HeaderComponent: React.FC<HeaderProps> = () => {
             <MenuOutlined />
           </Button>
         </div>
+
+        <Button
+          type="text"
+          className="theme-toggle-button"
+          onClick={handleDarkModeToggle}
+          icon={isDarkMode ? <SunOutlined /> : <MoonOutlined />}
+        />
       </div>
 
       {mobileMenuVisible && (
         <div className="mobile-menu">
           <Menu mode="vertical">
-            <Menu.SubMenu key="product" title="Sản Phẩm">
-              {productItems.map((item) => (
-                <Menu.Item key={item.key}>{item.label}</Menu.Item>
-              ))}
-            </Menu.SubMenu>
-            <Menu.SubMenu key="solutions" title="Giải Pháp">
-              {solutionsItems.map((item) => (
-                <Menu.Item key={item.key}>{item.label}</Menu.Item>
-              ))}
-            </Menu.SubMenu>
-            <Menu.Item key="integrations">
-              <Link href="/integrations">Tích Hợp</Link>
-            </Menu.Item>
-            <Menu.Item key="resources">
-              <Link href="/resources">Tài Nguyên</Link>
-            </Menu.Item>
-            <Menu.Item key="login">
-              <Link href="/login">Đăng Nhập</Link>
-            </Menu.Item>
+            {navItems.map((item) => (
+              <Menu.Item key={item.key}>
+                <Link href={item.path}>{item.label}</Link>
+              </Menu.Item>
+            ))}
           </Menu>
         </div>
       )}
