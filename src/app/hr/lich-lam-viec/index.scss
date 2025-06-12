@@ -1,0 +1,20 @@
+/* Styles for Work Schedule management page */
+
+// Fix for action column
+.ant-table-cell-fix-right {
+  z-index: 2 !important;
+  background-color: #fff !important;
+}
+
+// Add shadow to fixed column for better visual separation
+.ant-table-cell-fix-right::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 10px;
+  pointer-events: none;
+  box-shadow: inset 10px 0 8px -8px rgba(0, 0, 0, 0.15);
+  transform: translateX(-100%);
+} 
