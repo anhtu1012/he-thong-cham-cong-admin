@@ -252,7 +252,6 @@ const DanhMucChucVuManagementPage = () => {
 
         if (error.response && error.response.data) {
           console.log("API error:", error.response.data);
-
           handleFormErrors<UpdatePositionRequest>(form, error.response.data);
         }
       } finally {

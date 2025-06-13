@@ -11,63 +11,13 @@ import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import ChiNhanhForm from "./ChiNhanhForm";
 import { useTranslations } from "next-intl";
-
-// Sample data interface for Branch
-interface ChiNhanhItem {
-  id: string;
-  code: string;
-  branchName: string;
-  addressLine: string;
-  placeId: string;
-  city: string;
-  district: string;
-  lat: number;
-  long: number;
-  companyCode: string;
-}
+import { Branch } from "@/dtos/danhMuc/chi-nhanh/chinhanh.dto";
+import { DanhMucChiNhanhService } from "@/services/admin/danh-muc/chi-nhanh/chi-nhanh.service";
+import { DanhMucBranchResponseGetItem } from "@/dtos/danhMuc/chi-nhanh/chinhanh.response.dto";
+import { CreateBranchRequest } from "@/dtos/danhMuc/chi-nhanh/chinhanh.request.dto";
 
 const DanhMucChiNhanhManagementPage = () => {
   const t = useTranslations("DanhMucChiNhanh");
-
-  // Sample data - moved up before state declarations
-  const sampleData: ChiNhanhItem[] = [
-    {
-      id: "1",
-      code: "CN001",
-      branchName: "Chi nhánh Hà Nội",
-      addressLine: "123 Đường Láng",
-      placeId: "PL123456",
-      city: "Hà Nội",
-      district: "Đống Đa",
-      lat: 21.0285,
-      long: 105.8542,
-      companyCode: "COMP001",
-    },
-    {
-      id: "2",
-      code: "CN002",
-      branchName: "Chi nhánh TP.HCM",
-      addressLine: "456 Nguyễn Huệ",
-      placeId: "PL789456",
-      city: "TP.Hồ Chí Minh",
-      district: "Quận 1",
-      lat: 10.7769,
-      long: 106.7009,
-      companyCode: "COMP001",
-    },
-    {
-      id: "3",
-      code: "CN003",
-      branchName: "Chi nhánh Đà Nẵng",
-      addressLine: "789 Hàn Thuyên",
-      placeId: "PL321654",
-      city: "Đà Nẵng",
-      district: "Hải Châu",
-      lat: 16.0471,
-      long: 108.2068,
-      companyCode: "COMP001",
-    },
-  ];
 
   const [quickSearch, setQuickSearch] = useState<string>("");
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -76,7 +26,7 @@ const DanhMucChiNhanhManagementPage = () => {
   const [form] = Form.useForm<any>();
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
-  const [tableData, setTableData] = useState<ChiNhanhItem[]>(sampleData);
+  const [tableData, setTableData] = useState<Branch[]>();
   const [totalItems, setTotalItems] = useState<number>(0);
   const [loading, setLoading] = useState(false);
   const [editLoading, setEditLoading] = useState(false);
@@ -88,34 +38,29 @@ const DanhMucChiNhanhManagementPage = () => {
   ) => {
     setLoading(true);
     try {
-      // Simulate API call with setTimeout
-      setTimeout(() => {
-        let filteredData = [...sampleData];
+      const searchOwnweFilter: any = [
+        { key: "limit", type: "=", value: limit },
+        { key: "offset", type: "=", value: (page - 1) * limit },
+      ];
 
-        // Apply quick search filter if provided
-        if (quickkSearch && quickkSearch.trim() !== "") {
-          const searchTerm = quickkSearch.toLowerCase();
-          filteredData = filteredData.filter(
-            (item) =>
-              item.code.toLowerCase().includes(searchTerm) ||
-              item.branchName.toLowerCase().includes(searchTerm) ||
-              item.addressLine.toLowerCase().includes(searchTerm) ||
-              item.city.toLowerCase().includes(searchTerm) ||
-              item.district.toLowerCase().includes(searchTerm)
-          );
-        }
+      const result: any = await DanhMucChiNhanhService.getBranchs(
+        searchOwnweFilter,
+        {
+          quickSearch: quickkSearch,
+        },
+      );
 
-        // Calculate pagination
-        const startIndex = (page - 1) * limit;
-        const endIndex = startIndex + limit;
-        const paginatedData = filteredData.slice(startIndex, endIndex);
-
-        setTableData(paginatedData);
-        setTotalItems(filteredData.length);
-        setLoading(false);
-      }, 500); // Simulate network delay
+      if (result.data) {
+        setTableData(result.data);
+        setTotalItems(result.count || 0);
+      } else {
+        toast.error(result.message || "Tải dữ liệu thất bại!");
+      }
+      if (result && result.data) {
+      }
     } catch (error) {
       console.error("Error fetching data:", error);
+    } finally {
       setLoading(false);
     }
   };
@@ -124,23 +69,39 @@ const DanhMucChiNhanhManagementPage = () => {
     getData(currentPage, pageSize, quickSearch);
   }, []); // Reload data when page or size changes
 
-  const handleBeforeExport = async (): Promise<ChiNhanhItem[]> => {
+  const handleBeforeExport = async (): Promise<
+    DanhMucBranchResponseGetItem[]
+  > => {
     setLoading(true);
     try {
+      const searchOwnweFilterExport: any = [
+        {
+          key: "limit",
+          type: "=",
+          value: process.env.NEXT_PUBLIC_LIMIT_QUERY_EXPORT,
+        },
+        { key: "offset", type: "=", value: 0 },
+      ];
       toast.info("Đang chuẩn bị dữ liệu xuất Excel...");
+      const resultExport: any = await DanhMucChiNhanhService.getBranchs(
+        searchOwnweFilterExport,
+        {
+          ...(quickSearch ? { quickSearch: quickSearch } : {}),
+        }
+      );
 
-      // Simulate API call for export
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          setLoading(false);
-          resolve(sampleData);
-        }, 500);
-      });
+      if (resultExport.data) {
+        return resultExport.data;
+      } else {
+        toast.error("Không thể tải dữ liệu để xuất Excel!");
+        return [];
+      }
     } catch (error) {
       console.error("Error fetching export data:", error);
       toast.error("Lỗi khi tải dữ liệu để xuất Excel!");
-      setLoading(false);
       return [];
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -207,7 +168,7 @@ const DanhMucChiNhanhManagementPage = () => {
   );
 
   const showModal = async (
-    chiNhanh: any = null,
+    chiNhanh: Branch | null = null,
     action: "add" | "update" = "update"
   ) => {
     // First, reset the form before opening the modal
@@ -238,6 +199,7 @@ const DanhMucChiNhanhManagementPage = () => {
 
   const handleCancel = () => {
     setIsModalVisible(false);
+    setEditingDanhMucChiNhanh(null);
     form.resetFields();
   };
 
@@ -247,6 +209,7 @@ const DanhMucChiNhanhManagementPage = () => {
       try {
         // Validate form fields
         const values = await form.validateFields();
+
         const changedValues = getChangedValues(values, editingDanhMucChiNhanh);
 
         // Check if there are any changes
@@ -257,66 +220,54 @@ const DanhMucChiNhanhManagementPage = () => {
           return;
         }
 
-        // Simulate API update
-        setTimeout(() => {
-          // Update the item in the sample data
-          const updatedData = tableData.map((item) =>
-            item.id === editingDanhMucChiNhanh.id
-              ? { ...item, ...values }
-              : item
-          );
-
-          setTableData(updatedData);
+        const result: any = await DanhMucChiNhanhService.updateBranch(
+          editingDanhMucChiNhanh.id,
+          values
+        );
+        if (result) {
           toast.success("Cập nhật thành công!");
-          setIsModalVisible(false);
-          setEditLoading(false);
-        }, 500);
+          getData(currentPage, pageSize, quickSearch); // Refresh data after updating
+          setIsModalVisible(false); // Close the modal upon success
+        } else {
+          toast.error(result.message || "Cập nhật thất bại!");
+        }
       } catch (error: any) {
-        handleFormErrors(form, error);
+        handleFormErrors<CreateBranchRequest>(form, error);
+        if (
+          error.response &&
+          error.response.data &&
+          error.response.data.message
+        ) {
+          toast.error(error.response.data.message);
+        }
+      } finally {
         setEditLoading(false);
       }
     } else {
-      // Handle add new chi nhanh
-      setEditLoading(true);
       try {
-        // Validate form fields
         const values = await form.validateFields();
-
-        // Simulate API create
-        setTimeout(() => {
-          // Create a new item with a unique ID
-          const newItem: ChiNhanhItem = {
-            id: `${Date.now()}`, // Generate a unique ID
-            ...values,
-          };
-
-          // Add to the sample data
-          const updatedData = [...tableData, newItem];
-          setTableData(updatedData);
-          setTotalItems((prev) => prev + 1);
-
+        console.log({ values });
+        const result = await DanhMucChiNhanhService.createBranch(values);
+        console.log({ result });
+        if (result) {
           toast.success("Thêm mới thành công!");
+          getData(currentPage, pageSize, quickSearch); // Refresh data after adding
           setIsModalVisible(false);
           form.resetFields();
-          setEditLoading(false);
-        }, 500);
+        } else {
+          toast.error(result.message || "Thêm mới thất bại!");
+        }
       } catch (error: any) {
-        console.log("Form validation error:", error);
-        handleFormErrors(form, error);
-        setEditLoading(false);
+        toast.error("Form validation error:", error);
       }
     }
   };
 
   const handleDelete = async (record: any) => {
     try {
-      // Simulate API delete
-      setTimeout(() => {
-        const updatedData = tableData.filter((item) => item.id !== record.id);
-        setTableData(updatedData);
-        setTotalItems((prev) => prev - 1);
-        toast.success("Xóa thành công!");
-      }, 500);
+      await DanhMucChiNhanhService.deleteBranch(record.id);
+      toast.success("Xóa thành công!");
+      getData(currentPage, pageSize, quickSearch);
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -385,23 +336,25 @@ const DanhMucChiNhanhManagementPage = () => {
           </div>
         </div>
 
-        <Ctable
-          loading={loading}
-          columns={columns}
-          dataSource={tableData}
-          rowKey="id"
-          usePagination
-          totalItems={totalItems}
-          onPageChange={handlePageChange}
-          enableDrag={true}
-          pageSize={10}
-          rowHeight={15}
-          showActions
-          actionColumn={actionColumn}
-          stickyHeader
-          tableId="admin_danh_muc_chi_nhanh_v2"
-          onBeforeExport={handleBeforeExport}
-        />
+        {tableData && (
+          <Ctable
+            loading={loading}
+            columns={columns}
+            dataSource={tableData}
+            rowKey="id"
+            usePagination
+            totalItems={totalItems}
+            onPageChange={handlePageChange}
+            enableDrag={true}
+            pageSize={pageSize}
+            rowHeight={15}
+            showActions
+            actionColumn={actionColumn}
+            onBeforeExport={handleBeforeExport}
+            stickyHeader
+            tableId="admin_danh_muc_chi_nhanh_v2"
+          />
+        )}
       </div>
       <ChiNhanhForm
         form={form}

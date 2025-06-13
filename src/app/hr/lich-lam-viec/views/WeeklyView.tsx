@@ -100,16 +100,16 @@ const WeeklyView: React.FC<WeeklyViewProps> = ({
           <tbody>
             {employeesWithSchedules
               .filter(
-                (emp) =>
+                (emp: any) =>
                   selectedEmployees.length === 0 ||
                   selectedEmployees.includes(emp.id)
               )
               .filter(
-                (emp) =>
+                (emp: any) =>
                   selectedDepartment === "all" ||
                   emp.department === selectedDepartment
               )
-              .map((employee) => (
+              .map((employee: any) => (
                 <tr key={employee.id}>
                   <td className="employee-name">
                     <div className="employee-cell">

@@ -35,7 +35,6 @@ dayjs.extend(isBetween);
 const { RangePicker } = DatePicker;
 const { Title, Text } = Typography;
 
-// Mock data for demonstration
 const mockData = [
   {
     key: "1",
@@ -81,12 +80,9 @@ function DuyetNghiPhep() {
   const [status, setStatus] = useState<string | undefined>(undefined);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-
+  const [totalItems] = useState(mockData.length);
   console.log(currentPage, pageSize);
   
-  const [totalItems] = useState(mockData.length);
-
-
   const [viewModalOpen, setViewModalOpen] = useState<boolean>(false);
   const [selectedRecord, setSelectedRecord] = useState<any>(null);
   const [approveModalOpen, setApproveModalOpen] = useState<boolean>(false);

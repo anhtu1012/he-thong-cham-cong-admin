@@ -92,7 +92,7 @@ const UserForm: React.FC<UserFormProps> = ({
   const loadManagers = async (branch: string, role: string) => {
     setLoadingManagers(true);
     try {
-      const managersData = await SelectServices.getSelectManagers(branch, role);
+      const managersData = await SelectServices.getSelectManagers([branch], role);
       if (managersData) {
         setManagers(managersData);
       } else {
