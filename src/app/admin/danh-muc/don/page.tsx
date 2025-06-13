@@ -7,36 +7,13 @@ import Ctable from "@/components/basicUI/Ctable";
 import { RoleAdmin } from "@/model/enum";
 import { getChangedValues } from "@/utils/client/compareHelpers";
 import { handleFormErrors } from "@/utils/client/formHelpers";
-import { Form } from "antd";
+import { Form, Tag } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import DonForm from "./DonForm";
 import { useTranslations } from "next-intl";
-
-// Sample data interface for Don
-interface DonItem {
-  id: string;
-  code: string;
-  title: string;
-  description: string | null;
-  rolePermission: string;
-}
-
-// Map rolePermission values to display labels
-const getRolePermissionLabel = (roleCode: string): string => {
-  switch (roleCode) {
-    case RoleAdmin.ADMIN:
-      return "Admin";
-    case RoleAdmin.HR:
-      return "HR";
-    case RoleAdmin.MANAGER:
-      return "Manager";
-    case RoleAdmin.STAFF:
-      return "Staff";
-    default:
-      return roleCode;
-  }
-};
+import DanhMucDonServices from "@/services/admin/danh-muc/don/don.service";
+import { FormItem } from "@/dtos/danhMuc/don/don.dto";
 
 const DanhMucDonManagementPage = () => {
   const t = useTranslations("DanhMucDon");
@@ -46,35 +23,10 @@ const DanhMucDonManagementPage = () => {
   const [form] = Form.useForm<any>();
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
-  const [tableData, setTableData] = useState<DonItem[]>([]);
+  const [tableData, setTableData] = useState<FormItem[]>([]);
   const [totalItems, setTotalItems] = useState<number>(0);
   const [loading, setLoading] = useState(false);
   const [editLoading, setEditLoading] = useState(false);
-
-  // Sample data
-  const sampleData: DonItem[] = [
-    {
-      id: "1",
-      code: "DON001",
-      title: "Đơn xin nghỉ phép",
-      description: "Đơn xin nghỉ phép có lương",
-      rolePermission: RoleAdmin.MANAGER,
-    },
-    {
-      id: "2",
-      code: "DON002",
-      title: "Đơn xin tăng ca",
-      description: "Đơn xin làm thêm giờ",
-      rolePermission: RoleAdmin.HR,
-    },
-    {
-      id: "3",
-      code: "DON003",
-      title: "Đơn xin nghỉ không lương",
-      description: "Đơn xin nghỉ không lương",
-      rolePermission: RoleAdmin.ADMIN,
-    },
-  ];
 
   const getData = async (
     page = currentPage,
@@ -83,53 +35,43 @@ const DanhMucDonManagementPage = () => {
   ) => {
     setLoading(true);
     try {
-      // Simulate API call with setTimeout
-      setTimeout(() => {
-        let filteredData = [...sampleData];
+      // Use a simple params object instead of FilterQueryStringTypeItem array
+      const params: any = {
+        page,
+        limit,
+      };
 
-        // Apply quick search filter if provided
-        if (quickkSearch && quickkSearch.trim() !== "") {
-          const searchTerm = quickkSearch.toLowerCase();
-          filteredData = filteredData.filter(
-            (item) =>
-              item.code.toLowerCase().includes(searchTerm) ||
-              item.title.toLowerCase().includes(searchTerm) ||
-              (item.description &&
-                item.description.toLowerCase().includes(searchTerm))
-          );
-        }
+      // Add quickSearch as a simple query parameter if provided
+      if (quickkSearch && quickkSearch.trim() !== "") {
+        params.quickSearch = quickkSearch;
+      }
 
-        // Calculate pagination
-        const startIndex = (page - 1) * limit;
-        const endIndex = startIndex + limit;
-        const paginatedData = filteredData.slice(startIndex, endIndex);
-
-        setTableData(paginatedData);
-        setTotalItems(filteredData.length);
-        setLoading(false);
-      }, 500); // Simulate network delay
+      const response = await DanhMucDonServices.getDanhMucDon([], params);
+      setTableData(response.data || []);
+      setTotalItems(response.count);
+      setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
       setLoading(false);
+      toast.error("Lỗi khi tải dữ liệu!");
     }
   };
 
   useEffect(() => {
     getData(currentPage, pageSize, quickSearch);
-  }, []); // Reload data when page or size changes
+  }, [currentPage, pageSize]); // Reload data when page or size changes
 
-  const handleBeforeExport = async (): Promise<DonItem[]> => {
+  const handleBeforeExport = async (): Promise<FormItem[]> => {
     setLoading(true);
     try {
       toast.info("Đang chuẩn bị dữ liệu xuất Excel...");
-
-      // Simulate API call for export
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          setLoading(false);
-          resolve(sampleData);
-        }, 500);
-      });
+      const params = {
+        page: 1,
+        limit: 1000, // Get a larger number of records for export
+      };
+      const response = await DanhMucDonServices.getDanhMucDon([], params);
+      setLoading(false);
+      return response.data || [];
     } catch (error) {
       console.error("Error fetching export data:", error);
       toast.error("Lỗi khi tải dữ liệu để xuất Excel!");
@@ -138,19 +80,42 @@ const DanhMucDonManagementPage = () => {
     }
   };
 
+  const getRoleBadgeStyle = (role: string) => {
+    switch (role) {
+      case RoleAdmin.ADMIN:
+        return {
+          color: "#991b1b",
+          background: "#fee2e2",
+          borderColor: "#fecaca",
+        };
+      case RoleAdmin.HR:
+        return {
+          color: "#5b21b6",
+          background: "#ede9fe",
+          borderColor: "#ddd6fe",
+        };
+      case RoleAdmin.MANAGER:
+        return {
+          color: "#0369a1",
+          background: "#e0f2fe",
+          borderColor: "#bae6fd",
+        };
+      default:
+        return {
+          color: "#065f46",
+          background: "#d1fae5",
+          borderColor: "#a7f3d0",
+        };
+    }
+  };
+
   const columns = useMemo(
     () => [
-      {
-        title: t("maDon"),
-        dataIndex: "code",
-        key: "code",
-        width: 150,
-      },
       {
         title: t("tieuDe"),
         dataIndex: "title",
         key: "title",
-        width: 200,
+        width: 150,
       },
       {
         title: t("moTa"),
@@ -160,11 +125,32 @@ const DanhMucDonManagementPage = () => {
       },
       {
         title: t("nguoiDuyet"),
-        dataIndex: "rolePermission",
-        key: "rolePermission",
+        dataIndex: "roleCode",
+        key: "roleCode",
         width: 150,
-        render: (rolePermission: string) =>
-          getRolePermissionLabel(rolePermission),
+        render: (role: string) => {
+          const style = getRoleBadgeStyle(role);
+
+          return (
+            <Tag
+              style={{
+                ...style,
+                padding: "4px 12px",
+                borderRadius: "20px",
+                fontSize: "12px",
+                fontWeight: 600,
+              }}
+            >
+              {role === RoleAdmin.ADMIN
+                ? "Admin"
+                : role === RoleAdmin.HR
+                ? "HR"
+                : role === RoleAdmin.MANAGER
+                ? "Manager"
+                : "Staff"}
+            </Tag>
+          );
+        },
       },
     ],
     [t]
@@ -188,6 +174,7 @@ const DanhMucDonManagementPage = () => {
       setTimeout(() => {
         form.setFieldsValue({
           ...don,
+          rolePermission: don.roleCode, // Map API roleCode to form field rolePermission
         });
       }, 100);
     } else {
@@ -221,18 +208,21 @@ const DanhMucDonManagementPage = () => {
           return;
         }
 
-        // Simulate API update
-        setTimeout(() => {
-          // Update the item in the sample data
-          const updatedData = tableData.map((item) =>
-            item.id === editingDanhMucDon.id ? { ...item, ...values } : item
-          );
+        // Map form values to API request format
+        const formData = {
+          title: values.title,
+          description: values.description,
+          roleCode: values.rolePermission,
+        };
 
-          setTableData(updatedData);
-          toast.success("Cập nhật thành công!");
-          setIsModalVisible(false);
-          setEditLoading(false);
-        }, 500);
+        await DanhMucDonServices.updateDanhMucDon(
+          editingDanhMucDon.id,
+          formData
+        );
+        toast.success("Cập nhật thành công!");
+        getData(currentPage, pageSize, quickSearch);
+        setIsModalVisible(false);
+        setEditLoading(false);
       } catch (error: any) {
         handleFormErrors(form, error);
         setEditLoading(false);
@@ -244,24 +234,19 @@ const DanhMucDonManagementPage = () => {
         // Validate form fields
         const values = await form.validateFields();
 
-        // Simulate API create
-        setTimeout(() => {
-          // Create a new item with a unique ID
-          const newItem: DonItem = {
-            id: `${Date.now()}`, // Generate a unique ID
-            ...values,
-          };
+        // Map form values to API request format
+        const formData = {
+          title: values.title,
+          description: values.description,
+          roleCode: values.rolePermission,
+        };
 
-          // Add to the sample data
-          const updatedData = [...tableData, newItem];
-          setTableData(updatedData);
-          setTotalItems((prev) => prev + 1);
-
-          toast.success("Thêm mới thành công!");
-          setIsModalVisible(false);
-          form.resetFields();
-          setEditLoading(false);
-        }, 500);
+        await DanhMucDonServices.createDanhMucDon(formData);
+        toast.success("Thêm mới thành công!");
+        getData(currentPage, pageSize, quickSearch);
+        setIsModalVisible(false);
+        form.resetFields();
+        setEditLoading(false);
       } catch (error: any) {
         console.log("Form validation error:", error);
         handleFormErrors(form, error);
@@ -272,13 +257,9 @@ const DanhMucDonManagementPage = () => {
 
   const handleDelete = async (record: any) => {
     try {
-      // Simulate API delete
-      setTimeout(() => {
-        const updatedData = tableData.filter((item) => item.id !== record.id);
-        setTableData(updatedData);
-        setTotalItems((prev) => prev - 1);
-        toast.success("Xóa thành công!");
-      }, 500);
+      await DanhMucDonServices.deleteDanhMucDon(record.id);
+      toast.success("Xóa thành công!");
+      getData(currentPage, pageSize, quickSearch);
     } catch (error: any) {
       toast.error(error.message);
     }
