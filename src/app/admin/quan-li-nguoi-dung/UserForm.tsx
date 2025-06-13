@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import FormModal from "@/components/basicUI/FormModal";
 import { RoleAdmin } from "@/model/enum";
-import SelectServices from "@/services/select/select.service";
 import {
   CalendarOutlined,
   HomeOutlined,
@@ -22,13 +21,10 @@ import {
   Input,
   Row,
   Select,
-  Spin,
   Upload,
 } from "antd";
 import { UploadFile } from "antd/es/upload/interface";
 import dayjs from "dayjs";
-import React, { useEffect, useState } from "react";
-import { toast } from "react-toastify";
 import styles from "../../../components/styles/styles.module.scss";
 import "./index.scss";
 
@@ -42,8 +38,6 @@ interface UserFormProps {
   handleSubmit: () => void;
   editLoading: boolean;
   fileList: UploadFile[];
-  brands: { label: string; value: string }[];
-  positions: { label: string; value: string }[];
   handleUploadChange: (info: any) => void;
 }
 
@@ -55,80 +49,8 @@ const UserForm: React.FC<UserFormProps> = ({
   handleSubmit,
   editLoading,
   fileList,
-  brands,
-  positions,
   handleUploadChange,
 }) => {
-  const [managers, setManagers] = useState<{ label: string; value: string }[]>(
-    []
-  );
-  const [filteredPositions, setFilteredPositions] =
-    useState<{ label: string; value: string }[]>(positions);
-  const [loadingManagers, setLoadingManagers] = useState(false);
-  const [loadingPositions, setLoadingPositions] = useState(false);
-
-  // Get form values for dependent fields
-  const branchCode = Form.useWatch("branchCode", form);
-  const roleCode = Form.useWatch("roleCode", form);
-
-  // Effect for loading managers when branch and role are selected
-  useEffect(() => {
-    if (isModalVisible && branchCode && roleCode) {
-      loadManagers(branchCode, roleCode);
-    } else {
-      setManagers([]);
-    }
-  }, [branchCode, roleCode, isModalVisible]);
-
-  // Effect for loading positions when role changes
-  useEffect(() => {
-    if (isModalVisible && roleCode) {
-      loadPositionsByRole(roleCode);
-    } else {
-      setFilteredPositions(positions);
-    }
-  }, [roleCode, isModalVisible, positions]);
-
-  // Function to fetch managers based on branch and role
-  const loadManagers = async (branch: string, role: string) => {
-    setLoadingManagers(true);
-    try {
-      const managersData = await SelectServices.getSelectManagers(branch, role);
-      if (managersData) {
-        setManagers(managersData);
-      } else {
-        setManagers([]);
-        toast.error("Không thể tải danh sách người quản lý");
-      }
-    } catch (error) {
-      console.error("Error loading managers:", error);
-      toast.error("Lỗi khi tải danh sách người quản lý");
-      setManagers([]);
-    } finally {
-      setLoadingManagers(false);
-    }
-  };
-
-  // Function to fetch positions based on role
-  const loadPositionsByRole = async (role: string) => {
-    setLoadingPositions(true);
-    try {
-      const positionsData = await SelectServices.getSelectPositionByRole(role);
-      if (positionsData) {
-        setFilteredPositions(positionsData);
-      } else {
-        // Fall back to all positions if the filtered API fails
-        setFilteredPositions(positions);
-        toast.error("Không thể tải danh sách chức vụ theo quyền");
-      }
-    } catch (error) {
-      console.error("Error loading positions by role:", error);
-      setFilteredPositions(positions);
-    } finally {
-      setLoadingPositions(false);
-    }
-  };
-
   const uploadButton = (
     <div>
       <PlusOutlined />
@@ -148,7 +70,7 @@ const UserForm: React.FC<UserFormProps> = ({
           </span>
         </div>
       }
-      initialValues={{ bod: dayjs().startOf("day") }}
+      initialValues={{ dob: dayjs().startOf("day") }}
       form={form}
       open={isModalVisible}
       onCancel={handleCancel}
@@ -212,15 +134,27 @@ const UserForm: React.FC<UserFormProps> = ({
         </Col>
         <Col span={8}>
           <Form.Item
-            name="userName"
-            label="Tên đăng nhập"
-            rules={[
-              { required: true, message: "Vui lòng nhập tên đăng nhập!" },
-            ]}
+            name="gender"
+            label="Giới tính"
+            rules={[{ required: true, message: "Vui lòng nhập giới tính!" }]}
           >
-            <Input
+            <Select
+              placeholder="Chọn giới tính"
               prefix={<UserOutlined />}
-              placeholder="Nhập tên đăng nhập"
+              options={[
+                {
+                  label: "Nam",
+                  value: "M",
+                },
+                {
+                  label: "Nữ",
+                  value: "F",
+                },
+                {
+                  label: "Khác",
+                  value: "O",
+                },
+              ]}
               size="large"
             />
           </Form.Item>
@@ -261,7 +195,7 @@ const UserForm: React.FC<UserFormProps> = ({
         </Col>
         <Col span={8}>
           <Form.Item
-            name="bod"
+            name="dob"
             label="Ngày sinh"
             rules={[{ required: true, message: "Vui lòng chọn ngày sinh!" }]}
           >
@@ -278,8 +212,23 @@ const UserForm: React.FC<UserFormProps> = ({
       </Row>
 
       {!editingUser && (
-        <Row>
-          <Col span={24}>
+        <Row gutter={16}>
+          <Col span={12}>
+            <Form.Item
+              name="userName"
+              label="Tên đăng nhập"
+              rules={[
+                { required: true, message: "Vui lòng nhập tên đăng nhập!" },
+              ]}
+            >
+              <Input
+                prefix={<UserOutlined />}
+                placeholder="Nhập tên đăng nhập"
+                size="large"
+              />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
             <Form.Item
               name="password"
               label="Mật khẩu"
@@ -298,7 +247,7 @@ const UserForm: React.FC<UserFormProps> = ({
       <Row>
         <Col span={24}>
           <Form.Item
-            name="address"
+            name="addressCode"
             label="Địa chỉ"
             rules={[{ required: true, message: "Vui lòng nhập địa chỉ!" }]}
           >
@@ -313,23 +262,6 @@ const UserForm: React.FC<UserFormProps> = ({
 
       {/* First, select branch and role */}
       <Row gutter={16}>
-        <Col span={12}>
-          <Form.Item
-            name="branchCode"
-            label="Chi nhánh"
-            rules={[{ required: true, message: "Vui lòng chọn chi nhánh!" }]}
-          >
-            <Select
-              placeholder="Chọn chi nhánh"
-              size="large"
-              options={brands}
-              onChange={() => {
-                // Clear dependent fields when branch changes
-                form.setFieldsValue({ managedBy: undefined });
-              }}
-            />
-          </Form.Item>
-        </Col>
         <Col span={12}>
           <Form.Item
             name="roleCode"
@@ -356,60 +288,7 @@ const UserForm: React.FC<UserFormProps> = ({
             />
           </Form.Item>
         </Col>
-      </Row>
-
-      {/* Then select manager and position which depend on the above */}
-      <Row gutter={16}>
-        <Col span={8}>
-          <Form.Item
-            name="managedBy"
-            label="Quản lý bởi"
-            tooltip={
-              !branchCode || !roleCode
-                ? "Vui lòng chọn Chi nhánh và Quyền trước"
-                : ""
-            }
-          >
-            <Select
-              placeholder={
-                !branchCode || !roleCode
-                  ? "Chọn Chi nhánh và Quyền trước"
-                  : loadingManagers
-                  ? "Đang tải..."
-                  : "Chọn người quản lý"
-              }
-              size="large"
-              allowClear
-              disabled={!branchCode || !roleCode || loadingManagers}
-              options={managers}
-              notFoundContent={loadingManagers ? <Spin size="small" /> : null}
-            />
-          </Form.Item>
-        </Col>
-        <Col span={8}>
-          <Form.Item
-            name="positionCode"
-            label="Chức vụ"
-            rules={[{ required: true, message: "Vui lòng chọn chức vụ!" }]}
-            tooltip={!roleCode ? "Vui lòng chọn Quyền trước" : ""}
-          >
-            <Select
-              placeholder={
-                !roleCode
-                  ? "Chọn Quyền trước"
-                  : loadingPositions
-                  ? "Đang tải..."
-                  : "Chọn chức vụ"
-              }
-              size="large"
-              options={filteredPositions}
-              disabled={!roleCode || loadingPositions}
-              dropdownStyle={{ borderRadius: "10px" }}
-              notFoundContent={loadingPositions ? <Spin size="small" /> : null}
-            />
-          </Form.Item>
-        </Col>
-        <Col span={8}>
+        <Col span={12}>
           <Form.Item
             name="isActive"
             label="Trạng thái"

@@ -24,11 +24,22 @@ export const UserRequestRegisterSchema = z.object({
   email: z.string().email("Invalid email format"),
   faceImg: z.string().optional(),
   contract: z.string().optional(),
-  bod: z.string().or(z.date()),
-  address: z.string(),
+  dob: z.string().refine((value) => {
+    try {
+      return !isNaN(Date.parse(value));
+    } catch {
+      return false;
+    }
+  }, "dob must be a valid ISO 8601 date string"),
   phone: z.string(),
-  branchCode: z.string(),
-  managedBy: z.string(),
+  gender: z
+    .string()
+    .max(2, "gender must be shorter than or equal to 2 characters")
+    .min(1, "gender should not be empty"),
+  addressCode: z
+    .string()
+    .max(20, "addressCode must be shorter than or equal to 20 characters")
+    .min(1, "addressCode should not be empty"),
   // faceImg and contract are excluded as requested
 });
 
@@ -54,8 +65,12 @@ export const UserRequestChangePasswordSchema = UserInforSchema.omit({
     lastName: z.string().optional(),
     email: z.string().email("Invalid email format").optional(),
     faceImg: z.string().optional(),
-    bod: z.string().or(z.date()).optional(),
-    address: z.string().optional(),
+    dob: z.string().or(z.date()).optional(),
+    addressCode: z
+      .string()
+      .max(20, "AddressCode must be shorter than or equal to 20 characters")
+      .min(1, "AddressCode should not be empty")
+      .optional(),
     phone: z.string().optional(),
     branchCode: z.string().optional(),
     managedBy: z.string().optional(),

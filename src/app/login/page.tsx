@@ -4,18 +4,17 @@
 
 import { setAuthData } from "@/lib/store/slices/loginSlice";
 import AuthServices from "@/services/auth/api.service";
-import { getCookie } from "@/utils/client/getCookie";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { Button, Checkbox, Form, Input, Typography } from "antd";
 import { useForm } from "antd/es/form/Form";
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
-import "./login.scss";
 import backgroundImage from "../../../public/assets/image/BackgroundFaceAI.png";
+import "./login.scss";
 
 interface LoginForm {
   username: string;
@@ -29,28 +28,6 @@ const LoginPage: React.FC = () => {
   const [isNavigating, setIsNavigating] = useState(false);
   const dispatch = useDispatch();
   const router = useRouter();
-
-  useEffect(() => {
-    try {
-      const token: any = getCookie("token");
-      // If no token, don't try to redirect or parse
-      if (!token) return;
-
-      const base64Url = token.split(".")[1];
-      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-      const payload = JSON.parse(atob(base64));
-      const currentTime = Math.floor(Date.now() / 1000);
-
-      if (!payload.exp || payload.exp < currentTime) {
-        console.log("Token expired. Redirecting to login.");
-      } else {
-        router.push("/");
-      }
-    } catch (error) {
-      console.log("Middleware Token Error:" + error);
-    }
-  }, [router]);
-
   const onFinish = async (values: any) => {
     if (isLogin || isNavigating) return;
     setIsLogin(true);

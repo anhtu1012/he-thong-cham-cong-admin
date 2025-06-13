@@ -22,13 +22,15 @@ class SelectServicesBase extends AxiosService {
 
   // New methods for dependent dropdowns
   async getSelectManagers(
-    branchCode: string,
+    branchCodes: string[],
     roleCode: string
   ): Promise<SelectOptionsArray> {
-    return this.getWithParams(
-      `${this.basePath}/dropdown-user`,
-      new URLSearchParams({ branchCode, roleCode })
-    );
+    const params = new URLSearchParams();
+    // Add each branchCode as a separate parameter
+    branchCodes.forEach((code) => params.append("branchCode", code));
+    params.append("roleCode", roleCode);
+
+    return this.getWithParams(`${this.basePath}/dropdown-user`, params);
   }
 
   async getSelectPositionByRole(roleCode: string): Promise<SelectOptionsArray> {

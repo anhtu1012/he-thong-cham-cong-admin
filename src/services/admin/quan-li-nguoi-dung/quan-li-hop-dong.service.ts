@@ -2,8 +2,8 @@
 import { AxiosService } from "@/apis/axios.base";
 import { ValidateBaseClass } from "@/apis/ddd/validate.class.base";
 import {
+  CreateContractSchema,
   UpdateContractSchema,
-  UserContractItemSchema,
 } from "@/dtos/quan-li-nguoi-dung/contracts/contract.dto";
 import {
   CreateContractRequest,
@@ -12,15 +12,15 @@ import {
 import { UserContractResponseGetItem } from "@/dtos/quan-li-nguoi-dung/contracts/contract.response.dto";
 
 class QuanLyHopDongServicesBase extends AxiosService {
-  protected readonly basePath = "/v1/user-contract";
+  protected readonly basePath = "/v1/business";
 
   async getContractById(id: string): Promise<any> {
     return this.get(`${this.basePath}/${id}`);
   }
 
   async createContract(formData: CreateContractRequest): Promise<any> {
-    await ValidateBaseClass.validate(formData, UserContractItemSchema);
-    return this.post(`${this.basePath}`, formData);
+    await ValidateBaseClass.validate(formData, CreateContractSchema);
+    return this.post(`${this.basePath}/create-contract-with-branch`, formData);
   }
 
   async updateContract(
