@@ -8,10 +8,20 @@ import {
   AimOutlined,
   NumberOutlined,
 } from "@ant-design/icons";
-import { Col, Form, FormInstance, Input, Row, InputNumber } from "antd";
-import React from "react";
+import {
+  Col,
+  Form,
+  FormInstance,
+  Input,
+  Row,
+  InputNumber,
+  AutoComplete,
+} from "antd";
+import React, { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import "./index.scss";
+import { GoongService } from "@/services/goong/goong.service";
+import useDebounce from "@/hook/useDebounce";
 
 interface ChiNhanhFormProps {
   form: FormInstance;
@@ -31,6 +41,43 @@ const ChiNhanhForm: React.FC<ChiNhanhFormProps> = ({
   editLoading,
 }) => {
   const t = useTranslations("DanhMucChiNhanh");
+  const [addressOptions, setAddressOptions] = useState<any>();
+  const [input, setInput] = useState("");
+  const debouncedInput = useDebounce(input, 500);
+  const onSelect = async (addressLine: any, options: any) => {
+
+    console.log({addressLine});
+
+    const placeDetail: any = await GoongService.getPlaceDetail(options.place_id);
+    console.log({options});
+    
+    form.setFieldValue("city", options.compound.province)
+    form.setFieldValue("district", options.compound.district)
+    form.setFieldValue("placeId", options.place_id)
+    form.setFieldValue("lat", placeDetail.result.geometry.location.lat)
+    form.setFieldValue("long", placeDetail.result.geometry.location.lng)
+  };
+  useEffect(() => {
+    const fetchAutocomplete = async () => {
+      if (debouncedInput.trim() === "") return;
+
+      try {
+        const result = await GoongService.getAutoComplete(debouncedInput);
+        console.log({ result });
+
+        const panel = result.predictions.map((pre: any) => ({
+          value: pre.description,
+          ...pre
+        }));
+
+        setAddressOptions(panel);
+      } catch (err) {
+        console.error("Error fetching suggestions", err);
+      }
+    };
+
+    fetchAutocomplete();
+  }, [debouncedInput]);
 
   return (
     <FormModal
@@ -88,10 +135,11 @@ const ChiNhanhForm: React.FC<ChiNhanhFormProps> = ({
             label={t("diaChi")}
             rules={[{ required: true, message: t("vuilongNhapDiaChi") }]}
           >
-            <Input
-              prefix={<EnvironmentOutlined />}
-              placeholder={t("nhapDiaChi")}
-              size="large"
+            <AutoComplete
+              options={addressOptions}
+              onSelect={onSelect}
+              onSearch={setInput}
+              placeholder="Nhập địa chỉ"
             />
           </Form.Item>
         </Col>
@@ -108,6 +156,8 @@ const ChiNhanhForm: React.FC<ChiNhanhFormProps> = ({
               prefix={<GlobalOutlined />}
               placeholder={t("nhapThanhPho")}
               size="large"
+              readOnly
+              
             />
           </Form.Item>
         </Col>
@@ -121,6 +171,7 @@ const ChiNhanhForm: React.FC<ChiNhanhFormProps> = ({
               prefix={<EnvironmentOutlined />}
               placeholder={t("nhapQuan")}
               size="large"
+              readOnly
             />
           </Form.Item>
         </Col>
@@ -137,6 +188,7 @@ const ChiNhanhForm: React.FC<ChiNhanhFormProps> = ({
               prefix={<AimOutlined />}
               placeholder={t("nhapMaViTri")}
               size="large"
+              readOnly
             />
           </Form.Item>
         </Col>
@@ -155,6 +207,7 @@ const ChiNhanhForm: React.FC<ChiNhanhFormProps> = ({
               size="large"
               style={{ width: "100%" }}
               step={0.000001}
+              readOnly
               precision={6}
             />
           </Form.Item>
@@ -171,6 +224,7 @@ const ChiNhanhForm: React.FC<ChiNhanhFormProps> = ({
               size="large"
               style={{ width: "100%" }}
               step={0.000001}
+              readOnly
               precision={6}
             />
           </Form.Item>
