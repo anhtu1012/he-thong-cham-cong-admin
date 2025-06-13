@@ -30,9 +30,19 @@
       line-height: var(--row-height);
       border-bottom: 1px solid $border-color;
       border-right: 1px solid $border-color; // Add vertical border to body cells
-
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       &:last-child {
         border-right: none; // Remove right border from last body cell
+      }
+      &:hover {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.03) 0%, rgba(30, 64, 175, 0.03) 100%);
+        transform: scale(1.01);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      }
+
+      > td {
+        border-bottom: 1px solid rgba(233, 236, 239, 0.6);
+        padding: 12px;
       }
     }
 
@@ -91,6 +101,7 @@
       &.ant-table-cell-fix-left {
         background-color: #fff !important; // Always white for action column
       }
+
     }
 
     // Enhance hover effects for all rows
@@ -367,3 +378,4 @@ html.dark {
     }
   }
 }
+

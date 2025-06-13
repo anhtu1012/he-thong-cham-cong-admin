@@ -28,7 +28,9 @@ export const UserContractItemSchema = z.object({
   positionCode: z.string(),
   branchNames: z.string(),
   branchCodes: z.array(z.string()),
+  baseSalary: z.number().optional(),
   fullName: z.string().optional(),
+  fullNameManager: z.string().optional(),
 });
 
 export type UserContractItem = z.infer<typeof UserContractItemSchema>;
@@ -40,10 +42,9 @@ export const CreateContractSchema = z.object({
   startTime: z.string().datetime(),
   endTime: z.string().datetime(),
   duration: z.string(),
-  contractPdf: z.string(),
+  contractPdf: z.string().optional(),
   status: ContractStatusEnum,
   userCode: z.string().min(1, "User code is required"),
-  userBranchCode: z.string(),
   managedBy: z.string(),
   positionCode: z.string(),
   branchCodes: z.array(z.string()),

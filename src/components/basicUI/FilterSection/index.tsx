@@ -5,6 +5,7 @@ import {
   UpOutlined,
   FilterOutlined,
   ClearOutlined,
+  SearchOutlined,
 } from "@ant-design/icons";
 import "./styles.scss";
 
@@ -12,6 +13,7 @@ interface FilterSectionProps {
   children: React.ReactNode;
   title?: string;
   onReset?: () => void;
+  onSearch?: () => void;
   extra?: React.ReactNode;
   defaultCollapsed?: boolean;
 }
@@ -20,6 +22,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({
   children,
   title = "Bộ lọc",
   onReset,
+  onSearch,
   extra,
   defaultCollapsed = false,
 }) => {
@@ -57,6 +60,18 @@ const FilterSection: React.FC<FilterSectionProps> = ({
               <Tooltip title="Xóa bộ lọc">
                 <Button icon={<ClearOutlined />} onClick={onReset} size="small">
                   Xóa lọc
+                </Button>
+              </Tooltip>
+            )}
+            {onSearch && (
+              <Tooltip title="Tìm kiếm">
+                <Button
+                  type="primary"
+                  icon={<SearchOutlined style={{ color: "white" }} />}
+                  onClick={onSearch}
+                  size="small"
+                >
+                  Tìm kiếm
                 </Button>
               </Tooltip>
             )}

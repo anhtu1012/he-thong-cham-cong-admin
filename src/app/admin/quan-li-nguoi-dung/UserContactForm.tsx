@@ -1,13 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import FormModal from "@/components/basicUI/FormModal";
+import { UserInfor } from "@/dtos/auth/auth.dto";
+import { UserContractItem } from "@/dtos/quan-li-nguoi-dung/contracts/contract.dto";
+import SelectServices from "@/services/select/select.service";
 import {
   BankOutlined,
   CalendarOutlined,
+  EditOutlined,
   FileOutlined,
   FileTextOutlined,
   PlusOutlined,
-  UserOutlined,
-  EditOutlined,
 } from "@ant-design/icons";
 import {
   Button,
@@ -20,14 +22,15 @@ import {
   Row,
   Select,
   Skeleton,
+  Spin,
   Tag,
   Upload,
 } from "antd";
 import { UploadFile } from "antd/es/upload/interface";
 import dayjs from "dayjs";
 import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import styles from "../../../components/styles/styles.module.scss";
-import { UserContractItem } from "@/dtos/quan-li-nguoi-dung/contracts/contract.dto";
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -45,10 +48,10 @@ interface UserContactFormProps {
   fileList?: UploadFile[];
   positions?: { label: string; value: string }[];
   branches?: { label: string; value: string }[];
-  managers?: { label: string; value: string }[];
   handleUploadChange?: (info: any) => void;
   isViewMode?: boolean;
   contactData?: UserContractItem;
+  ueserDetails?: UserInfor;
   onSwitchToEditMode?: () => void; // Prop để thông báo cho component cha
 }
 
@@ -65,10 +68,10 @@ const UserContactForm: React.FC<UserContactFormProps> = ({
   fileList = [],
   positions = [],
   branches = [],
-  managers = [],
   handleUploadChange = () => {},
   isViewMode = false,
   contactData,
+  ueserDetails,
   onSwitchToEditMode,
 }) => {
   // Chuẩn hóa props để xử lý các tên khác nhau
@@ -81,11 +84,84 @@ const UserContactForm: React.FC<UserContactFormProps> = ({
   const [selectedBranches, setSelectedBranches] = useState<string[]>(
     editingContract?.branchCodes || []
   );
+  const roleCode = ueserDetails?.roleCode || "";
 
   // State quản lý chế độ xem
   const [currentViewMode, setCurrentViewMode] = useState<boolean>(isViewMode);
   // Thêm state để quản lý quá trình đồng bộ
   const [syncing, setSyncing] = useState<boolean>(true);
+
+  const [managerrs, setManagers] = useState<{ label: string; value: string }[]>(
+    []
+  );
+
+  const [filteredPositions, setFilteredPositions] =
+    useState<{ label: string; value: string }[]>(positions);
+  const [loadingManagers, setLoadingManagers] = useState(false);
+  const [loadingPositions, setLoadingPositions] = useState(false);
+  // Get form values for dependent fields
+  const branchCodes = Form.useWatch("branchCodes", form);
+
+  // Effect for loading managers when branch and role are selected
+  useEffect(() => {
+    if (modalVisible && branchCodes && branchCodes.length > 0 && roleCode) {
+      loadManagers(branchCodes, roleCode);
+    } else {
+      setManagers([]);
+    }
+  }, [branchCodes, roleCode, modalVisible]);
+
+  // Effect for loading positions when role changes
+  useEffect(() => {
+    if (isModalVisible && roleCode) {
+      loadPositionsByRole(roleCode);
+    } else {
+      setFilteredPositions(positions);
+    }
+  }, [roleCode, isModalVisible, positions]);
+
+  // Function to fetch managers based on branch and role
+  const loadManagers = async (branches: string[], role: string) => {
+    setLoadingManagers(true);
+    try {
+      const managersData = await SelectServices.getSelectManagers(
+        branches,
+        role
+      );
+      if (managersData) {
+        setManagers(managersData);
+      } else {
+        setManagers([]);
+        toast.error("Không thể tải danh sách người quản lý");
+      }
+    } catch (error) {
+      console.error("Error loading managers:", error);
+      toast.error("Lỗi khi tải danh sách người quản lý");
+      setManagers([]);
+    } finally {
+      setLoadingManagers(false);
+    }
+  };
+
+  // Function to fetch positions based on role
+  const loadPositionsByRole = async (role: string) => {
+    setLoadingPositions(true);
+    try {
+      const positionsData = await SelectServices.getSelectPositionByRole(role);
+      if (positionsData) {
+        setFilteredPositions(positionsData);
+      } else {
+        // Fall back to all positions if the filtered API fails
+        setFilteredPositions(positions);
+        toast.error("Không thể tải danh sách chức vụ theo quyền");
+      }
+    } catch (error) {
+      console.error("Error loading positions by role:", error);
+      setFilteredPositions(positions);
+    } finally {
+      setLoadingPositions(false);
+    }
+  };
 
   // Đồng bộ hóa state khi props thay đổi
   useEffect(() => {
@@ -331,7 +407,7 @@ const UserContactForm: React.FC<UserContactFormProps> = ({
                   Quản lý bởi:
                 </div>
                 <div className="value">
-                  {contactData.managedBy || "Chưa có quản lý"}
+                  {contactData.fullNameManager || "Chưa có quản lý"}
                 </div>
               </div>
             </Col>
@@ -365,7 +441,9 @@ const UserContactForm: React.FC<UserContactFormProps> = ({
                   className="value"
                   style={{ fontWeight: 600, color: "#d4380d" }}
                 >
-                  5.000.000 VNĐ
+                  {contactData.baseSalary
+                    ? `${contactData.baseSalary.toLocaleString()} VND`
+                    : "Chưa xác định"}
                 </div>
               </div>
             </Col>
@@ -521,6 +599,13 @@ const UserContactForm: React.FC<UserContactFormProps> = ({
       centered
       maskClosable={false}
       destroyOnClose
+      initialValues={{
+        startTime: dayjs().startOf("day"),
+        endTime: dayjs().add(1, "month").startOf("day"),
+        duration: "1 tháng",
+        userCode: ueserDetails?.code || "",
+        status: "ACTIVE",
+      }}
     >
       <Row gutter={16}>
         <Col span={12}>
@@ -534,6 +619,9 @@ const UserContactForm: React.FC<UserContactFormProps> = ({
               placeholder="Nhập tiêu đề hợp đồng"
               size="large"
             />
+          </Form.Item>
+          <Form.Item name="userCode" hidden>
+            <Input />
           </Form.Item>
         </Col>
         <Col span={12}>
@@ -561,7 +649,7 @@ const UserContactForm: React.FC<UserContactFormProps> = ({
           <Form.Item name="description" label="Mô tả">
             <TextArea
               placeholder="Nhập mô tả về hợp đồng"
-              rows={4}
+              rows={3}
               size="large"
             />
           </Form.Item>
@@ -619,72 +707,6 @@ const UserContactForm: React.FC<UserContactFormProps> = ({
       </Row>
 
       <Row gutter={16}>
-        <Col span={12}>
-          <Form.Item
-            name="userCode"
-            label="Mã nhân viên"
-            rules={[{ required: true, message: "Vui lòng nhập mã nhân viên!" }]}
-          >
-            <Input
-              prefix={<UserOutlined />}
-              placeholder="Nhập mã nhân viên"
-              size="large"
-            />
-          </Form.Item>
-        </Col>
-        <Col span={12}>
-          <Form.Item
-            name="positionCode"
-            label="Chức vụ"
-            rules={[{ required: true, message: "Vui lòng chọn chức vụ!" }]}
-          >
-            <Select
-              placeholder="Chọn chức vụ"
-              size="large"
-              options={positions}
-              dropdownStyle={{ borderRadius: "10px" }}
-            />
-          </Form.Item>
-        </Col>
-      </Row>
-
-      <Row gutter={16}>
-        <Col span={12}>
-          <Form.Item
-            name="userBranchCode"
-            label="Chi nhánh chính"
-            rules={[
-              { required: true, message: "Vui lòng chọn chi nhánh chính!" },
-            ]}
-          >
-            <Select
-              placeholder="Chọn chi nhánh chính"
-              size="large"
-              options={branches}
-              dropdownStyle={{ borderRadius: "10px" }}
-            />
-          </Form.Item>
-        </Col>
-        <Col span={12}>
-          <Form.Item
-            name="managedBy"
-            label="Quản lý bởi"
-            rules={[
-              { required: true, message: "Vui lòng chọn người quản lý!" },
-            ]}
-          >
-            <Select
-              placeholder="Chọn người quản lý"
-              size="large"
-              allowClear
-              options={managers}
-              dropdownStyle={{ borderRadius: "10px" }}
-            />
-          </Form.Item>
-        </Col>
-      </Row>
-
-      <Row gutter={16}>
         <Col span={24}>
           <Form.Item
             name="branchCodes"
@@ -718,6 +740,55 @@ const UserContactForm: React.FC<UserContactFormProps> = ({
                   </Tag>
                 );
               }}
+            />
+          </Form.Item>
+        </Col>
+        <Col span={12}>
+          <Form.Item
+            name="positionCode"
+            label="Chức vụ"
+            rules={[{ required: true, message: "Vui lòng chọn chức vụ!" }]}
+            tooltip={!roleCode ? "Vui lòng chọn Quyền trước" : ""}
+          >
+            <Select
+              placeholder={
+                !roleCode
+                  ? "Chọn Quyền trước"
+                  : loadingPositions
+                  ? "Đang tải..."
+                  : "Chọn chức vụ"
+              }
+              size="large"
+              options={filteredPositions}
+              disabled={!roleCode || loadingPositions}
+              dropdownStyle={{ borderRadius: "10px" }}
+              notFoundContent={loadingPositions ? <Spin size="small" /> : null}
+            />
+          </Form.Item>
+        </Col>
+        <Col span={12}>
+          <Form.Item
+            name="managedBy"
+            label="Quản lý bởi"
+            tooltip={
+              !branchCodes || !roleCode
+                ? "Vui lòng chọn Chi nhánh và Quyền trước"
+                : ""
+            }
+          >
+            <Select
+              placeholder={
+                !branchCodes || !roleCode
+                  ? "Chọn Chi nhánh và Quyền trước"
+                  : loadingManagers
+                  ? "Đang tải..."
+                  : "Chọn người quản lý"
+              }
+              size="large"
+              allowClear
+              disabled={!branchCodes || !roleCode || loadingManagers}
+              options={managerrs}
+              notFoundContent={loadingManagers ? <Spin size="small" /> : null}
             />
           </Form.Item>
         </Col>

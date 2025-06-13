@@ -9,23 +9,22 @@ import Cselect from "@/components/Cselect";
 import { UserInfor } from "@/dtos/auth/auth.dto";
 import { UserRequestUpdateUsser } from "@/dtos/auth/auth.request.dto";
 import { UserResponseGetItem } from "@/dtos/auth/auth.response.dto";
+import { UserContractItem } from "@/dtos/quan-li-nguoi-dung/contracts/contract.dto";
 import { RoleAdmin } from "@/model/enum";
+import QuanLyHopDongServices from "@/services/admin/quan-li-nguoi-dung/quan-li-hop-dong.service";
 import QlNguoiDungServices from "@/services/admin/quan-li-nguoi-dung/quan-li-nguoi-dung.service";
 import AuthServices from "@/services/auth/api.service";
 import SelectServices from "@/services/select/select.service";
 import { getChangedValues } from "@/utils/client/compareHelpers";
 import { handleFormErrors } from "@/utils/client/formHelpers";
-import { CalendarOutlined, EyeFilled } from "@ant-design/icons";
-import { Button, Col, Form, Row, Space, Switch, Tag, Tooltip } from "antd";
+import { EyeFilled } from "@ant-design/icons";
+import { Button, Col, Form, Row, Switch, Tag, Tooltip } from "antd";
 import type { UploadFile } from "antd/es/upload/interface";
 import dayjs from "dayjs";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
-import styles from "../../../components/styles/styles.module.scss";
-import UserForm from "./UserForm";
 import UserContactForm from "./UserContactForm";
-import QuanLyHopDongServices from "@/services/admin/quan-li-nguoi-dung/quan-li-hop-dong.service";
-import { UserContractItem } from "@/dtos/quan-li-nguoi-dung/contracts/contract.dto";
+import UserForm from "./UserForm";
 
 interface FormValues {
   role?: string;
@@ -53,6 +52,7 @@ const UserManagementPage = () => {
   const [isContactModalVisible, setIsContactModalVisible] = useState(false);
   const [isViewMode, setIsViewMode] = useState(false);
   const [selectedContact, setSelectedContact] = useState<any>(null);
+  const [ueserDetails, setUserDetails] = useState<UserInfor>();
   const [contactLoading, setContactLoading] = useState(false);
 
   // Watch for role changes in the form
@@ -202,7 +202,9 @@ const UserManagementPage = () => {
       setContactLoading(true);
       setSelectedContact(null); // Reset dữ liệu hợp đồng cũ
       setIsContactModalVisible(true); // Hiển thị modal trước để người dùng thấy loading
+      setUserDetails(record); // Lưu mã vai trò để sử dụng sau
 
+      await loadPositionsByRole(record.roleCode); // Tải chức vụ theo vai trò
       // Lấy thông tin hợp đồng từ API
       const contact = await QuanLyHopDongServices.getContractsByUserCode(
         record.code
@@ -335,8 +337,8 @@ const UserManagementPage = () => {
       },
       {
         title: "Ngày sinh",
-        dataIndex: "bod",
-        key: "bod",
+        dataIndex: "dob",
+        key: "dob",
         render: (text: string) => {
           return <span>{dayjs(text).format("DD/MM/YYYY")}</span>;
         },
@@ -390,7 +392,7 @@ const UserManagementPage = () => {
         form.setFieldsValue({
           ...user,
           // Convert date string to dayjs object for DatePicker
-          bod: user.bod ? dayjs(user.bod) : null,
+          dob: user.dob ? dayjs(user.dob) : null,
         });
       }, 100);
     } else {
@@ -422,8 +424,8 @@ const UserManagementPage = () => {
         // Validate form fields
         const values = await form.validateFields();
         values.faceImg = fileList[0]?.url || null; // Handle file upload
-        if (values.bod) {
-          values.bod = new Date(values.bod).toISOString();
+        if (values.dob) {
+          values.dob = new Date(values.dob).toISOString();
         }
         const changedValues = getChangedValues(values, editingUser);
 
@@ -465,8 +467,8 @@ const UserManagementPage = () => {
         // Validate form fields
         const values = await form.validateFields();
         console.log("Form values:", values);
-        if (values.bod) {
-          values.bod = new Date(values.bod).toISOString();
+        if (values.dob) {
+          values.dob = new Date(values.dob).toISOString();
         }
 
         const result: any = await AuthServices.register(values);
@@ -492,6 +494,45 @@ const UserManagementPage = () => {
       } finally {
         setEditLoading(false);
       }
+    }
+  };
+  const handleSubmitContract = async (values: UserContractItem) => {
+    setContactLoading(true);
+    try {
+      console.log("Submitting contract values:", values);
+
+      if (values.startTime) {
+        values.startTime = new Date(values.startTime).toISOString();
+      }
+      if (values.endTime) {
+        values.endTime = new Date(values.endTime).toISOString();
+      }
+      // thêm truờng userCode vào values
+      const result = await QuanLyHopDongServices.createContract(values);
+      if (result) {
+        toast.success("Thêm mới thành công!");
+        getData(currentPage, pageSize, quickSearch); // Refresh data after adding
+        setIsModalVisible(false);
+        formValues.resetFields();
+        handleCloseContactModal();
+      } else {
+        toast.error(result.message || "Thêm mới thất bại!");
+      }
+    } catch (error: any) {
+      console.log("Form validation error:", error);
+
+      handleFormErrors<UserRequestUpdateUsser>(formValues, error);
+
+      if (error.response && error.response.data) {
+        console.log("API error:", error.response.data);
+
+        handleFormErrors<UserRequestUpdateUsser>(
+          formValues,
+          error.response.data
+        );
+      }
+    } finally {
+      setContactLoading(false);
     }
   };
 
@@ -584,7 +625,10 @@ const UserManagementPage = () => {
       {" "}
       {/* Filter Section with collapsible UI */}
       <Form form={formFilter} onFinish={onFinish} className="from-quey">
-        <FilterSection onReset={resetFilters}>
+        <FilterSection
+          onReset={resetFilters}
+          onSearch={() => formFilter.submit()}
+        >
           <Row gutter={[16, 16]}>
             <Col xs={24} sm={12} md={8} lg={6}>
               <Form.Item name="role">
@@ -637,20 +681,7 @@ const UserManagementPage = () => {
               </Form.Item>
             </Col>
           </Row>
-
-          <Row justify="end" className={styles.actionButtonsRow}>
-            <Col>
-              <Space>
-                <Button
-                  type="primary"
-                  icon={<CalendarOutlined />}
-                  htmlType="submit"
-                >
-                  Tìm kiếm
-                </Button>
-              </Space>
-            </Col>
-          </Row>
+          {/* Removed the search button row as it's now handled by FilterSection */}
         </FilterSection>
       </Form>
       <div>
@@ -713,8 +744,6 @@ const UserManagementPage = () => {
         handleSubmit={handleSubmit}
         editLoading={editLoading}
         fileList={fileList}
-        brands={brands}
-        positions={positions}
         handleUploadChange={handleUploadChange}
       />
       {/* UserContactForm với các prop đã tối ưu */}
@@ -726,12 +755,11 @@ const UserManagementPage = () => {
         contactData={selectedContact}
         positions={positions}
         branches={brands}
-        managers={[]} // Cần bổ sung dữ liệu managers nếu có
         form={formValues}
+        ueserDetails={ueserDetails}
         onSwitchToEditMode={handleSwitchToEditMode}
         handleSubmit={() => {
-          toast.success("Cập nhật hợp đồng thành công!");
-          handleCloseContactModal();
+          handleSubmitContract(formValues.getFieldsValue());
           // Có thể reload dữ liệu nếu cần
         }}
       />

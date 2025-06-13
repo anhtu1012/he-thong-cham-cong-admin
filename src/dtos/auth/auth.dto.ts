@@ -15,7 +15,7 @@ export const UserInforSchema = z.object({
   fullName: z.string().optional(),
   faceImg: z.string(),
   email: z.string(),
-  bod: z.string().or(z.date()), // Support both string and Date representations
+  dob: z.string().or(z.date()), // Support both string and Date representations
   address: z.string(),
   phone: z.string(),
   contract: z.string(),
