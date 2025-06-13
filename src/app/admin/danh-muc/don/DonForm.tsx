@@ -1,11 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import FormModal from "@/components/basicUI/FormModal";
 import { RoleAdmin } from "@/model/enum";
-import {
-  IdcardOutlined,
-  FileTextOutlined,
-  FileOutlined,
-} from "@ant-design/icons";
+import { FileTextOutlined, FileOutlined } from "@ant-design/icons";
 import { Col, Form, FormInstance, Input, Row, Select } from "antd";
 import React from "react";
 import { useTranslations } from "next-intl";
@@ -51,20 +47,7 @@ const DonForm: React.FC<DonFormProps> = ({
       destroyOnClose
     >
       <Row gutter={16}>
-        <Col span={12}>
-          <Form.Item
-            name="code"
-            label={t("maDon")}
-            rules={[{ required: true, message: t("vuilongNhapMaDon") }]}
-          >
-            <Input
-              prefix={<IdcardOutlined />}
-              placeholder={t("nhapMaDon")}
-              size="large"
-            />
-          </Form.Item>
-        </Col>
-        <Col span={12}>
+        <Col span={24}>
           <Form.Item
             name="title"
             label={t("tieuDe")}
