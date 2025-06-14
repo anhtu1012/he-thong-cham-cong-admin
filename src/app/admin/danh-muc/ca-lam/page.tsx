@@ -4,13 +4,13 @@
 import ActionButton from "@/components/basicUI/ActionButton";
 import CInputLabel from "@/components/basicUI/CInputLabel";
 import Ctable from "@/components/basicUI/Ctable";
-import { getChangedValues } from "@/utils/client/compareHelpers";
 import { handleFormErrors } from "@/utils/client/formHelpers";
 import { Form } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import CaLamForm from "./CaLamForm";
 import { useTranslations } from "next-intl";
+import DanhMucCaLamServices from "@/services/admin/danh-muc/ca-lam/ca-lam.service";
 
 // Sample data interface for CaLam
 interface CaLamItem {
@@ -89,29 +89,17 @@ const DanhMucCaLamManagementPage = () => {
   ) => {
     setLoading(true);
     try {
-      // Simulate API call with setTimeout
-      setTimeout(() => {
-        let filteredData = [...allData];
-
-        // Apply quick search filter if provided
-        if (quickkSearch && quickkSearch.trim() !== "") {
-          const searchTerm = quickkSearch.toLowerCase();
-          filteredData = filteredData.filter(
-            (item) =>
-              item.code.toLowerCase().includes(searchTerm) ||
-              item.name.toLowerCase().includes(searchTerm)
-          );
-        }
-
-        // Calculate pagination
-        const startIndex = (page - 1) * limit;
-        const endIndex = startIndex + limit;
-        const paginatedData = filteredData.slice(startIndex, endIndex);
-
-        setTableData(paginatedData);
-        setTotalItems(filteredData.length);
-        setLoading(false);
-      }, 500);
+      const params: any = {
+        page,
+        limit,
+      };
+      if (quickkSearch && quickkSearch.trim() !== "") {
+        params.quickSearch = quickkSearch;
+      }
+      const response = await DanhMucCaLamServices.getDanhMucCaLam([], params);
+      setTableData(response.data || []);
+      setTotalItems(response.count);
+      setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
       setLoading(false);
@@ -120,23 +108,20 @@ const DanhMucCaLamManagementPage = () => {
 
   useEffect(() => {
     getData(currentPage, pageSize, quickSearch);
-  }, [allData, currentPage, pageSize, quickSearch, getData]);
+  }, [allData, currentPage, pageSize, quickSearch]);
 
   const handleBeforeExport = async (): Promise<CaLamItem[]> => {
     setLoading(true);
     try {
-      toast.info("Đang chuẩn bị dữ liệu xuất Excel...");
-
-      // Simulate API call for export
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          setLoading(false);
-          resolve(allData);
-        }, 500);
-      });
+      const params = {
+        page: 1,
+        limit: 1000,
+      };
+      const response = await DanhMucCaLamServices.getDanhMucCaLam([], params);
+      setLoading(false);
+      return response.data || [];
     } catch (error) {
       console.error("Error fetching export data:", error);
-      toast.error("Lỗi khi tải dữ liệu để xuất Excel!");
       setLoading(false);
       return [];
     }
@@ -148,39 +133,47 @@ const DanhMucCaLamManagementPage = () => {
         title: t("maCaLam"),
         dataIndex: "code",
         key: "code",
-        width: 150,
+        width: 120,
       },
       {
         title: t("tenCaLam"),
         dataIndex: "name",
         key: "name",
-        width: 200,
+        width: 160,
       },
       {
         title: t("gioBatDau"),
         dataIndex: "startTime",
         key: "startTime",
-        width: 200,
+        width: 160,
         render: (time: string) => formatDateTime(time),
       },
       {
         title: t("gioKetThuc"),
         dataIndex: "endTime",
         key: "endTime",
-        width: 200,
+        width: 160,
         render: (time: string) => formatDateTime(time),
       },
       {
         title: t("soGioLam"),
         dataIndex: "workingHours",
         key: "workingHours",
-        width: 120,
+        width: 100,
       },
       {
-        title: t("thoiGianTre"),
-        dataIndex: "delayTime",
-        key: "delayTime",
-        width: 150,
+        title: t("ngayTao"),
+        dataIndex: "createdAt",
+        key: "createdAt",
+        width: 160,
+        render: (time: string) => formatDateTime(time),
+      },
+      {
+        title: t("ngayCapNhat"),
+        dataIndex: "updatedAt",
+        key: "updatedAt",
+        width: 160,
+        render: (time: string) => formatDateTime(time),
       },
     ],
     [t]
@@ -218,81 +211,54 @@ const DanhMucCaLamManagementPage = () => {
 
   const handleCancel = () => {
     setIsModalVisible(false);
+    setEditingDanhMucCaLam(null);
+    setEditLoading(false);
     form.resetFields();
   };
 
-  const handleSubmit = async () => {
-    if (editingDanhMucCaLam) {
+  const handleSubmit = async (values: any) => {
+    // Chỉ gửi đúng 3 trường cần thiết
+    const submitData = {
+      name: values.name,
+      startTime:
+        values.startTime && typeof values.startTime !== "string"
+          ? values.startTime.toISOString()
+          : values.startTime,
+      endTime:
+        values.endTime && typeof values.endTime !== "string"
+          ? values.endTime.toISOString()
+          : values.endTime,
+    };
+    try {
       setEditLoading(true);
-      try {
-        // Validate form fields
-        const values = await form.validateFields();
-        const changedValues = getChangedValues(values, editingDanhMucCaLam);
-
-        // Check if there are any changes
-        if (Object.keys(changedValues).length === 0) {
-          toast.info("Không có thông tin nào được thay đổi!");
-          setEditLoading(false);
-          setIsModalVisible(false); // Close the modal even if no changes
-          return;
-        }
-
-        // Simulate API update
-        setTimeout(() => {
-          // Update the item in the sample data
-          const updatedData = allData.map((item) =>
-            item.id === editingDanhMucCaLam.id ? { ...item, ...values } : item
-          );
-
-          setAllData(updatedData);
-          toast.success("Cập nhật thành công!");
-          setIsModalVisible(false);
-          setEditLoading(false);
-        }, 500);
-      } catch (error: any) {
-        handleFormErrors(form, error);
-        setEditLoading(false);
+      if (editingDanhMucCaLam && editingDanhMucCaLam.id) {
+        await DanhMucCaLamServices.updateDanhMucCaLam(
+          editingDanhMucCaLam.id,
+          submitData
+        );
+        toast.success("Cập nhật thành công!");
+        setIsModalVisible(false);
+        getData();
+      } else {
+        await DanhMucCaLamServices.createDanhMucCaLam(submitData);
+        toast.success("Thêm mới thành công!");
+        setIsModalVisible(false);
+        form.resetFields();
+        getData();
       }
-    } else {
-      // Handle add new caLam
-      setEditLoading(true);
-      try {
-        // Validate form fields
-        const values = await form.validateFields();
-
-        // Simulate API create
-        setTimeout(() => {
-          // Create a new item with a unique ID
-          const newItem: CaLamItem = {
-            id: `${Date.now()}`, // Generate a unique ID
-            ...values,
-          };
-
-          // Add to the sample data
-          const updatedData = [...allData, newItem];
-          setAllData(updatedData);
-          toast.success("Thêm mới thành công!");
-          setIsModalVisible(false);
-          form.resetFields();
-          setEditLoading(false);
-        }, 500);
-      } catch (error: any) {
-        console.log("Form validation error:", error);
-        handleFormErrors(form, error);
-        setEditLoading(false);
-      }
+    } catch (error: any) {
+      console.log("Lỗi xác thực biểu mẫu:", error);
+      handleFormErrors(form, error);
+    } finally {
+      setEditLoading(false);
     }
   };
 
   const handleDelete = async (record: any) => {
     try {
-      // Simulate API delete
-      setTimeout(() => {
-        // Remove the item from allData
-        const updatedData = allData.filter((item) => item.id !== record.id);
-        setAllData(updatedData);
-        toast.success("Xóa thành công!");
-      }, 500);
+      await DanhMucCaLamServices.deleteDanhMucCaLam(record.id);
+      toast.success("Xóa thành công!");
+      getData();
     } catch (error: any) {
       toast.error(error.message || "Có lỗi xảy ra khi xóa");
     }
@@ -339,7 +305,6 @@ const DanhMucCaLamManagementPage = () => {
               value={quickSearch}
               onChange={(e) => {
                 setQuickSearch(e.target.value);
-                getData(currentPage, pageSize, e.target.value);
               }}
             />
           </div>
@@ -382,7 +347,7 @@ const DanhMucCaLamManagementPage = () => {
         editingData={editingDanhMucCaLam}
         isModalVisible={isModalVisible}
         handleCancel={handleCancel}
-        handleSubmit={handleSubmit}
+        onFinish={handleSubmit}
         editLoading={editLoading}
       />
     </>
