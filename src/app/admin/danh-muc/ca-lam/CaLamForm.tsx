@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import FormModal from "@/components/basicUI/FormModal";
 import { ClockCircleOutlined } from "@ant-design/icons";
-import { Col, Form, FormInstance, Input, Row, DatePicker } from "antd";
-import React, { useEffect } from "react";
-import { useTranslations } from "next-intl";
+import { Col, Form, FormInstance, Input, Row, TimePicker } from "antd";
 import dayjs from "dayjs";
+import { useTranslations } from "next-intl";
+import React, { useEffect } from "react";
 import "./index.scss";
 
 interface CaLamFormProps {
@@ -112,9 +112,8 @@ const CaLamForm: React.FC<CaLamFormProps> = ({
               rules={[{ required: true, message: t("vuilongChonGioBatDau") }]}
               getValueProps={(value) => ({ value: convertToDateTime(value) })}
             >
-              <DatePicker
-                showTime={{ format: "HH:mm" }}
-                format="HH:mm DD/MM/YYYY"
+              <TimePicker
+                format="HH:mm"
                 placeholder={t("chonGioBatDau")}
                 size="large"
                 style={{ width: "100%" }}
@@ -128,9 +127,8 @@ const CaLamForm: React.FC<CaLamFormProps> = ({
               rules={[{ required: true, message: t("vuilongChonGioKetThuc") }]}
               getValueProps={(value) => ({ value: convertToDateTime(value) })}
             >
-              <DatePicker
-                showTime={{ format: "HH:mm" }}
-                format="HH:mm DD/MM/YYYY"
+              <TimePicker
+                format="HH:mm"
                 placeholder={t("chonGioKetThuc")}
                 size="large"
                 style={{ width: "100%" }}

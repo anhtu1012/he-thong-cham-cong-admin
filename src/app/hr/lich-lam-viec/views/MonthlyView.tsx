@@ -2,6 +2,8 @@
 import React from "react";
 import { Calendar } from "antd";
 import dayjs from "dayjs";
+import locale from "antd/es/date-picker/locale/vi_VN";
+import { getMonthNameInVietnamese } from "../../../../utils/dateLocalization";
 
 interface MonthlyViewProps {
   currentDate: dayjs.Dayjs;
@@ -37,14 +39,18 @@ const MonthlyView: React.FC<MonthlyViewProps> = ({
       return schedule.fullName;
     }
     // Otherwise use provided getEmployeeName function
-    return getEmployeeName(schedule.employeeId);
+    return getEmployeeName(schedule.userCode);
   };
 
   return (
     <div className="monthly-schedule-view">
-      <h3>Lịch làm việc tháng {currentDate.format("MM/YYYY")}</h3>
+      <h3>
+        Lịch làm việc {getMonthNameInVietnamese(currentDate.month() + 1)}{" "}
+        {currentDate.format("YYYY")}
+      </h3>
       <Calendar
         value={currentDate}
+        locale={locale}
         onSelect={(date) => {
           setCurrentDate(date);
           setViewType("day");
@@ -56,9 +62,9 @@ const MonthlyView: React.FC<MonthlyViewProps> = ({
           const filteredSchedules = daySchedules.filter(
             (schedule) =>
               (selectedEmployees.length === 0 ||
-                selectedEmployees.includes(schedule.employeeId)) &&
+                selectedEmployees.includes(schedule.userCode)) &&
               (selectedDepartment === "all" ||
-                employeeList.find((e) => e.id === schedule.employeeId)
+                employeeList.find((e) => e.userCode === schedule.userCode)
                   ?.department === selectedDepartment)
           );
 

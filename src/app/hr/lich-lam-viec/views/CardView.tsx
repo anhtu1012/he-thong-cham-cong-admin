@@ -7,7 +7,6 @@ import dayjs from "dayjs";
 interface CardViewProps {
   dateRange: { start: dayjs.Dayjs; end: dayjs.Dayjs };
   scheduleData: any[];
-  employeeList: any[];
   selectedEmployees: number[];
   selectedDepartment: string;
   currentDate: dayjs.Dayjs;
@@ -20,7 +19,6 @@ interface CardViewProps {
 const CardView: React.FC<CardViewProps> = ({
   dateRange,
   scheduleData,
-  employeeList,
   selectedEmployees,
   selectedDepartment,
   currentDate,
@@ -33,16 +31,21 @@ const CardView: React.FC<CardViewProps> = ({
 
   // Create a combined list of employees that includes both employeeList and
   // any employees found only in the schedule data (from API)
-  const combinedEmployeeList = [...employeeList];
+  const combinedEmployeeList: {
+    userCode: number;
+    name: string;
+    department: string;
+    avatar?: string;
+  }[] = [];
 
   // Add unique employees from schedule data
   scheduleData.forEach((schedule) => {
     if (
       schedule.fullName &&
-      !combinedEmployeeList.find((e) => e.id === schedule.employeeId)
+      !combinedEmployeeList.find((e) => e.userCode === schedule.userCode)
     ) {
       combinedEmployeeList.push({
-        id: schedule.employeeId,
+        userCode: schedule.userCode,
         name: schedule.fullName,
         department: schedule.positionName || "Unknown",
         // No avatar for API-only employees
@@ -53,7 +56,7 @@ const CardView: React.FC<CardViewProps> = ({
   const filteredEmployees = combinedEmployeeList.filter(
     (employee) =>
       (selectedEmployees.length === 0 ||
-        selectedEmployees.includes(employee.id)) &&
+        selectedEmployees.includes(employee.userCode)) &&
       (selectedDepartment === "all" ||
         employee.department === selectedDepartment)
   );
@@ -71,14 +74,14 @@ const CardView: React.FC<CardViewProps> = ({
           const employeeSchedules = scheduleData.filter((schedule) => {
             const scheduleDate = dayjs(schedule.date);
             return (
-              schedule.employeeId === employee.id &&
+              schedule.userCode === employee.userCode &&
               (scheduleDate.isAfter(start) || scheduleDate.isSame(start)) &&
               (scheduleDate.isBefore(end) || scheduleDate.isSame(end))
             );
           });
 
           return (
-            <Col xs={24} sm={12} md={8} lg={6} key={employee.id}>
+            <Col xs={24} sm={12} md={8} lg={6} key={employee.userCode}>
               <Card
                 title={
                   <div className="employee-card-header">
@@ -101,7 +104,7 @@ const CardView: React.FC<CardViewProps> = ({
                     size="small"
                     onClick={() => {
                       form.setFieldsValue({
-                        employeeId: employee.id,
+                        userCode: employee.userCode,
                         date: currentDate,
                       });
                       handleAddSchedule();
@@ -120,7 +123,7 @@ const CardView: React.FC<CardViewProps> = ({
                     dataSource={employeeSchedules}
                     renderItem={(schedule) => (
                       <List.Item
-                        key={schedule.id}
+                        key={schedule.userCode}
                         className={`schedule-list-item status-${schedule.status}`}
                         actions={[
                           <Button

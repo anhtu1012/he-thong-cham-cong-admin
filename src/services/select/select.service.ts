@@ -13,11 +13,24 @@ class SelectServicesBase extends AxiosService {
     }
     return this.get(`${this.basePath}/dropdown-user/${id}`);
   }
-  async getSelectBrand(): Promise<SelectOptionsArray[]> {
+
+  async getSelectBrand(userCode?: string): Promise<SelectOptionsArray[]> {
+    if (userCode) {
+      return this.getWithParams(
+        `${this.basePath}/dropdown-branch`,
+        new URLSearchParams({ userCode })
+      );
+    }
     return this.get(`${this.basePath}/dropdown-branch`);
   }
+
   async getSelectPosition(): Promise<SelectOptionsArray[]> {
     return this.get(`${this.basePath}/dropdown-position`);
+  }
+
+  //Ca làm
+  async getSelectShift(): Promise<SelectOptionsArray[]> {
+    return this.get(`${this.basePath}/dropdown-shift`);
   }
 
   // New methods for dependent dropdowns

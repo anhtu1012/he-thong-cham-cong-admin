@@ -11,6 +11,7 @@ import { toast } from "react-toastify";
 import CaLamForm from "./CaLamForm";
 import { useTranslations } from "next-intl";
 import DanhMucCaLamServices from "@/services/admin/danh-muc/ca-lam/ca-lam.service";
+import { formatDateTime } from "@/utils/dateTime";
 
 // Sample data interface for CaLam
 interface CaLamItem {
@@ -22,15 +23,6 @@ interface CaLamItem {
   workingHours: number;
   delayTime: string; // Format "HH:mm"
 }
-
-// Format date for display
-const formatDateTime = (timeString: string): string => {
-  const date = new Date(timeString);
-  return `${date.toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit",
-  })} ${date.toLocaleDateString()}`;
-};
 
 const DanhMucCaLamManagementPage = () => {
   const t = useTranslations("DanhMucCaLam");
@@ -44,43 +36,6 @@ const DanhMucCaLamManagementPage = () => {
   const [totalItems, setTotalItems] = useState<number>(0);
   const [loading, setLoading] = useState(false);
   const [editLoading, setEditLoading] = useState(false);
-  const [allData, setAllData] = useState<CaLamItem[]>([]);
-
-  // Sample data with proper date format
-  const initialData: CaLamItem[] = [
-    {
-      id: "1",
-      code: "CA001",
-      name: "Ca sáng",
-      startTime: "2025-06-01T08:00:00.000Z",
-      endTime: "2025-06-01T15:00:00.000Z",
-      workingHours: 7,
-      delayTime: "00:15",
-    },
-    {
-      id: "2",
-      code: "CA002",
-      name: "Ca chiều",
-      startTime: "2025-06-01T14:00:00.000Z",
-      endTime: "2025-06-01T21:00:00.000Z",
-      workingHours: 7,
-      delayTime: "00:15",
-    },
-    {
-      id: "3",
-      code: "CA003",
-      name: "Ca tối",
-      startTime: "2025-06-01T22:00:00.000Z",
-      endTime: "2025-06-02T05:00:00.000Z",
-      workingHours: 7,
-      delayTime: "00:15",
-    },
-  ];
-
-  // Initialize allData with initialData on component mount
-  useEffect(() => {
-    setAllData([...initialData]);
-  }, []);
 
   const getData = async (
     page = currentPage,
@@ -108,7 +63,7 @@ const DanhMucCaLamManagementPage = () => {
 
   useEffect(() => {
     getData(currentPage, pageSize, quickSearch);
-  }, [allData, currentPage, pageSize, quickSearch]);
+  }, [currentPage, pageSize, quickSearch]);
 
   const handleBeforeExport = async (): Promise<CaLamItem[]> => {
     setLoading(true);

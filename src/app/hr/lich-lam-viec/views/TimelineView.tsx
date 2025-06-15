@@ -2,6 +2,7 @@
 import React from "react";
 import type { JSX } from "react";
 import dayjs from "dayjs";
+import { getDayNameInVietnamese } from "../../../../utils/dateLocalization";
 
 interface TimelineViewProps {
   dateRange: { start: dayjs.Dayjs; end: dayjs.Dayjs };
@@ -77,7 +78,10 @@ const TimelineView: React.FC<TimelineViewProps> = ({
           </div>
         ) : (
           sortedDates.map((date) => {
-            const formattedDate = dayjs(date).format("dddd, DD/MM/YYYY");
+            const dateObj = dayjs(date);
+            const formattedDate = `${getDayNameInVietnamese(
+              dateObj
+            )}, ${dateObj.format("DD/MM/YYYY")}`;
             const daySchedules = dateGroups[date];
 
             // Group by shift for timeline view

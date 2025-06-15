@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 import dayjs from "dayjs";
+import { getShortDayNameInVietnamese } from "@/utils/dateLocalization";
 
 interface GanttViewProps {
   dateRange: { start: dayjs.Dayjs; end: dayjs.Dayjs };
   scheduleData: any[];
-  employeeList: any[];
   selectedEmployees: number[];
   selectedDepartment: string;
   form: any;
@@ -16,7 +16,6 @@ interface GanttViewProps {
 const GanttView: React.FC<GanttViewProps> = ({
   dateRange,
   scheduleData,
-  employeeList,
   selectedEmployees,
   selectedDepartment,
   form,
@@ -34,16 +33,20 @@ const GanttView: React.FC<GanttViewProps> = ({
 
   // Create a combined list of employees that includes both employeeList and
   // any employees found only in the schedule data (from API)
-  const combinedEmployeeList = [...employeeList];
+  const combinedEmployeeList: {
+    userCode: number;
+    name: string;
+    department: string;
+  }[] = [];
 
   // Add unique employees from schedule data
   scheduleData.forEach((schedule) => {
     if (
       schedule.fullName &&
-      !combinedEmployeeList.find((e) => e.id === schedule.employeeId)
+      !combinedEmployeeList.find((e) => e.userCode === schedule.userCode)
     ) {
       combinedEmployeeList.push({
-        id: schedule.employeeId,
+        userCode: schedule.userCode,
         name: schedule.fullName,
         department: schedule.positionName || "Unknown",
       });
@@ -53,7 +56,7 @@ const GanttView: React.FC<GanttViewProps> = ({
   const filteredEmployees = combinedEmployeeList.filter(
     (employee) =>
       (selectedEmployees.length === 0 ||
-        selectedEmployees.includes(employee.id)) &&
+        selectedEmployees.includes(employee.userCode)) &&
       (selectedDepartment === "all" ||
         employee.department === selectedDepartment)
   );
@@ -71,7 +74,9 @@ const GanttView: React.FC<GanttViewProps> = ({
           <div className="gantt-timeline-header">
             {days.map((day: any) => (
               <div key={day.format("YYYY-MM-DD")} className="gantt-day-header">
-                <div className="day-name">{day.format("ddd")}</div>
+                <div className="day-name">
+                  {getShortDayNameInVietnamese(day)}
+                </div>
                 <div className="day-date">{day.format("DD/MM")}</div>
               </div>
             ))}
@@ -81,13 +86,13 @@ const GanttView: React.FC<GanttViewProps> = ({
         <div className="gantt-body">
           {filteredEmployees.map((employee) => {
             return (
-              <div key={employee.id} className="gantt-row">
+              <div key={employee.userCode} className="gantt-row">
                 <div className="gantt-side-cell">{employee.name}</div>
                 <div className="gantt-timeline">
                   {days.map((day: any) => {
                     const daySchedules = scheduleData.filter(
                       (s) =>
-                        s.employeeId === employee.id &&
+                        s.userCode === employee.userCode &&
                         s.date === day.format("YYYY-MM-DD")
                     );
 
@@ -98,7 +103,7 @@ const GanttView: React.FC<GanttViewProps> = ({
                       >
                         {daySchedules.map((schedule) => (
                           <div
-                            key={schedule.id}
+                            key={schedule.userCode}
                             className={`gantt-schedule-item status-${schedule.status}`}
                             onClick={() => handleEditSchedule(schedule)}
                             title={`${schedule.shift}: ${schedule.startTime}-${schedule.endTime}`}
@@ -110,7 +115,7 @@ const GanttView: React.FC<GanttViewProps> = ({
                           className="gantt-add-button"
                           onClick={() => {
                             form.setFieldsValue({
-                              employeeId: employee.id,
+                              userCode: employee.userCode,
                               date: day,
                             });
                             handleAddSchedule();

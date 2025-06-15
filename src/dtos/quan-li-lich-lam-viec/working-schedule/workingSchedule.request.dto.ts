@@ -1,49 +1,9 @@
 import { z } from "zod";
 import {
+  CreateWorkingScheduleSchema,
   WorkingScheduleSchema,
   WorkingScheduleStatusEnum,
 } from "./workingSchedule.dto";
-
-/**
- * Schema and type for creating a working schedule
- */
-export const CreateWorkingScheduleSchema = WorkingScheduleSchema.omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-})
-  .partial({
-    checkInTime: true,
-    checkOutTime: true,
-  })
-  .extend({
-    // Required fields with validation
-    userCode: z.string().min(1, "User code is required"),
-    userContractCode: z.string().min(1, "User contract code is required"),
-    date: z.string().refine((value) => {
-      try {
-        return !isNaN(Date.parse(value));
-      } catch {
-        return false;
-      }
-    }, "Date must be a valid ISO 8601 date string"),
-    shiftCode: z.string().min(1, "Shift code is required"),
-    branchCode: z.string().min(1, "Branch code is required"),
-    startShiftTime: z.string().refine((value) => {
-      try {
-        return !isNaN(Date.parse(value));
-      } catch {
-        return false;
-      }
-    }, "Start shift time must be a valid ISO 8601 date string"),
-    endShiftTime: z.string().refine((value) => {
-      try {
-        return !isNaN(Date.parse(value));
-      } catch {
-        return false;
-      }
-    }, "End shift time must be a valid ISO 8601 date string"),
-  });
 
 export type CreateWorkingScheduleRequest = z.infer<
   typeof CreateWorkingScheduleSchema

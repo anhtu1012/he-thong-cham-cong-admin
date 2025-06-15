@@ -35,7 +35,15 @@ export const WorkingScheduleSchema = z.object({
   checkInTime: z.string().or(z.date()).nullable(),
   checkOutTime: z.string().or(z.date()).nullable(),
   positionName: z.string(),
-  fullNameManagerBy: z.string(),
+  managerFullName: z.string(),
 });
 
 export type WorkingScheduleItem = z.infer<typeof WorkingScheduleSchema>;
+
+export const CreateWorkingScheduleSchema = z.object({
+  userCode: z.string(),
+  date: z.string().or(z.date()),
+  shiftCode: z.string(),
+  branchCode: z.string(),
+});
+export type CreateWorkingSchedule = z.infer<typeof CreateWorkingScheduleSchema>;

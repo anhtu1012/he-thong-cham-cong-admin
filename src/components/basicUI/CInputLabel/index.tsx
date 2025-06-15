@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Input, InputProps } from "antd";
 import "./index.scss";
 
 interface InputWithLabelProps extends InputProps {
   label: string;
   defaultValue?: string;
-  value?: string; // Thêm thuộc tính value
-  disabled?: boolean; // Check if disabled to handle that case
+  value?: string;
+  disabled?: boolean;
   type?: "text" | "number";
+  debounceDelay?: number; // Add debounce delay prop
 }
 
 const CInputLabel: React.FC<InputWithLabelProps> = ({
@@ -17,12 +18,14 @@ const CInputLabel: React.FC<InputWithLabelProps> = ({
   onChange,
   disabled,
   type = "text",
+  debounceDelay = 300, // Default debounce delay of 300ms
   ...inputProps
 }) => {
   const [hasFocus, setHasFocus] = useState(false);
   const [inputValue, setInputValue] = useState<string | undefined>(
     value || defaultValue
   );
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     // Cập nhật inputValue khi value thay đổi
@@ -31,17 +34,36 @@ const CInputLabel: React.FC<InputWithLabelProps> = ({
     }
   }, [defaultValue, value]);
 
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, []);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value;
     if (type === "number") {
       value = value.replace(/[^0-9]/g, "");
     }
     setInputValue(value);
+
+    // Always update local state immediately
     if (onChange) {
-      onChange({
-        ...e,
-        target: { ...e.target, value },
-      });
+      // Clear any existing timeout
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+
+      // Set new timeout for debounced onChange
+      debounceTimerRef.current = setTimeout(() => {
+        onChange({
+          ...e,
+          target: { ...e.target, value },
+        });
+      }, debounceDelay);
     }
   };
 

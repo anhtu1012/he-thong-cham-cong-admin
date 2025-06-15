@@ -3,11 +3,11 @@ import React from "react";
 import type { JSX } from "react";
 import { List, Button } from "antd";
 import dayjs from "dayjs";
+import { getDayNameInVietnamese } from "../../../../utils/dateLocalization";
 
 interface ListViewProps {
   dateRange: { start: dayjs.Dayjs; end: dayjs.Dayjs };
   scheduleData: any[];
-  employeeList: any[];
   selectedEmployees: number[];
   selectedDepartment: string;
   handleEditSchedule: (schedule: any) => void;
@@ -18,7 +18,6 @@ interface ListViewProps {
 const ListView: React.FC<ListViewProps> = ({
   dateRange,
   scheduleData,
-  employeeList,
   selectedEmployees,
   selectedDepartment,
   handleEditSchedule,
@@ -40,7 +39,9 @@ const ListView: React.FC<ListViewProps> = ({
     let matchesDepartmentFilter = selectedDepartment === "all";
 
     if (!matchesDepartmentFilter) {
-      const employee = employeeList.find((e) => e.id === schedule.employeeId);
+      const employee = scheduleData.find(
+        (e) => e.userCode === schedule.userCode
+      );
       if (employee) {
         matchesDepartmentFilter = employee.department === selectedDepartment;
       } else if (schedule.positionName) {
@@ -78,17 +79,14 @@ const ListView: React.FC<ListViewProps> = ({
         dateKeys.map((dateKey) => (
           <div key={dateKey} className="date-group">
             <h4 className="date-header">
-              {dayjs(dateKey).format("dddd, DD/MM/YYYY")}
+              {getDayNameInVietnamese(dayjs(dateKey))},{" "}
+              {dayjs(dateKey).format("DD/MM/YYYY")}
             </h4>
             <List
               dataSource={schedulesByDate[dateKey]}
               renderItem={(schedule) => {
-                const employee = employeeList.find(
-                  (e) => e.id === schedule.employeeId
-                );
-                const employeeName =
-                  employee?.name || schedule.fullName || "N/A";
-                const employeeAvatar = employee?.avatar;
+                const employeeName = schedule.fullName || "N/A";
+                const employeeAvatar = schedule?.avatar;
 
                 return (
                   <List.Item
