@@ -554,9 +554,9 @@
 
     .ant-menu-submenu-title {
       border-radius: 8px;
-      padding: 0 16px;
       position: relative;
       overflow: hidden;
+      padding-left: 12px !important;
 
       &:hover {
         background-color: rgba(24, 144, 255, 0.08);

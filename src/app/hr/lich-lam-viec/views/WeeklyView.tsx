@@ -3,6 +3,7 @@ import React from "react";
 import { Button } from "antd";
 import { EnvironmentOutlined, PlusOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
+import { getDayNameInVietnamese } from "../../../../utils/dateLocalization";
 
 interface WeeklyViewProps {
   dateRange: { start: dayjs.Dayjs; end: dayjs.Dayjs };
@@ -10,9 +11,7 @@ interface WeeklyViewProps {
   employeeList?: any[];
   selectedEmployees: number[];
   selectedDepartment: string;
-  branches: any[];
   attendanceStatuses: Record<string, string>;
-  branchFilter: number | null;
   attendanceFilter: string | null;
   form: any;
   handleViewSchedule: (schedule: any) => void;
@@ -24,9 +23,7 @@ const WeeklyView: React.FC<WeeklyViewProps> = ({
   scheduleData,
   selectedEmployees,
   selectedDepartment,
-  branches,
   attendanceStatuses,
-  branchFilter,
   attendanceFilter,
   form,
   handleViewSchedule,
@@ -41,16 +38,6 @@ const WeeklyView: React.FC<WeeklyViewProps> = ({
     day = day.add(1, "day");
   }
 
-  const getBranchName = (schedule: any) => {
-    // First check if the schedule has branchName from API
-    if (schedule.branchName) {
-      return schedule.branchName;
-    }
-    // Otherwise lookup from branches array
-    const branch = branches.find((b) => b.id === schedule.branchId);
-    return branch ? branch.name : "N/A";
-  };
-
   //   // Find employees with schedules in the date range
   const employeesWithSchedules: any = [];
 
@@ -58,13 +45,13 @@ const WeeklyView: React.FC<WeeklyViewProps> = ({
   scheduleData.forEach((schedule) => {
     if (schedule.fullName) {
       const existingEmployee = employeesWithSchedules.find(
-        (emp: any) => emp.id === schedule.employeeId
+        (emp: any) => emp.userCode === schedule.userCode
       );
       if (!existingEmployee) {
         employeesWithSchedules.push({
-          id: schedule.employeeId,
-          name: schedule.fullName,
-          department: schedule.positionName || "Unknown",
+          userCode: schedule.userCode,
+          fullName: schedule.fullName,
+          positionName: schedule.positionName || "Unknown",
         });
       }
     }
@@ -74,6 +61,8 @@ const WeeklyView: React.FC<WeeklyViewProps> = ({
     if (!status) return "";
     return `attendance-${status}`;
   };
+  console.log("employeesWithSchedules", employeesWithSchedules);
+  console.log("selectedEmployees", selectedEmployees);
 
   return (
     <div className="weekly-schedule-view">
@@ -91,7 +80,7 @@ const WeeklyView: React.FC<WeeklyViewProps> = ({
               </th>
               {days.map((d: any) => (
                 <th key={d.format("YYYY-MM-DD")}>
-                  <div>{d.format("dddd")}</div>
+                  <div>{getDayNameInVietnamese(d)}</div>
                   <div>{d.format("DD/MM")}</div>
                 </th>
               ))}
@@ -102,7 +91,7 @@ const WeeklyView: React.FC<WeeklyViewProps> = ({
               .filter(
                 (emp: any) =>
                   selectedEmployees.length === 0 ||
-                  selectedEmployees.includes(emp.id)
+                  selectedEmployees.includes(emp.userCode)
               )
               .filter(
                 (emp: any) =>
@@ -117,19 +106,17 @@ const WeeklyView: React.FC<WeeklyViewProps> = ({
                         <img
                           src={employee.avatar}
                           className="employee-avatar-small"
-                          alt={employee.name}
+                          alt={employee.fullName}
                         />
                       )}
-                      <span>{employee.name}</span>
+                      <span>{employee.fullName}</span>
                     </div>
                   </td>
                   {days.map((d: any) => {
                     const daySchedules = scheduleData.filter(
                       (s) =>
-                        s.employeeId === employee.id &&
+                        s.userCode === employee.userCode &&
                         s.date === d.format("YYYY-MM-DD") &&
-                        (branchFilter === null ||
-                          s.branchId === branchFilter) &&
                         (attendanceFilter === null ||
                           s.attendanceStatus === attendanceFilter)
                     );
@@ -153,15 +140,12 @@ const WeeklyView: React.FC<WeeklyViewProps> = ({
                               {schedule.shift}
                             </div>
                             <div className="schedule-info">
-                              <span className="branch-badge">
-                                <EnvironmentOutlined />
-                                {getBranchName(schedule)
-                                  .split(" ")
-                                  .slice(-1)
-                                  .join(" ")}
-                              </span>
                               <span className="time-range">
                                 {schedule.startTime}-{schedule.endTime}
+                              </span>
+                              <span className="branch-badge">
+                                <EnvironmentOutlined />
+                                {schedule.branchName || "N/A"}
                               </span>
                             </div>
                             {schedule.attendanceStatus && (
@@ -195,7 +179,7 @@ const WeeklyView: React.FC<WeeklyViewProps> = ({
                           icon={<PlusOutlined />}
                           onClick={() => {
                             form.setFieldsValue({
-                              employeeId: employee.id,
+                              userCode: employee.userCode,
                               date: d,
                             });
                             handleAddSchedule();

@@ -3,6 +3,9 @@
 import { AxiosService } from "@/apis/axios.base";
 import { FilterQueryStringTypeItem } from "@/apis/ddd/repository.port";
 import { UserResponseGetItem } from "@/dtos/auth/auth.response.dto";
+import { CreateWorkingSchedule } from "@/dtos/quan-li-lich-lam-viec/working-schedule/workingSchedule.dto";
+import { PaginatedSelectOptionsResponse } from "@/dtos/select/select.response.dto";
+import { StaffSearchParams } from "@/types/staff";
 
 class WorkingScheduleServicesBase extends AxiosService {
   protected readonly basePath = "/v1/business";
@@ -16,6 +19,21 @@ class WorkingScheduleServicesBase extends AxiosService {
       searchFilter,
       params
     );
+  }
+
+  async getSelectStaff(
+    searchFilter: FilterQueryStringTypeItem[] = [],
+    params?: StaffSearchParams
+  ): Promise<PaginatedSelectOptionsResponse> {
+    return this.getWithFilter(
+      `${this.basePath}/user-by-management`,
+      searchFilter,
+      params as Record<string, string>
+    );
+  }
+
+  async createWorkingSchedule(data: CreateWorkingSchedule): Promise<any> {
+    return this.post(`${this.basePath}/tao-lich-lam`, data);
   }
 }
 

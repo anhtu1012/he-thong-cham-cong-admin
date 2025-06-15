@@ -7,17 +7,16 @@ import {
   EditOutlined,
   DeleteOutlined,
   UserOutlined,
-  TeamOutlined,
   ApartmentOutlined,
   EnvironmentOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
+import { getDayNameInVietnamese } from "../../../../utils/dateLocalization";
 
 interface DetailViewProps {
   currentSchedule: any;
   employeeList: any[];
   scheduleData: any[];
-  branches: any[];
   setDetailView: (show: boolean) => void;
   handleEditSchedule: (schedule: any) => void;
   handleDeleteSchedule: (id: number) => void;
@@ -32,7 +31,6 @@ const DetailView: React.FC<DetailViewProps> = ({
   currentSchedule,
   employeeList,
   scheduleData,
-  branches,
   setDetailView,
   handleEditSchedule,
   handleDeleteSchedule,
@@ -45,14 +43,13 @@ const DetailView: React.FC<DetailViewProps> = ({
   if (!currentSchedule) return null;
 
   const employee = employeeList.find(
-    (e) => e.id === currentSchedule.employeeId
+    (e) => e.userCode === currentSchedule.userCode
   );
-  const branch = branches.find((b) => b.id === currentSchedule.branchId);
 
   // Find other schedules for the same employee on the same day
   const otherSchedules = scheduleData.filter(
     (s) =>
-      s.employeeId === currentSchedule.employeeId &&
+      s.userCode === currentSchedule.userCode &&
       s.date === currentSchedule.date &&
       s.id !== currentSchedule.id
   );
@@ -109,20 +106,17 @@ const DetailView: React.FC<DetailViewProps> = ({
                   />
                 )}
                 <div className="employee-info">
-                  <h3>{employee?.name || currentSchedule.fullName || "N/A"}</h3>
-                  <p>
-                    <TeamOutlined /> {employee?.department}
-                  </p>
+                  <h3>{currentSchedule.fullName || "N/A"}</h3>
                   <p>
                     <UserOutlined />{" "}
                     {employee?.position ||
                       currentSchedule.positionName ||
                       "N/A"}
                   </p>
-                  {currentSchedule.fullNameManagerBy && (
+                  {currentSchedule.managerFullName && (
                     <p>
                       <UserOutlined /> Quản lý:{" "}
-                      {currentSchedule.fullNameManagerBy}
+                      {currentSchedule.managerFullName}
                     </p>
                   )}
                 </div>
@@ -136,22 +130,10 @@ const DetailView: React.FC<DetailViewProps> = ({
             >
               <div className="branch-detail">
                 <h4>
-                  <ApartmentOutlined />{" "}
-                  {branch?.name || currentSchedule.branchName || "N/A"}
-                  {currentSchedule.branchCode && (
-                    <small
-                      style={{
-                        marginLeft: 8,
-                        color: "#888",
-                      }}
-                    >
-                      ({currentSchedule.branchCode})
-                    </small>
-                  )}
+                  <ApartmentOutlined /> {currentSchedule.branchName || "N/A"}
                 </h4>
                 <p>
-                  <EnvironmentOutlined />{" "}
-                  {branch?.address || currentSchedule.addressLine || "N/A"}
+                  <EnvironmentOutlined /> {currentSchedule.addressLine || "N/A"}
                 </p>
               </div>
             </Card>
@@ -184,7 +166,7 @@ const DetailView: React.FC<DetailViewProps> = ({
                             <div>
                               {schedule.startTime} - {schedule.endTime}
                             </div>
-                            <div>{branch ? branch.name : "N/A"}</div>
+                            <div>{schedule ? schedule.branchName : "N/A"}</div>
                           </div>
                         }
                       />
@@ -202,7 +184,8 @@ const DetailView: React.FC<DetailViewProps> = ({
                   <div className="detail-item">
                     <div className="item-label">Ngày làm việc</div>
                     <div className="item-value">
-                      {dayjs(currentSchedule.date).format("dddd, DD/MM/YYYY")}
+                      {getDayNameInVietnamese(dayjs(currentSchedule.date))},{" "}
+                      {dayjs(currentSchedule.date).format("DD/MM/YYYY")}
                     </div>
                   </div>
                 </Col>

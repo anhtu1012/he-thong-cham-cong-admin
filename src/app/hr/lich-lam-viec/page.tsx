@@ -5,28 +5,28 @@ import {
   AppstoreOutlined,
   BarsOutlined,
   CalendarOutlined,
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  CloseCircleOutlined,
+  FilterOutlined,
   ProfileOutlined,
   ScheduleOutlined,
   TableOutlined,
-  CheckCircleOutlined,
-  ClockCircleOutlined,
   WarningOutlined,
-  CloseCircleOutlined,
-  FilterOutlined,
 } from "@ant-design/icons";
 import {
   Button,
+  Col,
+  Collapse,
   DatePicker,
   Form,
   Input,
   Modal,
   Radio,
-  Select,
-  Tag,
-  Space,
-  Collapse,
   Row,
-  Col,
+  Select,
+  Space,
+  Tag,
 } from "antd";
 import dayjs from "dayjs";
 import "dayjs/locale/vi";
@@ -35,15 +35,19 @@ import { toast } from "react-toastify";
 import "./index.scss";
 
 // Import view components
-import DailyView from "./views/DailyView";
-import WeeklyView from "./views/WeeklyView";
-import MonthlyView from "./views/MonthlyView";
-import ListView from "./views/ListView";
-import CardView from "./views/CardView";
-import GanttView from "./views/GanttView";
-import TimelineView from "./views/TimelineView";
-import DetailView from "./views/DetailView";
+import { SelectOptionsArray } from "@/dtos/select/select.dto";
+import { selectAuthLogin } from "@/lib/store/slices/loginSlice";
 import WorkingScheduleServices from "@/services/quan-li-lich-lam-viec/working-schedule.service";
+import SelectServices from "@/services/select/select.service";
+import { useSelector } from "react-redux";
+import CardView from "./views/CardView";
+import DailyView from "./views/DailyView";
+import DetailView from "./views/DetailView";
+import GanttView from "./views/GanttView";
+import ListView from "./views/ListView";
+import MonthlyView from "./views/MonthlyView";
+import TimelineView from "./views/TimelineView";
+import WeeklyView from "./views/WeeklyView";
 
 // Sample API response data
 // const sampleApiResponse = {
@@ -71,7 +75,7 @@ import WorkingScheduleServices from "@/services/quan-li-lich-lam-viec/working-sc
 //       checkInTime: null,
 //       checkOutTime: null,
 //       positionName: "thu duc",
-//       fullNameManagerBy: "Pham HR",
+//       managerFullName: "Pham HR",
 //     },
 //     {
 //       id: "5",
@@ -93,7 +97,7 @@ import WorkingScheduleServices from "@/services/quan-li-lich-lam-viec/working-sc
 //       checkInTime: null,
 //       checkOutTime: null,
 //       positionName: "thu duc",
-//       fullNameManagerBy: "Pham HR",
+//       managerFullName: "Pham HR",
 //     },
 //     {
 //       id: "6",
@@ -115,7 +119,7 @@ import WorkingScheduleServices from "@/services/quan-li-lich-lam-viec/working-sc
 //       checkInTime: null,
 //       checkOutTime: null,
 //       positionName: "tân bình",
-//       fullNameManagerBy: "Nguyen HR",
+//       managerFullName: "Nguyen HR",
 //     },
 //     {
 //       id: "7",
@@ -137,7 +141,7 @@ import WorkingScheduleServices from "@/services/quan-li-lich-lam-viec/working-sc
 //       checkInTime: null,
 //       checkOutTime: null,
 //       positionName: "tân bình",
-//       fullNameManagerBy: "Nguyen HR",
+//       managerFullName: "Nguyen HR",
 //     },
 //     {
 //       id: "8",
@@ -159,7 +163,7 @@ import WorkingScheduleServices from "@/services/quan-li-lich-lam-viec/working-sc
 //       checkInTime: null,
 //       checkOutTime: null,
 //       positionName: "gò vấp",
-//       fullNameManagerBy: "Tran HR",
+//       managerFullName: "Tran HR",
 //     },
 //     {
 //       id: "9",
@@ -181,7 +185,7 @@ import WorkingScheduleServices from "@/services/quan-li-lich-lam-viec/working-sc
 //       checkInTime: null,
 //       checkOutTime: null,
 //       positionName: "gò vấp",
-//       fullNameManagerBy: "Tran HR",
+//       managerFullName: "Tran HR",
 //     },
 //     {
 //       id: "10",
@@ -203,7 +207,7 @@ import WorkingScheduleServices from "@/services/quan-li-lich-lam-viec/working-sc
 //       checkInTime: null,
 //       checkOutTime: null,
 //       positionName: "bình thạnh",
-//       fullNameManagerBy: "Vo HR",
+//       managerFullName: "Vo HR",
 //     },
 //     {
 //       id: "11",
@@ -225,7 +229,7 @@ import WorkingScheduleServices from "@/services/quan-li-lich-lam-viec/working-sc
 //       checkInTime: null,
 //       checkOutTime: null,
 //       positionName: "bình thạnh",
-//       fullNameManagerBy: "Vo HR",
+//       managerFullName: "Vo HR",
 //     },
 //   ],
 // };
@@ -234,21 +238,13 @@ import WorkingScheduleServices from "@/services/quan-li-lich-lam-viec/working-sc
 const transformApiScheduleData = (apiData: any[]) => {
   return apiData.map((item, index) => {
     // Extract time portions from the datetime strings
-    const startTime = item.startShiftTime
-      ? new Date(item.startShiftTime).toLocaleTimeString("en-US", {
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: false,
-        })
-      : "08:00";
+    // const startTime = item.startShiftTime
+    //   ? new Date(item.startShiftTime).toISOString().substring(11, 16) // "HH:mm"
+    //   : "08:00";
 
-    const endTime = item.endShiftTime
-      ? new Date(item.endShiftTime).toLocaleTimeString("en-US", {
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: false,
-        })
-      : "17:00";
+    // const endTime = item.endShiftTime
+    //   ? new Date(item.endShiftTime).toISOString().substring(11, 16) // "HH:mm"
+    //   : "08:00";
 
     const checkinTime = item.checkInTime
       ? new Date(item.checkInTime).toLocaleTimeString("en-US", {
@@ -283,83 +279,35 @@ const transformApiScheduleData = (apiData: any[]) => {
     else if (item.status === "ABSENT")
       attendanceStatus = attendanceStatuses.ABSENT;
 
-    // Find branch from API data if available, otherwise use random
-    let branchId = Math.floor(Math.random() * branches.length) + 1;
-
-    // Try to find an existing branch with matching name
-    if (item.branchName) {
-      const existingBranch = branches.find((b) => b.name === item.branchName);
-      if (existingBranch) {
-        branchId = existingBranch.id;
-      }
-    }
-
     // Extract or generate employee ID
     const employeeId = parseInt(item.userCode?.replace("USER", "") || "1");
 
     return {
       id: parseInt(item.id || index + 1),
       employeeId: employeeId,
+      userCode: item.userCode,
       date: date,
       shift: item.shiftName || "Ca làm việc",
-      startTime: startTime,
-      endTime: endTime,
-      status: status,
-      branchId: branchId,
+      startTime: item.startShiftTime,
+      endTime: item.endShiftTime,
+      status: item.status || status,
+      statusTimeKeeping: item.statusTimeKeeping || null,
       checkinTime: checkinTime,
       checkoutTime: checkoutTime,
       attendanceStatus: attendanceStatus,
       note: "",
-      // Original API data fields
       code: item.code,
-      userCode: item.userCode,
       userContractCode: item.userContractCode,
       fullName: item.fullName,
       shiftCode: item.shiftCode,
-      // New fields from updated API
       branchName: item.branchName,
       branchCode: item.branchCode,
       addressLine: item.addressLine,
       positionName: item.positionName,
-      fullNameManagerBy: item.fullNameManagerBy,
+      managerFullName: item.managerFullName,
     };
   });
 };
-
-// Replace the mockGetScheduleData function with a simpler version
-// const mockGetScheduleData = async () => {
-//   // In a real implementation, this would be an API call to fetch data
-//   // For now, we just use the sample data and transform it
-
-//   return {
-//     data: transformedData,
-//   };
-// };
-
-// Define branch data
-const branches = [
-  {
-    id: 1,
-    name: "Chi nhánh Quận 1",
-    address: "123 Nguyễn Huệ, Quận 1, TP.HCM",
-  },
-  { id: 2, name: "Chi nhánh Quận 2", address: "456 Thảo Điền, Quận 2, TP.HCM" },
-  {
-    id: 3,
-    name: "Chi nhánh Quận 7",
-    address: "789 Nguyễn Lương Bằng, Quận 7, TP.HCM",
-  },
-  {
-    id: 4,
-    name: "Chi nhánh Hà Nội",
-    address: "101 Bà Triệu, Hai Bà Trưng, Hà Nội",
-  },
-  {
-    id: 5,
-    name: "Chi nhánh Đà Nẵng",
-    address: "202 Bạch Đằng, Hải Châu, Đà Nẵng",
-  },
-];
 
 // Define attendance status types
 const attendanceStatuses = {
@@ -370,61 +318,6 @@ const attendanceStatuses = {
   EARLY_LEAVE: "early_leave",
   COMPLETED: "completed",
 };
-
-// Function to calculate attendance status based on check-in/out times
-// const calculateAttendanceStatus = (schedule: any) => {
-//   if (!schedule.checkinTime && !schedule.checkoutTime) {
-//     return attendanceStatuses.NOT_STARTED;
-//   }
-
-//   const scheduledStart = dayjs(
-//     `${schedule.date} ${schedule.startTime}`,
-//     "YYYY-MM-DD HH:mm"
-//   );
-//   const scheduledEnd = dayjs(
-//     `${schedule.date} ${schedule.endTime}`,
-//     "YYYY-MM-DD HH:mm"
-//   );
-
-//   if (schedule.checkinTime && !schedule.checkoutTime) {
-//     // Only checked in
-//     const checkin = dayjs(
-//       `${schedule.date} ${schedule.checkinTime}`,
-//       "YYYY-MM-DD HH:mm"
-//     );
-//     if (checkin.isAfter(scheduledStart.add(15, "minute"))) {
-//       return attendanceStatuses.LATE;
-//     }
-//     return attendanceStatuses.ON_TIME;
-//   }
-
-//   if (schedule.checkinTime && schedule.checkoutTime) {
-//     // Both checked in and out
-//     const checkin = dayjs(
-//       `${schedule.date} ${schedule.checkinTime}`,
-//       "YYYY-MM-DD HH:mm"
-//     );
-//     const checkout = dayjs(
-//       `${schedule.date} ${schedule.checkoutTime}`,
-//       "YYYY-MM-DD HH:mm"
-//     );
-
-//     if (checkin.isAfter(scheduledStart.add(15, "minute"))) {
-//       if (checkout.isBefore(scheduledEnd.subtract(15, "minute"))) {
-//         return attendanceStatuses.EARLY_LEAVE;
-//       }
-//       return attendanceStatuses.LATE;
-//     }
-
-//     if (checkout.isBefore(scheduledEnd.subtract(15, "minute"))) {
-//       return attendanceStatuses.EARLY_LEAVE;
-//     }
-
-//     return attendanceStatuses.COMPLETED;
-//   }
-
-//   return attendanceStatuses.NOT_STARTED;
-// };
 
 const WorkSchedulePage = () => {
   //   const t = useTranslations("WorkSchedule");
@@ -439,12 +332,15 @@ const WorkSchedulePage = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const [currentSchedule, setCurrentSchedule] = useState<any>(null);
-  const [branchFilter, setBranchFilter] = useState<number | null>(null);
+  const [branchFilter, setBranchFilter] = useState<any>(null);
   const [detailView, setDetailView] = useState<boolean>(false);
   const [attendanceFilter, setAttendanceFilter] = useState<string | null>(null);
   const [form] = Form.useForm();
   const [collapsedFilters, setCollapsedFilters] = useState(false);
-
+  const [shiftList, setShiftList] = useState<SelectOptionsArray[]>([]);
+  const { userProfile } = useSelector(selectAuthLogin);
+  const userCode = Form.useWatch("userCode", form);
+  const [branchList, setBranchList] = useState<SelectOptionsArray[]>([]);
   // Get date range based on view type - moved here before it's used
   const getDateRange = () => {
     if (viewType === "day") {
@@ -470,105 +366,119 @@ const WorkSchedulePage = () => {
     const range = getDateRange();
     return [range.start, range.end];
   });
-
-  // Fetch employee list
-  useEffect(() => {
-    const fetchEmployees = async () => {
-      setLoading(true);
-      try {
-        const result = {
-          data: [
-            // {
-            //   id: 4,
-            //   name: "Họ Staff Tên Viên",
-            //   department: "Kỹ thuật",
-            //   avatar: "https://example.com/avatar1.jpg",
-            // },
-          ],
-        };
-        if (result.data) {
-          setEmployeeList(result.data);
+  const fetchEmployees = async () => {
+    setLoading(true);
+    try {
+      const searchFilterEmployees: any = [
+        { key: "limit", type: "=", value: 15 },
+        { key: "offset", type: "=", value: 0 },
+      ];
+      const result = await WorkingScheduleServices.getSelectStaff(
+        searchFilterEmployees,
+        {
+          quickSearch: "",
+          userCode: userProfile.code,
         }
-      } catch (error) {
-        console.error("Error fetching employees:", error);
-        toast.error("Không thể tải danh sách nhân viên");
-      } finally {
-        setLoading(false);
+      );
+      if (result.data) {
+        setEmployeeList(result.data);
       }
-    };
-
-    fetchEmployees();
-  }, []);
-
+    } catch (error) {
+      console.error("Error fetching employees:", error);
+      toast.error("Không thể tải danh sách nhân viên");
+    } finally {
+      setLoading(false);
+    }
+  };
+  const fetchSelect = async () => {
+    try {
+      const selectShift = await SelectServices.getSelectShift();
+      setShiftList(selectShift);
+      const selectBranch = await SelectServices.getSelectBrand();
+      if (selectBranch) {
+        setBranchFilter(selectBranch);
+      }
+    } catch (error) {
+      console.error("Error fetching branches:", error);
+      toast.error("Không thể tải danh sách chi nhánh");
+    }
+  };
   // Fetch schedule data when date or employees change
-  useEffect(() => {
-    const fetchSchedules = async () => {
-      setLoading(true);
-      try {
-        console.log("dateRange", dateRange);
 
-        // Calculate fromDate and toDate based on viewType
-        let fromDate, toDate;
+  const fetchSchedules = async () => {
+    setLoading(true);
+    try {
+      // Calculate fromDate and toDate based on viewType
+      let fromDate, toDate;
 
-        if (
-          viewType === "list" ||
-          viewType === "card" ||
-          viewType === "gantt" ||
-          viewType === "timeline"
-        ) {
-          fromDate = dateRange[0]
-            ? dateRange[0].startOf("day").toISOString()
-            : undefined;
-          toDate = dateRange[1]
-            ? dateRange[1].endOf("day").toISOString()
-            : undefined;
-        } else {
-          const range = getDateRange();
-          fromDate = range.start.startOf("day").toISOString();
-          toDate = range.end.endOf("day").toISOString();
-        }
-
-        console.log(
-          "Using date range:",
-          dayjs(fromDate).format("YYYY-MM-DD hh:mm:ss"),
-          "to",
-          dayjs(toDate).format("YYYY-MM-DD hh:mm:ss")
-        );
-
-        const searchOwnweFilter: any = [
-          { key: "limit", type: "=", value: 100 },
-          { key: "offset", type: "=", value: 0 },
-        ];
-
-        const result = await WorkingScheduleServices.getWorkingSchedule(
-          searchOwnweFilter,
-          {
-            ...(fromDate ? { fromDate } : {}),
-            ...(toDate ? { toDate } : {}),
-          }
-        );
-        const transformedData = transformApiScheduleData(result.data);
-
-        if (transformedData) {
-          setScheduleData(transformedData);
-        }
-      } catch (error) {
-        console.error("Error fetching schedules:", error);
-        toast.error("Không thể tải lịch làm việc");
-      } finally {
-        setLoading(false);
+      if (
+        viewType === "list" ||
+        viewType === "card" ||
+        viewType === "gantt" ||
+        viewType === "timeline"
+      ) {
+        fromDate = dateRange[0]
+          ? dateRange[0].startOf("day").toISOString()
+          : undefined;
+        toDate = dateRange[1]
+          ? dateRange[1].endOf("day").toISOString()
+          : undefined;
+      } else {
+        const range = getDateRange();
+        fromDate = range.start.startOf("day").toISOString();
+        toDate = range.end.endOf("day").toISOString();
       }
-    };
 
+      const searchOwnweFilter: any = [
+        { key: "limit", type: "=", value: 100 },
+        { key: "offset", type: "=", value: 0 },
+      ];
+
+      const result = await WorkingScheduleServices.getWorkingSchedule(
+        searchOwnweFilter,
+        {
+          ...(fromDate ? { fromDate } : {}),
+          ...(toDate ? { toDate } : {}),
+        }
+      );
+      const transformedData = transformApiScheduleData(result.data);
+
+      if (transformedData) {
+        setScheduleData(transformedData);
+      }
+    } catch (error) {
+      console.error("Error fetching schedules:", error);
+      toast.error("Không thể tải lịch làm việc");
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
     fetchSchedules();
+    fetchSelect();
+    fetchEmployees();
   }, [selectedEmployees, selectedDepartment, currentDate, viewType, dateRange]);
 
-  const handleAddSchedule = () => {
+  const fetchSelectBranchByCode = async () => {
+    try {
+      const selectBranchByUserCode = await SelectServices.getSelectBrand(
+        userCode
+      );
+      setBranchList(selectBranchByUserCode);
+    } catch (error) {
+      console.error("Error fetching branches:", error);
+      toast.error("Không thể tải danh sách chi nhánh");
+    }
+  };
+  useEffect(() => {
+    if (userCode) {
+      fetchSelectBranchByCode();
+    }
+  }, [userCode]);
+
+  const handleAddSchedule = async () => {
     setCurrentSchedule(null);
-    form.resetFields();
-    form.setFieldsValue({
-      date: currentDate,
-    });
+    console.log("form", form.getFieldsValue());
     setIsModalVisible(true);
   };
 
@@ -576,12 +486,13 @@ const WorkSchedulePage = () => {
     setCurrentSchedule(schedule);
     form.setFieldsValue({
       employeeId: schedule.employeeId,
+      userCode: schedule.userCode,
       date: dayjs(schedule.date),
       shift: schedule.shift,
       startTime: schedule.startTime,
       endTime: schedule.endTime,
       status: schedule.status,
-      branchId: schedule.branchId,
+      branchCode: schedule.branchCode,
       checkinTime: schedule.checkinTime,
       checkoutTime: schedule.checkoutTime,
       attendanceStatus: schedule.attendanceStatus,
@@ -612,23 +523,27 @@ const WorkSchedulePage = () => {
       if (currentSchedule) {
         // Update existing schedule
         const updatedSchedule = { ...currentSchedule, ...values };
+        console.log("Updated schedule:", updatedSchedule);
+
         // await updateScheduleService(updatedSchedule);
         setScheduleData(
           scheduleData.map((s) =>
             s.id === currentSchedule.id ? updatedSchedule : s
           )
         );
+
         toast.success("Cập nhật lịch làm việc thành công");
       } else {
-        // Create new schedule
-        const newSchedule = {
-          id: Date.now(),
-          ...values,
-          status: "pending",
-        };
-        // await createScheduleService(newSchedule);
-        setScheduleData([...scheduleData, newSchedule]);
-        toast.success("Tạo lịch làm việc thành công");
+        values.date = dayjs(values.date).toISOString();
+        try {
+          console.log("Creating new schedule with values:", values);
+          await WorkingScheduleServices.createWorkingSchedule(values);
+          toast.success("Tạo lịch làm việc thành công");
+          fetchSchedules();
+        } catch (error) {
+          console.error("Error creating schedule:", error);
+          toast.error("Không thể tạo lịch làm việc");
+        }
       }
       setIsModalVisible(false);
     } catch (error) {
@@ -767,6 +682,10 @@ const WorkSchedulePage = () => {
                 icon={<ScheduleOutlined />}
                 onClick={(e) => {
                   e.stopPropagation();
+                  form.resetFields();
+                  form.setFieldsValue({
+                    date: currentDate,
+                  });
                   handleAddSchedule();
                 }}
                 size="middle"
@@ -967,16 +886,7 @@ const WorkSchedulePage = () => {
                   optionFilterProp="label"
                   size="middle"
                   maxTagCount="responsive"
-                  options={employeeList
-                    .filter(
-                      (emp) =>
-                        selectedDepartment === "all" ||
-                        emp.department === selectedDepartment
-                    )
-                    .map((emp) => ({
-                      value: emp.id,
-                      label: emp.name,
-                    }))}
+                  options={employeeList}
                 />
               </div>
             </Col>
@@ -988,15 +898,9 @@ const WorkSchedulePage = () => {
                 <Select
                   placeholder="Chọn chi nhánh"
                   style={{ width: "100%" }}
-                  value={branchFilter}
-                  onChange={setBranchFilter}
                   allowClear
-                  onClear={() => setBranchFilter(null)}
                   size="middle"
-                  options={branches.map((branch) => ({
-                    value: branch.id,
-                    label: branch.name,
-                  }))}
+                  options={branchFilter}
                 />
               </div>
             </Col>
@@ -1046,7 +950,6 @@ const WorkSchedulePage = () => {
           <DailyView
             currentDate={currentDate}
             scheduleData={scheduleData}
-            branches={branches}
             attendanceStatuses={attendanceStatuses}
             loading={loading}
             handleViewSchedule={handleViewSchedule}
@@ -1063,9 +966,7 @@ const WorkSchedulePage = () => {
             scheduleData={scheduleData}
             selectedEmployees={selectedEmployees}
             selectedDepartment={selectedDepartment}
-            branches={branches}
             attendanceStatuses={attendanceStatuses}
-            branchFilter={branchFilter}
             attendanceFilter={attendanceFilter}
             form={form}
             handleViewSchedule={handleViewSchedule}
@@ -1151,7 +1052,6 @@ const WorkSchedulePage = () => {
           currentSchedule={currentSchedule}
           employeeList={employeeList}
           scheduleData={scheduleData}
-          branches={branches}
           setDetailView={setDetailView}
           handleEditSchedule={handleEditSchedule}
           handleDeleteSchedule={handleDeleteSchedule}
@@ -1215,7 +1115,14 @@ const WorkSchedulePage = () => {
           },
         }}
       >
-        <Form form={form} layout="vertical" size="large">
+        <Form
+          form={form}
+          layout="vertical"
+          size="large"
+          initialValues={{
+            optionCreate: "NGAY",
+          }}
+        >
           <div
             style={{
               background:
@@ -1238,7 +1145,7 @@ const WorkSchedulePage = () => {
             </h4>
 
             <Form.Item
-              name="employeeId"
+              name="userCode"
               label={<span style={{ fontWeight: 600 }}>Nhân viên</span>}
               rules={[{ required: true, message: "Vui lòng chọn nhân viên" }]}
             >
@@ -1246,10 +1153,7 @@ const WorkSchedulePage = () => {
                 placeholder="Chọn nhân viên"
                 showSearch
                 optionFilterProp="label"
-                options={employeeList.map((emp) => ({
-                  value: emp.id,
-                  label: emp.name,
-                }))}
+                options={employeeList}
                 style={{ borderRadius: "8px" }}
               />
             </Form.Item>
@@ -1268,7 +1172,7 @@ const WorkSchedulePage = () => {
 
             <Space.Compact style={{ width: "100%" }}>
               <Form.Item
-                name="shift"
+                name="shiftCode"
                 label={<span style={{ fontWeight: 600 }}>Ca làm việc</span>}
                 rules={[
                   { required: true, message: "Vui lòng nhập ca làm việc" },
@@ -1277,22 +1181,13 @@ const WorkSchedulePage = () => {
               >
                 <Select
                   placeholder="Chọn ca làm việc"
-                  options={[
-                    { value: "Ca sáng", label: "Ca sáng (08:00 - 12:00)" },
-                    { value: "Ca chiều", label: "Ca chiều (13:00 - 17:00)" },
-                    { value: "Ca tối", label: "Ca tối (18:00 - 22:00)" },
-                    { value: "Ca đêm", label: "Ca đêm (22:00 - 06:00)" },
-                    {
-                      value: "Ca fullday",
-                      label: "Ca full ngày (08:00 - 17:00)",
-                    },
-                  ]}
+                  options={shiftList}
                   style={{ borderRadius: "8px" }}
                 />
               </Form.Item>
 
               <Form.Item
-                name="branchId"
+                name="branchCode"
                 label={<span style={{ fontWeight: 600 }}>Chi nhánh</span>}
                 rules={[{ required: true, message: "Vui lòng chọn chi nhánh" }]}
                 style={{ flex: 1, marginLeft: "8px" }}
@@ -1301,40 +1196,48 @@ const WorkSchedulePage = () => {
                   placeholder="Chọn chi nhánh"
                   showSearch
                   optionFilterProp="label"
-                  options={branches.map((branch) => ({
-                    value: branch.id,
-                    label: branch.name,
-                  }))}
+                  options={branchList}
                   style={{ borderRadius: "8px" }}
                 />
               </Form.Item>
             </Space.Compact>
-
             <Space.Compact style={{ width: "100%" }}>
               <Form.Item
-                name="startTime"
-                label={<span style={{ fontWeight: 600 }}>Giờ bắt đầu</span>}
-                rules={[
-                  { required: true, message: "Vui lòng nhập giờ bắt đầu" },
-                ]}
-                style={{ flex: 1, marginRight: "8px" }}
+                name="optionCreate"
+                label={<span style={{ fontWeight: 600 }}>Chế độ tạo</span>}
+                style={{ flex: 1, marginLeft: "8px" }}
               >
-                <Input
-                  placeholder="VD: 08:00"
+                <Select
+                  placeholder="Chọn chế độ tạo"
+                  showSearch
+                  optionFilterProp="label"
+                  options={[
+                    { value: "NGAY", label: "Tạo 1 ngày" },
+                    { value: "TUAN", label: "Tạo 1 tuần" },
+                    { value: "THANG", label: "Tạo 1 tháng" },
+                  ]}
                   style={{ borderRadius: "8px" }}
                 />
               </Form.Item>
-
               <Form.Item
-                name="endTime"
-                label={<span style={{ fontWeight: 600 }}>Giờ kết thúc</span>}
-                rules={[
-                  { required: true, message: "Vui lòng nhập giờ kết thúc" },
-                ]}
+                name="holidayMode"
+                label={<span style={{ fontWeight: 600 }}>Chế ngày nghỉ</span>}
                 style={{ flex: 1, marginLeft: "8px" }}
               >
-                <Input
-                  placeholder="VD: 17:00"
+                <Select
+                  placeholder="Chọn ngày nghỉ"
+                  showSearch
+                  mode="multiple"
+                  optionFilterProp="label"
+                  options={[
+                    { value: "T2", label: "Thứ 2" },
+                    { value: "T3", label: "Thứ 3" },
+                    { value: "T4", label: "Thứ 4" },
+                    { value: "T5", label: "Thứ 5" },
+                    { value: "T6", label: "Thứ 6" },
+                    { value: "T7", label: "Thứ 7" },
+                    { value: "CN", label: "Chủ Nhật" },
+                  ]}
                   style={{ borderRadius: "8px" }}
                 />
               </Form.Item>

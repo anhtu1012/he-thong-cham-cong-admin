@@ -36,7 +36,7 @@ export class AxiosService extends Authorization implements RepositoryPort {
   async getWithFilter<T>(
     url: string,
     filterParams?: FilterQueryStringType,
-    regularParams?: Record<string, string>
+    regularParams?: Record<string | number | symbol, string | number | boolean>
   ): Promise<T> {
     const http = await this._http();
     const queryString = filterQueryString(filterParams ?? []);
@@ -46,7 +46,15 @@ export class AxiosService extends Authorization implements RepositoryPort {
 
     if (regularParams && Object.keys(regularParams).length > 0) {
       const separator = queryString ? "&" : "?";
-      const regularQueryString = new URLSearchParams(regularParams).toString();
+      const stringifiedParams: Record<string, string> = Object.fromEntries(
+        Object.entries(regularParams).map(([key, value]) => [
+          String(key),
+          String(value),
+        ])
+      );
+      const regularQueryString = new URLSearchParams(
+        stringifiedParams
+      ).toString();
       finalUrl += `${separator}${regularQueryString}`;
     }
 

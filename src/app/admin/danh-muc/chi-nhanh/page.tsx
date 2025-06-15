@@ -26,7 +26,7 @@ const DanhMucChiNhanhManagementPage = () => {
   const [form] = Form.useForm<any>();
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
-  const [tableData, setTableData] = useState<Branch[]>();
+  const [tableData, setTableData] = useState<Branch[]>([]);
   const [totalItems, setTotalItems] = useState<number>(0);
   const [loading, setLoading] = useState(false);
   const [editLoading, setEditLoading] = useState(false);
@@ -47,7 +47,7 @@ const DanhMucChiNhanhManagementPage = () => {
         searchOwnweFilter,
         {
           quickSearch: quickkSearch,
-        },
+        }
       );
 
       if (result.data) {
@@ -298,8 +298,6 @@ const DanhMucChiNhanhManagementPage = () => {
     getData(page, size, quickSearch);
   };
 
-  console.log("tableData:", tableData);
-  console.log("columns length:", columns.length);
   return (
     <>
       <div>
@@ -336,25 +334,23 @@ const DanhMucChiNhanhManagementPage = () => {
           </div>
         </div>
 
-        {tableData && (
-          <Ctable
-            loading={loading}
-            columns={columns}
-            dataSource={tableData}
-            rowKey="id"
-            usePagination
-            totalItems={totalItems}
-            onPageChange={handlePageChange}
-            enableDrag={true}
-            pageSize={pageSize}
-            rowHeight={15}
-            showActions
-            actionColumn={actionColumn}
-            onBeforeExport={handleBeforeExport}
-            stickyHeader
-            tableId="admin_danh_muc_chi_nhanh_v2"
-          />
-        )}
+        <Ctable
+          loading={loading}
+          columns={columns}
+          dataSource={tableData}
+          rowKey="id"
+          usePagination
+          totalItems={totalItems}
+          onPageChange={handlePageChange}
+          enableDrag={true}
+          pageSize={pageSize}
+          rowHeight={15}
+          showActions
+          actionColumn={actionColumn}
+          onBeforeExport={handleBeforeExport}
+          stickyHeader
+          tableId="admin_danh_muc_chi_nhanh_v2"
+        />
       </div>
       <ChiNhanhForm
         form={form}

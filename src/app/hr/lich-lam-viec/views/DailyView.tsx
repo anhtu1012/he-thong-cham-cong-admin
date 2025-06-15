@@ -3,7 +3,6 @@ import React from "react";
 import type { JSX } from "react";
 import Ctable from "@/components/basicUI/Ctable";
 import {
-  EnvironmentOutlined,
   EditOutlined,
   DeleteOutlined,
   WarningOutlined,
@@ -12,11 +11,11 @@ import {
 } from "@ant-design/icons";
 import { Button, Tooltip, Space, Tag } from "antd";
 import dayjs from "dayjs";
+import { getDayNameInVietnamese } from "@/utils/dateLocalization";
 
 interface DailyViewProps {
   currentDate: dayjs.Dayjs;
   scheduleData: any[];
-  branches: any[];
   attendanceStatuses: Record<string, string>;
   loading: boolean;
   handleViewSchedule: (schedule: any) => void;
@@ -29,7 +28,6 @@ interface DailyViewProps {
 const DailyView: React.FC<DailyViewProps> = ({
   currentDate,
   scheduleData,
-  branches,
   loading,
   handleViewSchedule,
   handleEditSchedule,
@@ -37,16 +35,6 @@ const DailyView: React.FC<DailyViewProps> = ({
   getAttendanceTag,
   getStatusTag,
 }) => {
-  const getBranchName = (branchId: number, schedule: any) => {
-    // First check if the schedule has branchName from API
-    if (schedule.branchName) {
-      return schedule.branchName;
-    }
-    // Otherwise lookup from branches array
-    const branch = branches.find((b) => b.id === branchId);
-    return branch ? branch.name : "N/A";
-  };
-
   const filteredSchedules = scheduleData.filter(
     (schedule) => schedule.date === currentDate.format("YYYY-MM-DD")
   );
@@ -89,7 +77,10 @@ const DailyView: React.FC<DailyViewProps> = ({
 
   return (
     <div className="daily-schedule-view">
-      <h3>Lịch làm việc ngày {currentDate.format("dddd, DD/MM/YYYY")}</h3>
+      <h3>
+        Lịch làm việc ngày {getDayNameInVietnamese(currentDate)},{" "}
+        {currentDate.format("DD/MM/YYYY")}
+      </h3>
 
       {filteredSchedules.length === 0 ? (
         <div className="empty-list">
@@ -113,39 +104,16 @@ const DailyView: React.FC<DailyViewProps> = ({
           columns={[
             {
               title: "Nhân viên",
-              dataIndex: "employeeId",
-              key: "employeeId",
-              render: (__, record) => {
-                return (
-                  <div className="employee-cell">
-                    <div>
-                      <div style={{ fontWeight: 600, color: "#495057" }}>
-                        {record.fullName}
-                      </div>
-                      <div style={{ fontSize: 12, color: "#6c757d" }}>
-                        {record.department}
-                      </div>
-                    </div>
-                  </div>
-                );
-              },
+              dataIndex: "fullName",
+              key: "fullName",
+
               width: 200,
               // fixed: "left",
             },
             {
               title: "Chi nhánh",
-              dataIndex: "branchId",
-              key: "branchId",
-              render: (branchId, record) => (
-                <div className="branch-cell">
-                  <EnvironmentOutlined
-                    style={{ marginRight: 8, color: "#667eea" }}
-                  />
-                  <Tooltip title={getBranchName(branchId, record)}>
-                    <span>{getBranchName(branchId, record)}</span>
-                  </Tooltip>
-                </div>
-              ),
+              dataIndex: "branchName",
+              key: "branchName",
               width: 180,
               ellipsis: true,
             },
