@@ -1,16 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import FormModal from "@/components/basicUI/FormModal";
-import { IdcardOutlined, ClockCircleOutlined } from "@ant-design/icons";
-import {
-  Col,
-  Form,
-  FormInstance,
-  Input,
-  InputNumber,
-  Row,
-  DatePicker,
-  TimePicker,
-} from "antd";
+import { ClockCircleOutlined } from "@ant-design/icons";
+import { Col, Form, FormInstance, Input, Row, DatePicker } from "antd";
 import React, { useEffect } from "react";
 import { useTranslations } from "next-intl";
 import dayjs from "dayjs";
@@ -39,19 +30,6 @@ const CaLamForm: React.FC<CaLamFormProps> = ({
   const convertToDateTime = (timeString: string | undefined) => {
     if (!timeString) return undefined;
     return dayjs(timeString);
-  };
-
-  // Helper function to convert string time (HH:mm) to dayjs object for TimePicker
-  const convertToTime = (timeString: string | undefined) => {
-    if (!timeString) return undefined;
-
-    // Xử lý trường hợp chuỗi là "HH:mm"
-    if (timeString.includes(":")) {
-      const [hours, minutes] = timeString.split(":");
-      return dayjs().hour(parseInt(hours)).minute(parseInt(minutes)).second(0);
-    }
-
-    return undefined;
   };
 
   // Khi edit, chuyển đổi dữ liệu từ API sang giá trị phù hợp cho form
