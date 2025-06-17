@@ -35,10 +35,6 @@ const DailyView: React.FC<DailyViewProps> = ({
   getAttendanceTag,
   getStatusTag,
 }) => {
-  const filteredSchedules = scheduleData.filter(
-    (schedule) => schedule.date === currentDate.format("YYYY-MM-DD")
-  );
-
   const calculateTimeDifference = (
     scheduledTime: string,
     actualTime: string,
@@ -82,7 +78,7 @@ const DailyView: React.FC<DailyViewProps> = ({
         {currentDate.format("DD/MM/YYYY")}
       </h3>
 
-      {filteredSchedules.length === 0 ? (
+      {scheduleData.length === 0 ? (
         <div className="empty-list">
           <div className="empty-icon">📅</div>
           <h4>Không có lịch làm việc</h4>
@@ -91,7 +87,7 @@ const DailyView: React.FC<DailyViewProps> = ({
       ) : (
         <Ctable
           loading={loading}
-          dataSource={filteredSchedules}
+          dataSource={scheduleData}
           rowKey="id"
           rowHeight={15}
           pagination={{
@@ -277,7 +273,7 @@ const DailyView: React.FC<DailyViewProps> = ({
       )}
 
       {/* Statistics Summary */}
-      {filteredSchedules.length > 0 && (
+      {scheduleData.length > 0 && (
         <div className="statistics-panel" style={{ marginTop: 24 }}>
           <div className="statistics-header">
             <h3>Thống kê ngày {currentDate.format("DD/MM/YYYY")}</h3>
@@ -288,7 +284,7 @@ const DailyView: React.FC<DailyViewProps> = ({
                 <div className="ant-statistic-title">Tổng ca làm việc</div>
                 <div className="ant-statistic-content">
                   <span className="ant-statistic-content-value">
-                    {filteredSchedules.length}
+                    {scheduleData.length}
                   </span>
                 </div>
               </div>
@@ -299,7 +295,7 @@ const DailyView: React.FC<DailyViewProps> = ({
                     className="ant-statistic-content-value"
                     style={{ color: "#52c41a" }}
                   >
-                    {filteredSchedules.filter((s) => s.checkinTime).length}
+                    {scheduleData.filter((s) => s.checkinTime).length}
                   </span>
                 </div>
               </div>
@@ -311,7 +307,7 @@ const DailyView: React.FC<DailyViewProps> = ({
                     style={{ color: "#1890ff" }}
                   >
                     {
-                      filteredSchedules.filter(
+                      scheduleData.filter(
                         (s) => s.checkinTime && s.checkoutTime
                       ).length
                     }
@@ -326,7 +322,7 @@ const DailyView: React.FC<DailyViewProps> = ({
                     style={{ color: "#fa8c16" }}
                   >
                     {
-                      filteredSchedules.filter((s) => {
+                      scheduleData.filter((s) => {
                         if (!s.checkinTime) return false;
                         const diff = calculateTimeDifference(
                           s.startTime,

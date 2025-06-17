@@ -341,6 +341,7 @@ const WorkSchedulePage = () => {
   const { userProfile } = useSelector(selectAuthLogin);
   const userCode = Form.useWatch("userCode", form);
   const [branchList, setBranchList] = useState<SelectOptionsArray[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   // Get date range based on view type - moved here before it's used
   const getDateRange = () => {
     if (viewType === "day") {
@@ -519,6 +520,7 @@ const WorkSchedulePage = () => {
 
   const handleSaveSchedule = async () => {
     try {
+      setIsLoading(true);
       const values = await form.validateFields();
       if (currentSchedule) {
         // Update existing schedule
@@ -548,6 +550,8 @@ const WorkSchedulePage = () => {
       setIsModalVisible(false);
     } catch (error) {
       console.error("Form validation failed:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -992,7 +996,6 @@ const WorkSchedulePage = () => {
           <ListView
             dateRange={dateRange}
             scheduleData={scheduleData}
-            employeeList={employeeList}
             selectedEmployees={selectedEmployees}
             selectedDepartment={selectedDepartment}
             handleEditSchedule={handleEditSchedule}
@@ -1005,7 +1008,6 @@ const WorkSchedulePage = () => {
           <CardView
             dateRange={dateRange}
             scheduleData={scheduleData}
-            employeeList={employeeList}
             selectedEmployees={selectedEmployees}
             selectedDepartment={selectedDepartment}
             currentDate={currentDate}
@@ -1020,7 +1022,6 @@ const WorkSchedulePage = () => {
           <GanttView
             dateRange={dateRange}
             scheduleData={scheduleData}
-            employeeList={employeeList}
             selectedEmployees={selectedEmployees}
             selectedDepartment={selectedDepartment}
             form={form}
@@ -1092,6 +1093,7 @@ const WorkSchedulePage = () => {
           </div>
         }
         open={isModalVisible}
+        confirmLoading={isLoading}
         onOk={handleSaveSchedule}
         onCancel={() => setIsModalVisible(false)}
         width={700}
