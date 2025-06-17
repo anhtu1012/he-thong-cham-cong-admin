@@ -9,13 +9,8 @@ import { toast } from "react-toastify";
 import { useTranslations } from "next-intl";
 import dayjs from "dayjs";
 import "./index.scss";
-import {
-  CheckCircleOutlined,
-  CloseCircleOutlined,
-  CalendarOutlined,
-} from "@ant-design/icons";
+import { CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import Cselect from "@/components/Cselect";
-import styles from "../../../components/styles/styles.module.scss";
 import DanhMucDonServices from "@/services/admin/quan-li-don/quan-li-don.service";
 import { FormItem } from "@/dtos/quan-li-don/quan-li-don";
 import { useSelector } from "react-redux";
@@ -65,8 +60,8 @@ const getStatusTagColor = (status: string): string => {
 };
 
 interface FilterValues {
-  startDate?: dayjs.Dayjs;
-  endDate?: dayjs.Dayjs;
+  fromDate?: dayjs.Dayjs;
+  toDate?: dayjs.Dayjs;
   formId?: string;
 }
 
@@ -112,12 +107,12 @@ const QuanLiDonPage = () => {
           params.formId = filters.formId;
         }
 
-        if (filters.startDate) {
-          params.fromDate = filters.startDate.startOf("day").toISOString();
+        if (filters.fromDate) {
+          params.fromDate = filters.fromDate.startOf("day").toISOString();
         }
 
-        if (filters.endDate) {
-          params.toDate = filters.endDate.endOf("day").toISOString();
+        if (filters.toDate) {
+          params.toDate = filters.toDate.endOf("day").toISOString();
         }
       }
 
@@ -125,14 +120,16 @@ const QuanLiDonPage = () => {
       let response;
       if (
         quickkSearch ||
-        (filters && (filters.formId || filters.startDate || filters.endDate))
+        (filters && (filters.formId || filters.fromDate || filters.toDate))
       ) {
         response = await DanhMucDonServices.filterDanhMucDon(params);
       } else {
         response = await DanhMucDonServices.getDanhMucDon([], params);
       }
 
-      setTableData(response.data);
+      //Reverse the data array before setting it to state
+      const reversedData = [...response.data].reverse();
+      setTableData(reversedData);
       setTotalItems(response.count);
       setLoading(false);
     } catch (error) {
@@ -145,7 +142,7 @@ const QuanLiDonPage = () => {
   useEffect(() => {
     getData(currentPage, pageSize, quickSearch);
     fetchFormTypes();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [currentPage, pageSize]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Fetch form types for the dropdown
   const fetchFormTypes = async () => {
@@ -257,6 +254,18 @@ const QuanLiDonPage = () => {
         width: 120,
       },
       {
+        title: t("nguoiNop"),
+        dataIndex: "submittedBy",
+        key: "submittedBy",
+        width: 150,
+      },
+      {
+        title: t("tieuDeDon"),
+        dataIndex: "formTitle",
+        key: "formTitle",
+        width: 120,
+      },
+      {
         title: t("lyDo"),
         dataIndex: "reason",
         key: "reason",
@@ -309,41 +318,12 @@ const QuanLiDonPage = () => {
         width: 150,
         render: (approvedTime: string) => formatDate(approvedTime),
       },
-      {
-        title: t("maBieuMau"),
-        dataIndex: "formTitle",
-        key: "formTitle",
-        width: 120,
-      },
-      {
-        title: t("nguoiNop"),
-        dataIndex: "submittedBy",
-        key: "submittedBy",
-        width: 150,
-        render: (submittedBy: string) => {
-          const users = {
-            user1: "Nguyễn Văn A",
-            user2: "Trần Thị B",
-            user3: "Lê Văn C",
-            user4: "Phạm Thị D",
-          };
-          return users[submittedBy as keyof typeof users] || submittedBy;
-        },
-      },
+
       {
         title: t("nguoiDuyet"),
         dataIndex: "approvedBy",
         key: "approvedBy",
         width: 150,
-        render: (approvedBy: string) => {
-          const users = {
-            user1: "Nguyễn Văn A",
-            user2: "Trần Thị B",
-            user3: "Lê Văn C",
-            user4: "Phạm Thị D",
-          };
-          return users[approvedBy as keyof typeof users] || approvedBy;
-        },
       },
     ],
     [t]
@@ -439,54 +419,43 @@ const QuanLiDonPage = () => {
     <>
       {/* Filter Section */}
       <Form form={formFilter} onFinish={onFinish} className="from-quey">
-        <FilterSection onReset={resetFilters}>
+        <FilterSection
+          onReset={resetFilters}
+          onSearch={() => formFilter.submit()}
+        >
           <Row gutter={[16, 16]}>
             <Col xs={24} sm={12} md={6} lg={6}>
-              <Form.Item name="startDate" label="Thời gian bắt đầu">
+              <Form.Item name="fromDate" label="Từ ngày">
                 <DatePicker
                   style={{ width: "100%" }}
                   format="DD/MM/YYYY"
-                  placeholder="Chọn thời gian bắt đầu"
+                  placeholder="Chọn từ ngày"
                 />
               </Form.Item>
             </Col>
 
             <Col xs={24} sm={12} md={6} lg={6}>
-              <Form.Item name="endDate" label="Thời gian kết thúc">
+              <Form.Item name="toDate" label="Đến ngày">
                 <DatePicker
                   style={{ width: "100%" }}
                   format="DD/MM/YYYY"
-                  placeholder="Chọn thời gian kết thúc"
+                  placeholder="Chọn đến ngày"
                 />
               </Form.Item>
             </Col>
 
             <Col xs={24} sm={12} md={6} lg={6}>
-              <Form.Item name="formId" label="Mã biểu mẫu">
+              <Form.Item name="formId" label="Tiêu đề đơn">
                 <Cselect
                   allowClear
                   showSearch
                   placeholder={
-                    formTypesLoading ? "Đang tải..." : "Chọn mã biểu mẫu"
+                    formTypesLoading ? "Đang tải..." : "Chọn tiêu đề đơn"
                   }
                   options={formTypes}
                   disabled={formTypesLoading}
                 />
               </Form.Item>
-            </Col>
-          </Row>
-
-          <Row justify="end" className={styles.actionButtonsRow}>
-            <Col>
-              <Space>
-                <Button
-                  type="primary"
-                  icon={<CalendarOutlined />}
-                  htmlType="submit"
-                >
-                  Tìm kiếm
-                </Button>
-              </Space>
             </Col>
           </Row>
         </FilterSection>

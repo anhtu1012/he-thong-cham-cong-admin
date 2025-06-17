@@ -64,7 +64,7 @@ interface FilterValues {
   formId?: string;
 }
 
-function DuyetNghiPhep() {
+const DuyetNghiPhepPage = () => {
   const t = useTranslations("QuanLiDon");
   const { userProfile } = useSelector(selectAuthLogin);
 
@@ -123,10 +123,10 @@ function DuyetNghiPhep() {
       ) {
         response = await DanhMucDonServices.filterDanhMucDon(params);
       } else {
-        response = await DanhMucDonServices.getDanhMucDon([], params);
+        response = await DanhMucDonServices.filterDanhMucDon(params);
       }
 
-      // Reverse the data array before setting it to state
+      //Reverse the data array before setting it to state
       const reversedData = [...response.data].reverse();
       setTableData(reversedData);
       setTotalItems(response.count);
@@ -499,12 +499,12 @@ function DuyetNghiPhep() {
           showActions
           actionColumn={actionColumn}
           stickyHeader
-          tableId="manager_duyet_nghi_phep"
+          tableId="hr_duyet_nghi_phep"
           onBeforeExport={handleBeforeExport}
         />
       </div>
     </>
   );
-}
+};
 
-export default DuyetNghiPhep;
+export default DuyetNghiPhepPage;
