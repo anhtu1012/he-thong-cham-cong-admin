@@ -3,14 +3,12 @@
 import CInputLabel from "@/components/basicUI/CInputLabel";
 import Ctable from "@/components/basicUI/Ctable";
 import FilterSection from "@/components/basicUI/FilterSection";
-import { Tag, Button, Space, Form, Row, Col, DatePicker } from "antd";
+import { Tag, Form, Row, Col, DatePicker } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import dayjs from "dayjs";
-import { CalendarOutlined } from "@ant-design/icons";
-import Cselect from "@/components/Cselect";
-import styles from "../../../components/styles/styles.module.scss";
 import { useTranslations } from "next-intl";
+import Cselect from "@/components/Cselect";
 
 // Sample roles enum
 enum UserRole {
@@ -490,7 +488,10 @@ const QuanLiChamCongPage = () => {
     <>
       {/* Filter Section */}
       <Form form={formFilter} onFinish={onFinish} className="from-quey">
-        <FilterSection onReset={resetFilters}>
+        <FilterSection
+          onReset={resetFilters}
+          onSearch={() => formFilter.submit()}
+        >
           <Row gutter={[16, 16]}>
             <Col xs={24} sm={12} md={6} lg={6}>
               <Form.Item name="date" label={t("ngay")}>
@@ -555,20 +556,6 @@ const QuanLiChamCongPage = () => {
                   options={companiesData}
                 />
               </Form.Item>
-            </Col>
-          </Row>
-
-          <Row justify="end" className={styles.actionButtonsRow}>
-            <Col>
-              <Space>
-                <Button
-                  type="primary"
-                  icon={<CalendarOutlined />}
-                  htmlType="submit"
-                >
-                  {t("timKiemBtn")}
-                </Button>
-              </Space>
             </Col>
           </Row>
         </FilterSection>
