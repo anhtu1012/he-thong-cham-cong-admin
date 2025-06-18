@@ -135,7 +135,12 @@
     "vuilongNhapSoGioLam": "Vui lòng nhập số giờ làm!",
     "nhapSoGioLam": "Nhập số giờ làm",
     "vuilongChonThoiGianTre": "Vui lòng chọn thời gian trễ!",
-    "chonThoiGianTre": "Chọn thời gian trễ"
+    "chonThoiGianTre": "Chọn thời gian trễ",
+    "lunchBreak": "Giờ nghĩ trưa",
+    "nhapThoiGianNghiTrua": "Nhập giờ nghỉ trưa",
+    "gioNghiTrua": "Giờ nghĩ trưa",
+    "ngayTao": "Ngày tạo",
+    "ngayCapNhat": "Ngày cập nhật"
   },
   "DanhMucChiNhanh": {
     "maChiNhanh": "Mã chi nhánh",

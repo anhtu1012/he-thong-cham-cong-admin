@@ -3,16 +3,38 @@ import FormModal from "@/components/basicUI/FormModal";
 import { ClockCircleOutlined } from "@ant-design/icons";
 import { Col, Form, FormInstance, Input, Row, TimePicker } from "antd";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
 import { useTranslations } from "next-intl";
-import React, { useEffect } from "react";
+import React from "react";
 import "./index.scss";
+
+dayjs.extend(utc);
+
+// Utility function to convert string time to dayjs object
+const convertToDateTime = (value: string | null | undefined) => {
+  if (!value) return null;
+
+  // If value is already a dayjs object, return it
+  if (dayjs.isDayjs(value)) return value;
+
+  // Handle string format "HH:mm"
+  if (typeof value === "string" && value.includes(":")) {
+    const [hours, minutes] = value.split(":");
+    return dayjs()
+      .hour(parseInt(hours, 10))
+      .minute(parseInt(minutes, 10))
+      .second(0);
+  }
+
+  return dayjs(value);
+};
 
 interface CaLamFormProps {
   form: FormInstance;
   editingData: any | null;
   isModalVisible: boolean;
   handleCancel: () => void;
-  onFinish: (values: any) => void;
+  handleSubmit: () => void;
   editLoading: boolean;
 }
 
@@ -21,52 +43,10 @@ const CaLamForm: React.FC<CaLamFormProps> = ({
   editingData,
   isModalVisible,
   handleCancel,
-  onFinish,
+  handleSubmit,
   editLoading,
 }) => {
   const t = useTranslations("DanhMucCaLam");
-
-  // Helper function to convert ISO string to dayjs object for DatePicker
-  const convertToDateTime = (timeString: string | undefined) => {
-    if (!timeString) return undefined;
-    return dayjs(timeString);
-  };
-
-  // Khi edit, chuyển đổi dữ liệu từ API sang giá trị phù hợp cho form
-  useEffect(() => {
-    if (editingData) {
-      form.setFieldsValue({
-        ...editingData,
-        startTime: editingData.startTime
-          ? dayjs(editingData.startTime)
-          : undefined,
-        endTime: editingData.endTime ? dayjs(editingData.endTime) : undefined,
-        delayTime: editingData.delayTime
-          ? dayjs(editingData.delayTime, "HH:mm")
-          : undefined,
-      });
-    } else {
-      form.resetFields();
-    }
-  }, [editingData, form]);
-
-  // Khi submit, chuyển đổi dữ liệu form về đúng định dạng API
-  const handleFormFinish = (values: any) => {
-    const toISOStringSafe = (val: any) => {
-      if (!val) return undefined;
-      if (typeof val === "object" && typeof val.toISOString === "function") {
-        return val.toISOString();
-      }
-      return val;
-    };
-    const submitData = {
-      name: values.name,
-      startTime: toISOStringSafe(values.startTime),
-      endTime: toISOStringSafe(values.endTime),
-    };
-    console.log("Form submit (add/edit):", submitData);
-    onFinish(submitData);
-  };
 
   return (
     <FormModal
@@ -79,7 +59,7 @@ const CaLamForm: React.FC<CaLamFormProps> = ({
       form={form}
       open={isModalVisible}
       onCancel={handleCancel}
-      onOk={() => form.submit()}
+      onOk={handleSubmit}
       okText={editingData ? t("capNhat") : t("themMoi")}
       cancelText={t("huy")}
       width={700}
@@ -88,55 +68,75 @@ const CaLamForm: React.FC<CaLamFormProps> = ({
       maskClosable={false}
       destroyOnClose
     >
-      <Form form={form} layout="vertical" onFinish={handleFormFinish}>
-        <Row gutter={16}>
-          <Col span={24}>
-            <Form.Item
-              name="name"
-              label={t("tenCaLam")}
-              rules={[{ required: true, message: t("vuilongNhapTenCaLam") }]}
-            >
-              <Input
-                prefix={<ClockCircleOutlined />}
-                placeholder={t("nhapTenCaLam")}
-                size="large"
-              />
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item
-              name="startTime"
-              label={t("gioBatDau")}
-              rules={[{ required: true, message: t("vuilongChonGioBatDau") }]}
-              getValueProps={(value) => ({ value: convertToDateTime(value) })}
-            >
-              <TimePicker
-                format="HH:mm"
-                placeholder={t("chonGioBatDau")}
-                size="large"
-                style={{ width: "100%" }}
-              />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item
-              name="endTime"
-              label={t("gioKetThuc")}
-              rules={[{ required: true, message: t("vuilongChonGioKetThuc") }]}
-              getValueProps={(value) => ({ value: convertToDateTime(value) })}
-            >
-              <TimePicker
-                format="HH:mm"
-                placeholder={t("chonGioKetThuc")}
-                size="large"
-                style={{ width: "100%" }}
-              />
-            </Form.Item>
-          </Col>
-        </Row>
-      </Form>
+      <Row gutter={16}>
+        <Col span={24}>
+          <Form.Item
+            name="name"
+            label={t("tenCaLam")}
+            rules={[{ required: true, message: t("vuilongNhapTenCaLam") }]}
+          >
+            <Input
+              prefix={<ClockCircleOutlined />}
+              placeholder={t("nhapTenCaLam")}
+              size="large"
+            />
+          </Form.Item>
+        </Col>
+        <Col span={24}>
+          <Form.Item
+            name="lunchBreak"
+            label={t("lunchBreak")}
+            rules={[
+              { required: true, message: t("vuilongNhapThoiGianNghiTrua") },
+            ]}
+            getValueProps={(value) => ({
+              value: value ? convertToDateTime(value) : null,
+            })}
+          >
+            <TimePicker
+              format="HH:mm"
+              style={{ width: "100%" }}
+              prefix={<ClockCircleOutlined />}
+              placeholder={t("nhapThoiGianNghiTrua")}
+              size="large"
+            />
+          </Form.Item>
+        </Col>
+      </Row>
+      <Row gutter={16}>
+        <Col span={12}>
+          <Form.Item
+            name="startTime"
+            label={t("gioBatDau")}
+            rules={[{ required: true, message: t("vuilongChonGioBatDau") }]}
+            getValueProps={(value) => ({
+              value: convertToDateTime(value),
+            })}
+          >
+            <TimePicker
+              format="HH:mm"
+              placeholder={t("chonGioBatDau")}
+              size="large"
+              style={{ width: "100%" }}
+            />
+          </Form.Item>
+        </Col>
+        <Col span={12}>
+          <Form.Item
+            name="endTime"
+            label={t("gioKetThuc")}
+            rules={[{ required: true, message: t("vuilongChonGioKetThuc") }]}
+            getValueProps={(value) => ({ value: convertToDateTime(value) })}
+          >
+            <TimePicker
+              format="HH:mm"
+              placeholder={t("chonGioKetThuc")}
+              size="large"
+              style={{ width: "100%" }}
+            />
+          </Form.Item>
+        </Col>
+      </Row>
     </FormModal>
   );
 };

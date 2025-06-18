@@ -135,7 +135,12 @@
     "vuilongNhapSoGioLam": "Please enter working hours!",
     "nhapSoGioLam": "Enter working hours",
     "vuilongChonThoiGianTre": "Please select delay time!",
-    "chonThoiGianTre": "Select delay time"
+    "chonThoiGianTre": "Select delay time",
+    "lunchBreak": "Lunch Break",
+    "nhapThoiGianNghiTrua": "Enter Lunch Break",
+    "gioNghiTrua": "Lunch Break",
+    "ngayTao": "CreateAt",
+    "ngayCapNhat": "UpdateAt"
   },
   "DanhMucChiNhanh": {
     "maChiNhanh": "Branch Code",

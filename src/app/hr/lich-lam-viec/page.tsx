@@ -562,9 +562,10 @@ const WorkSchedulePage = () => {
 
   const getStatusTag = (status: string) => {
     const statusMap: Record<string, { color: string; text: string }> = {
-      confirmed: { color: "green", text: "Đã xác nhận" },
-      pending: { color: "orange", text: "Chờ xác nhận" },
-      cancelled: { color: "red", text: "Đã hủy" },
+      ACTIVE: { color: "green", text: "Đang diễn ra" },
+      NOTSTARTED: { color: "orange", text: "Chưa bắt đầu" },
+      END: { color: "red", text: "Kết thúc" },
+      NOTWORK: { color: "red", text: "Không chấm công" },
     };
 
     const statusInfo = statusMap[status] || { color: "default", text: status };
