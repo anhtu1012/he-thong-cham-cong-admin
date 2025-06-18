@@ -1,5 +1,5 @@
 "use client";
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import CInputLabel from "@/components/basicUI/CInputLabel";
 import Ctable from "@/components/basicUI/Ctable";
 import FilterSection from "@/components/basicUI/FilterSection";
@@ -121,9 +121,9 @@ const DuyetNghiPhepPage = () => {
         quickkSearch ||
         (filters && (filters.formId || filters.fromDate || filters.toDate))
       ) {
-        response = await DanhMucDonServices.filterDanhMucDon(params);
+        response = await DanhMucDonServices.filterDanhMucDon(params as any);
       } else {
-        response = await DanhMucDonServices.filterDanhMucDon(params);
+        response = await DanhMucDonServices.filterDanhMucDon(params as any);
       }
 
       //Reverse the data array before setting it to state

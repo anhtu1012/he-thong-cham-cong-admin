@@ -1,5 +1,5 @@
 "use client";
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import CInputLabel from "@/components/basicUI/CInputLabel";
 import Ctable from "@/components/basicUI/Ctable";
 import FilterSection from "@/components/basicUI/FilterSection";
@@ -16,6 +16,7 @@ import { useSelector } from "react-redux";
 import { selectAuthLogin } from "@/lib/store/slices/loginSlice";
 import FormDescriptionServices from "@/services/admin/danh-muc/don/don.service";
 import { FormItem as FormDescriptionItem } from "@/dtos/danhMuc/don/don.dto";
+
 
 // Use FormItem from our DTO
 type DuyetNghiPhepItem = FormItem;
@@ -121,7 +122,7 @@ function DuyetNghiPhep() {
         quickkSearch ||
         (filters && (filters.formId || filters.fromDate || filters.toDate))
       ) {
-        response = await DanhMucDonServices.filterDanhMucDon(params);
+        response = await DanhMucDonServices.filterDanhMucDon(params as any);
       } else {
         response = await DanhMucDonServices.getDanhMucDon([], params);
       }

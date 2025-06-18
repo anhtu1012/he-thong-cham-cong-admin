@@ -9,19 +9,21 @@ import Cselect from "@/components/Cselect";
 import { UserInfor } from "@/dtos/auth/auth.dto";
 import { UserRequestUpdateUsser } from "@/dtos/auth/auth.request.dto";
 import { UserResponseGetItem } from "@/dtos/auth/auth.response.dto";
+import { UserContractItem } from "@/dtos/quan-li-nguoi-dung/contracts/contract.dto";
 import { RoleAdmin } from "@/model/enum";
+import QuanLyHopDongServices from "@/services/admin/quan-li-nguoi-dung/quan-li-hop-dong.service";
 import QlNguoiDungServices from "@/services/admin/quan-li-nguoi-dung/quan-li-nguoi-dung.service";
 import AuthServices from "@/services/auth/api.service";
 import SelectServices from "@/services/select/select.service";
 import { getChangedValues } from "@/utils/client/compareHelpers";
 import { handleFormErrors } from "@/utils/client/formHelpers";
-import { CalendarOutlined } from "@ant-design/icons";
-import { Button, Col, Form, Row, Space, Switch, Tag } from "antd";
+import { EyeFilled } from "@ant-design/icons";
+import { Button, Col, Form, Row, Switch, Tag, Tooltip } from "antd";
 import type { UploadFile } from "antd/es/upload/interface";
 import dayjs from "dayjs";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
-import styles from "../../../components/styles/styles.module.scss";
+import UserContactForm from "./UserContactForm";
 import UserForm from "./UserForm";
 
 interface FormValues {
@@ -36,6 +38,7 @@ const QuanLiNhanVienPage = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingUser, setEditingUser] = useState<any>(null);
   const [form] = Form.useForm<any>();
+  const [formValues] = Form.useForm<UserContractItem>();
   const [formFilter] = Form.useForm<FormValues>();
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
@@ -46,6 +49,11 @@ const QuanLiNhanVienPage = () => {
   const [brands, setBrands] = useState<any[]>([]);
   const [positions, setPositions] = useState<any[]>([]);
   const [editLoading, setEditLoading] = useState(false);
+  const [isContactModalVisible, setIsContactModalVisible] = useState(false);
+  const [isViewMode, setIsViewMode] = useState(false);
+  const [selectedContact, setSelectedContact] = useState<any>(null);
+  const [ueserDetails, setUserDetails] = useState<UserInfor>();
+  const [contactLoading, setContactLoading] = useState(false);
 
   // Watch for role changes in the form
   const selectedRole = Form.useWatch("role", formFilter);
@@ -103,7 +111,7 @@ const QuanLiNhanVienPage = () => {
       ];
 
       const result: any = await QlNguoiDungServices.getUser(searchOwnweFilter, {
-        ...(quickkSearch ? { quickSearch: quickSearch } : {}),
+        ...(quickkSearch ? { quickSearch: quickkSearch } : {}),
         ...(value.role ? { role: value.role } : {}),
         ...(value.positionCode ? { positionCode: value.positionCode } : {}),
         ...(value.branchCode ? { branchCode: value.branchCode } : {}),
@@ -177,6 +185,49 @@ const QuanLiNhanVienPage = () => {
       setLoading(false);
     }
   };
+
+  /**
+   * Xử lý chuyển từ chế độ xem sang chế độ chỉnh sửa
+   * Logic đơn giản hóa, chỉ đổi trạng thái
+   */
+  const handleSwitchToEditMode = () => {
+    setIsViewMode(false);
+  };
+
+  /**
+   * Xử lý hiển thị modal thông tin hợp đồng
+   * @param record Thông tin người dùng
+   */
+  const handleContact = async (record: UserInfor) => {
+    try {
+      setContactLoading(true);
+      setSelectedContact(null); // Reset dữ liệu hợp đồng cũ
+      setIsContactModalVisible(true); // Hiển thị modal trước để người dùng thấy loading
+      setUserDetails(record); // Lưu mã vai trò để sử dụng sau
+
+      await loadPositionsByRole(record.roleCode); // Tải chức vụ theo vai trò
+      // Lấy thông tin hợp đồng từ API
+      const contact = await QuanLyHopDongServices.getContractsByUserCode(
+        record.code
+      );
+
+      // Kiểm tra nếu có dữ liệu hợp đồng, hiển thị dạng xem
+      // Ngược lại, hiển thị form thêm mới
+      if (contact.id) {
+        setSelectedContact(contact);
+        setIsViewMode(true);
+      } else {
+        setIsViewMode(false);
+      }
+    } catch (error) {
+      console.error("Error fetching contact information:", error);
+      toast.error("Lỗi khi tải thông tin hợp đồng!");
+      setIsContactModalVisible(false);
+    } finally {
+      setContactLoading(false);
+    }
+  };
+
   const columns = useMemo(
     () => [
       {
@@ -203,14 +254,27 @@ const QuanLiNhanVienPage = () => {
         width: 150,
       },
       {
-        title: "Chi nhánh",
-        dataIndex: "branchCode",
-        key: "branchCode",
+        title: "Hợp đồng",
+        dataIndex: "contact",
+        key: "contact",
         width: 150,
-        render: (branchCode: string) => {
-          const branch = brands.find((item) => item.value === branchCode);
-          return <span>{branch ? branch.label : branchCode}</span>;
-        },
+        render: (__: any, record: any) => (
+          <Tooltip title="Xem thông tin hợp đồng">
+            <Button
+              type="link"
+              icon={<EyeFilled />}
+              onClick={() => handleContact(record)}
+            >
+              Xem
+            </Button>
+          </Tooltip>
+        ),
+      },
+      {
+        title: "Chi nhánh",
+        dataIndex: "branchName",
+        key: "branchName",
+        width: 150,
       },
       {
         title: "Chức vụ",
@@ -267,25 +331,18 @@ const QuanLiNhanVienPage = () => {
       },
       {
         title: "Địa chỉ",
-        dataIndex: "address",
-        key: "address",
+        dataIndex: "addressCode",
+        key: "addressCode",
         width: 200,
       },
       {
         title: "Ngày sinh",
-        dataIndex: "bod",
-        key: "bod",
+        dataIndex: "dob",
+        key: "dob",
         render: (text: string) => {
           return <span>{dayjs(text).format("DD/MM/YYYY")}</span>;
         },
       },
-      {
-        title: "Hợp đồng",
-        dataIndex: "contact",
-        key: "contact",
-        width: 150,
-      },
-
       {
         title: "Trạng thái",
         dataIndex: "isActive",
@@ -335,7 +392,9 @@ const QuanLiNhanVienPage = () => {
         form.setFieldsValue({
           ...user,
           // Convert date string to dayjs object for DatePicker
-          bod: user.bod ? dayjs(user.bod) : null,
+          dob: user.dob ? dayjs(user.dob) : null,
+          // Ensure addressCode is set (fallback to address if addressCode doesn't exist)
+          addressCode: user.addressCode || user.address || "",
         });
       }, 100);
     } else {
@@ -367,8 +426,8 @@ const QuanLiNhanVienPage = () => {
         // Validate form fields
         const values = await form.validateFields();
         values.faceImg = fileList[0]?.url || null; // Handle file upload
-        if (values.bod) {
-          values.bod = new Date(values.bod).toISOString();
+        if (values.dob) {
+          values.dob = new Date(values.dob).toISOString();
         }
         const changedValues = getChangedValues(values, editingUser);
 
@@ -410,8 +469,22 @@ const QuanLiNhanVienPage = () => {
         // Validate form fields
         const values = await form.validateFields();
         console.log("Form values:", values);
-        if (values.bod) {
-          values.bod = new Date(values.bod).toISOString();
+        
+        // Ensure all required fields are present
+        if (!values.gender) {
+          toast.error("Vui lòng chọn giới tính!");
+          setEditLoading(false);
+          return;
+        }
+        
+        if (!values.addressCode) {
+          toast.error("Vui lòng nhập địa chỉ!");
+          setEditLoading(false);
+          return;
+        }
+        
+        if (values.dob) {
+          values.dob = new Date(values.dob).toISOString();
         }
 
         const result: any = await AuthServices.register(values);
@@ -437,6 +510,46 @@ const QuanLiNhanVienPage = () => {
       } finally {
         setEditLoading(false);
       }
+    }
+  };
+
+  const handleSubmitContract = async (values: UserContractItem) => {
+    setContactLoading(true);
+    try {
+      console.log("Submitting contract values:", values);
+
+      if (values.startTime) {
+        values.startTime = new Date(values.startTime).toISOString();
+      }
+      if (values.endTime) {
+        values.endTime = new Date(values.endTime).toISOString();
+      }
+      // thêm truờng userCode vào values
+      const result = await QuanLyHopDongServices.createContract(values);
+      if (result) {
+        toast.success("Thêm mới thành công!");
+        getData(currentPage, pageSize, quickSearch); // Refresh data after adding
+        setIsModalVisible(false);
+        formValues.resetFields();
+        handleCloseContactModal();
+      } else {
+        toast.error(result.message || "Thêm mới thất bại!");
+      }
+    } catch (error: any) {
+      console.log("Form validation error:", error);
+
+      handleFormErrors<UserRequestUpdateUsser>(formValues, error);
+
+      if (error.response && error.response.data) {
+        console.log("API error:", error.response.data);
+
+        handleFormErrors<UserRequestUpdateUsser>(
+          formValues,
+          error.response.data
+        );
+      }
+    } finally {
+      setContactLoading(false);
     }
   };
 
@@ -519,12 +632,20 @@ const QuanLiNhanVienPage = () => {
   const resetFilters = () => {
     form.resetFields();
   };
+  const handleCloseContactModal = () => {
+    setIsContactModalVisible(false);
+    setSelectedContact(null);
+  };
+
   return (
     <>
       {" "}
       {/* Filter Section with collapsible UI */}
       <Form form={formFilter} onFinish={onFinish} className="from-quey">
-        <FilterSection onReset={resetFilters}>
+        <FilterSection
+          onReset={resetFilters}
+          onSearch={() => formFilter.submit()}
+        >
           <Row gutter={[16, 16]}>
             <Col xs={24} sm={12} md={8} lg={6}>
               <Form.Item name="role">
@@ -575,20 +696,7 @@ const QuanLiNhanVienPage = () => {
               </Form.Item>
             </Col>
           </Row>
-
-          <Row justify="end" className={styles.actionButtonsRow}>
-            <Col>
-              <Space>
-                <Button
-                  type="primary"
-                  icon={<CalendarOutlined />}
-                  htmlType="submit"
-                >
-                  Tìm kiếm
-                </Button>
-              </Space>
-            </Col>
-          </Row>
+          {/* Removed the search button row as it's now handled by FilterSection */}
         </FilterSection>
       </Form>
       <div>
@@ -654,6 +762,23 @@ const QuanLiNhanVienPage = () => {
         brands={brands}
         positions={positions}
         handleUploadChange={handleUploadChange}
+      />
+      {/* UserContactForm với các prop đã tối ưu */}
+      <UserContactForm
+        isViewMode={isViewMode}
+        isVisible={isContactModalVisible}
+        onCancel={handleCloseContactModal}
+        loading={contactLoading}
+        contactData={selectedContact}
+        positions={positions}
+        branches={brands}
+        form={formValues}
+        ueserDetails={ueserDetails}
+        onSwitchToEditMode={handleSwitchToEditMode}
+        handleSubmit={() => {
+          handleSubmitContract(formValues.getFieldsValue());
+          // Có thể reload dữ liệu nếu cần
+        }}
       />
     </>
   );
