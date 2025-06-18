@@ -1,21 +1,23 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
+import CdatePicker from "@/components/basicUI/CdatePicker";
 import CInputLabel from "@/components/basicUI/CInputLabel";
 import Ctable from "@/components/basicUI/Ctable";
 import FilterSection from "@/components/basicUI/FilterSection";
-import { Tag, Tooltip, Button, Space, Form, Row, Col, DatePicker } from "antd";
-import { useEffect, useMemo, useState } from "react";
-import { toast } from "react-toastify";
-import { useTranslations } from "next-intl";
-import dayjs from "dayjs";
-import { CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import Cselect from "@/components/Cselect";
-import DanhMucDonServices from "@/services/admin/quan-li-don/quan-li-don.service";
+import { FormItem as FormDescriptionItem } from "@/dtos/danhMuc/don/don.dto";
 import { FormItem } from "@/dtos/quan-li-don/quan-li-don";
-import { useSelector } from "react-redux";
 import { selectAuthLogin } from "@/lib/store/slices/loginSlice";
 import FormDescriptionServices from "@/services/admin/danh-muc/don/don.service";
-import { FormItem as FormDescriptionItem } from "@/dtos/danhMuc/don/don.dto";
+import DanhMucDonServices from "@/services/admin/quan-li-don/quan-li-don.service";
+import { CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
+import { Button, Col, Form, Row, Space, Tag, Tooltip } from "antd";
+import dayjs from "dayjs";
+import { useTranslations } from "next-intl";
+import { useEffect, useMemo, useState } from "react";
+import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
 
 // Use FormItem from our DTO
 type DuyetNghiPhepItem = FormItem;
@@ -59,12 +61,12 @@ const getStatusTagColor = (status: string): string => {
 };
 
 interface FilterValues {
-  fromDate?: dayjs.Dayjs;
-  toDate?: dayjs.Dayjs;
+  fromDate: dayjs.Dayjs;
+  toDate: dayjs.Dayjs;
   formId?: string;
 }
 
-function DuyetNghiPhep() {
+const DuyetNghiPhepPage = () => {
   const t = useTranslations("QuanLiDon");
   const { userProfile } = useSelector(selectAuthLogin);
 
@@ -89,46 +91,35 @@ function DuyetNghiPhep() {
   ) => {
     setLoading(true);
     try {
-      // Prepare params object for API call
-      const params: Record<string, string | number> = {
-        page: page - 1, // API uses 0-based indexing
-        limit,
+      const searchFilter: any = [
+        { key: "limit", type: "=", value: limit },
+        { key: "offset", type: "=", value: (page - 1) * limit },
+      ];
+
+      // searchFilter.push({
+      //   key: "reason",
+      //   type: FilterOperationType.IContains,
+      //   value: "Đưa con đi học",
+      // });
+
+      const params: any = {
+        ...(quickkSearch ? { quickSearch: quickkSearch } : {}),
+        ...(filters && filters.formId ? { formId: filters.formId } : {}),
+        ...(filters && filters.fromDate !== undefined
+          ? { fromDate: filters.fromDate.startOf("day").toISOString() }
+          : {}),
+        ...(filters && filters.toDate !== undefined
+          ? { toDate: filters.toDate.endOf("day").toISOString() }
+          : {}),
       };
-
-      // Add quick search if provided
-      if (quickkSearch && quickkSearch.trim() !== "") {
-        params.quickSearch = quickkSearch;
-      }
-
-      // Add filters if provided
-      if (filters) {
-        if (filters.formId) {
-          params.formId = filters.formId;
-        }
-
-        if (filters.fromDate) {
-          params.fromDate = filters.fromDate.startOf("day").toISOString();
-        }
-
-        if (filters.toDate) {
-          params.toDate = filters.toDate.endOf("day").toISOString();
-        }
-      }
-
-      // Call API service - use filter endpoint if any filters are applied
-      let response;
-      if (
-        quickkSearch ||
-        (filters && (filters.formId || filters.fromDate || filters.toDate))
-      ) {
-        response = await DanhMucDonServices.filterDanhMucDon(params);
-      } else {
-        response = await DanhMucDonServices.getDanhMucDon([], params);
-      }
-
-      // Reverse the data array before setting it to state
-      const reversedData = [...response.data].reverse();
-      setTableData(reversedData);
+      const response = await DanhMucDonServices.filterDanhMucDon(
+        searchFilter,
+        params
+      );
+      setTableData(response.data);
+      //Reverse the data array before setting it to state
+      // const reversedData = [...response.data].reverse();
+      // setTableData(reversedData);
       setTotalItems(response.count);
       setLoading(false);
     } catch (error) {
@@ -139,9 +130,9 @@ function DuyetNghiPhep() {
   };
 
   useEffect(() => {
-    getData(currentPage, pageSize, quickSearch);
+    getData(currentPage, pageSize, quickSearch, formFilter.getFieldsValue());
     fetchFormTypes();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [currentPage, pageSize]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Fetch form types for the dropdown
   const fetchFormTypes = async () => {
@@ -173,13 +164,35 @@ function DuyetNghiPhep() {
     try {
       toast.info("Đang chuẩn bị dữ liệu xuất Excel...");
 
-      // Get all data for export
-      const params: Record<string, string | number> = {
-        page: 0,
-        limit: 1000, // Get larger amount of data for export
+      const searchFilterExport: any = [
+        {
+          key: "limit",
+          type: "=",
+          value: process.env.NEXT_PUBLIC_LIMIT_QUERY_EXPORT,
+        },
+        { key: "offset", type: "=", value: 0 },
+      ];
+      const params: any = {
+        ...(quickSearch ? { quickSearch: quickSearch } : {}),
+        ...(formFilter.getFieldValue("formId")
+          ? { formId: formFilter.getFieldValue("formId") }
+          : {}),
+        ...(formFilter.getFieldValue("fromDate") !== undefined
+          ? {
+              fromDate: formFilter
+                .getFieldValue("fromDate")
+                .startOf("day")
+                .toISOString(),
+            }
+          : {}),
+        ...(formFilter.getFieldValue("toDate") !== undefined
+          ? { toDate: formFilter.getFieldValue("toDate").toISOString() }
+          : {}),
       };
-
-      const response = await DanhMucDonServices.getDanhMucDon([], params);
+      const response = await DanhMucDonServices.filterDanhMucDon(
+        searchFilterExport,
+        params
+      );
       setLoading(false);
       return response.data;
     } catch (error) {
@@ -396,7 +409,7 @@ function DuyetNghiPhep() {
         );
       },
     }),
-    [handleApprove, handleReject]
+    []
   );
 
   const handlePageChange = (page: number, size: number) => {
@@ -417,40 +430,80 @@ function DuyetNghiPhep() {
   return (
     <>
       {/* Filter Section */}
-      <Form form={formFilter} onFinish={onFinish} className="from-quey">
+      <Form
+        form={formFilter}
+        onFinish={onFinish}
+        className="from-quey"
+        // initialValues={{
+        //   fromDate: dayjs().startOf("day"),
+        //   toDate: dayjs().endOf("day"),
+        // }}
+      >
         <FilterSection
           onReset={resetFilters}
           onSearch={() => formFilter.submit()}
         >
           <Row gutter={[16, 16]}>
             <Col xs={24} sm={12} md={6} lg={6}>
-              <Form.Item name="fromDate" label="Từ ngày">
-                <DatePicker
-                  style={{ width: "100%" }}
-                  format="DD/MM/YYYY"
-                  placeholder="Chọn từ ngày"
+              <Form.Item
+                name="fromDate"
+                rules={[
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      const endDate = getFieldValue("datePlugOut");
+                      if (!value || !endDate || value.isBefore(endDate)) {
+                        return Promise.resolve();
+                      }
+                      return Promise.reject(
+                        new Error("Ngày vào không thể lớn hơn ngày ra")
+                      );
+                    },
+                  }),
+                ]}
+              >
+                <CdatePicker
+                  label="Từ ngày"
+                  placeholder="date"
+                  showTime
+                  style={{ width: "100%", height: "33px" }}
+                  format="YYYY-MM-DD  HH:mm:ss"
                 />
               </Form.Item>
             </Col>
 
             <Col xs={24} sm={12} md={6} lg={6}>
-              <Form.Item name="toDate" label="Đến ngày">
-                <DatePicker
-                  style={{ width: "100%" }}
-                  format="DD/MM/YYYY"
-                  placeholder="Chọn đến ngày"
+              <Form.Item
+                name="toDate"
+                rules={[
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      const startDate = getFieldValue("datePlugIn");
+                      if (!value || !startDate || value.isAfter(startDate)) {
+                        return Promise.resolve();
+                      }
+                      return Promise.reject(
+                        new Error("Ngày ra không thể bé hơn ngày vào")
+                      );
+                    },
+                  }),
+                ]}
+              >
+                <CdatePicker
+                  placeholder="date"
+                  label="Đến ngày"
+                  showTime
+                  style={{ width: "100%", height: "33px" }}
+                  format="YYYY-MM-DD HH:mm:ss"
                 />
               </Form.Item>
             </Col>
 
             <Col xs={24} sm={12} md={6} lg={6}>
-              <Form.Item name="formId" label="Tiêu đề đơn">
+              <Form.Item name="formId">
                 <Cselect
                   allowClear
                   showSearch
-                  placeholder={
-                    formTypesLoading ? "Đang tải..." : "Chọn tiêu đề đơn"
-                  }
+                  label="Tiêu đề đơn"
                   options={formTypes}
                   disabled={formTypesLoading}
                 />
@@ -505,6 +558,6 @@ function DuyetNghiPhep() {
       </div>
     </>
   );
-}
+};
 
-export default DuyetNghiPhep;
+export default DuyetNghiPhepPage;
