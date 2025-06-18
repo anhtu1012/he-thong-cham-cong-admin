@@ -118,7 +118,7 @@ const QuanLiDonPage = () => {
         params
       );
       setTableData(response.data);
-      // //Reverse the data array before setting it to state
+      //Reverse the data array before setting it to state
       // const reversedData = [...response.data].reverse();
       // setTableData(reversedData);
       setTotalItems(response.count);
@@ -435,10 +435,10 @@ const QuanLiDonPage = () => {
         form={formFilter}
         onFinish={onFinish}
         className="from-quey"
-        initialValues={{
-          fromDate: dayjs().startOf("day"),
-          toDate: dayjs().endOf("day"),
-        }}
+        // initialValues={{
+        //   fromDate: dayjs().startOf("day"),
+        //   toDate: dayjs().endOf("day"),
+        // }}
       >
         <FilterSection
           onReset={resetFilters}
