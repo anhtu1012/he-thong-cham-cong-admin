@@ -12,6 +12,9 @@ import CaLamForm from "./CaLamForm";
 import { useTranslations } from "next-intl";
 import DanhMucCaLamServices from "@/services/admin/danh-muc/ca-lam/ca-lam.service";
 import { formatDateTime } from "@/utils/dateTime";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+dayjs.extend(utc);
 
 // Sample data interface for CaLam
 interface CaLamItem {
@@ -117,18 +120,30 @@ const DanhMucCaLamManagementPage = () => {
         width: 100,
       },
       {
+        title: t("gioNghiTrua"),
+        dataIndex: "lunchBreak",
+        key: "lunchBreak",
+        width: 120,
+      },
+      {
         title: t("ngayTao"),
         dataIndex: "createdAt",
         key: "createdAt",
         width: 160,
-        render: (time: string) => formatDateTime(time),
+        render: (time: string) => {
+          if (!time) return "-";
+          return dayjs(time).format("DD/MM/YYYY HH:mm");
+        },
       },
       {
         title: t("ngayCapNhat"),
         dataIndex: "updatedAt",
         key: "updatedAt",
         width: 160,
-        render: (time: string) => formatDateTime(time),
+        render: (time: string) => {
+          if (!time) return "-";
+          return dayjs(time).format("DD/MM/YYYY HH:mm");
+        },
       },
     ],
     [t]
@@ -171,10 +186,19 @@ const DanhMucCaLamManagementPage = () => {
     form.resetFields();
   };
 
-  const handleSubmit = async (values: any) => {
+  const handleSubmit = async () => {
+    const values = await form.validateFields();
     // Chỉ gửi đúng 3 trường cần thiết
     const submitData = {
       name: values.name,
+      lunchBreak: values.lunchBreak
+        ? dayjs.isDayjs(values.lunchBreak)
+          ? values.lunchBreak.format("HH:mm")
+          : typeof values.lunchBreak === "object" &&
+            values.lunchBreak instanceof Date
+          ? dayjs(values.lunchBreak).format("HH:mm")
+          : values.lunchBreak
+        : null,
       startTime:
         values.startTime && typeof values.startTime !== "string"
           ? values.startTime.toISOString()
@@ -302,7 +326,7 @@ const DanhMucCaLamManagementPage = () => {
         editingData={editingDanhMucCaLam}
         isModalVisible={isModalVisible}
         handleCancel={handleCancel}
-        onFinish={handleSubmit}
+        handleSubmit={handleSubmit}
         editLoading={editLoading}
       />
     </>

@@ -147,7 +147,7 @@ const UserForm: React.FC<UserFormProps> = ({
           </span>
         </div>
       }
-      initialValues={{ bod: dayjs().startOf("day") }}
+      initialValues={{ dob: dayjs().startOf("day") }}
       form={form}
       open={isModalVisible}
       onCancel={handleCancel}
@@ -364,7 +364,6 @@ const UserForm: React.FC<UserFormProps> = ({
                 });
               }}
               options={[
-                { value: RoleAdmin.HR, label: "HR" },
                 { value: RoleAdmin.STAFF, label: "Staff" },
               ]}
             />
@@ -466,4 +465,4 @@ const UserForm: React.FC<UserFormProps> = ({
   );
 };
 
-export default UserForm;
+export default UserForm; 

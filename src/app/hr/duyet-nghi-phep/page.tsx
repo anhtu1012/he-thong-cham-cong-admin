@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-
 import CdatePicker from "@/components/basicUI/CdatePicker";
 import CInputLabel from "@/components/basicUI/CInputLabel";
 import Ctable from "@/components/basicUI/Ctable";
@@ -117,6 +116,7 @@ const DuyetNghiPhepPage = () => {
         params
       );
       setTableData(response.data);
+
       //Reverse the data array before setting it to state
       // const reversedData = [...response.data].reverse();
       // setTableData(reversedData);
