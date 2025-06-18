@@ -139,14 +139,15 @@ const QuanLiDonPage = () => {
   const fetchFormTypes = async () => {
     try {
       setFormTypesLoading(true);
-      // Use the same approach as in danh-muc/don/page.tsx
-      const params = {
-        page: 1,
-        limit: 100, // Get a reasonable number of form types
-      };
-
-      // Ensure we're using the correct API endpoint
-      const response = await FormDescriptionServices.getDanhMucDon([], params);
+      const searchFilter: any = [
+        { key: "limit", type: "=", value: 100 },
+        { key: "offset", type: "=", value: 0 },
+      ];
+      const params: any = {};
+      const response = await FormDescriptionServices.getDanhMucDon(
+        searchFilter,
+        params
+      );
       const formOptions = response.data.map((form: FormDescriptionItem) => ({
         value: form.id,
         label: form.title,
@@ -223,7 +224,7 @@ const QuanLiDonPage = () => {
       // Refresh data
       getData(currentPage, pageSize, quickSearch, formFilter.getFieldsValue());
 
-      toast.success(`Đã duyệt đơn: ${record.code}`);
+      toast.success(`Đã duyệt: ${record.formTitle} của ${record.submittedBy}`);
     } catch (error) {
       console.error("Error approving form:", error);
       toast.error("Lỗi khi duyệt đơn!");
@@ -250,7 +251,9 @@ const QuanLiDonPage = () => {
       // Refresh data
       getData(currentPage, pageSize, quickSearch, formFilter.getFieldsValue());
 
-      toast.success(`Đã từ chối đơn: ${record.code}`);
+      toast.success(
+        `Đã từ chối: ${record.formTitle} của ${record.submittedBy}`
+      );
     } catch (error) {
       console.error("Error rejecting form:", error);
       toast.error("Lỗi khi từ chối đơn!");
