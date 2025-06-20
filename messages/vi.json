@@ -44,6 +44,8 @@
   "DanhMucChucVu": {
     "maChucVu": "Mã chức vụ",
     "tenChucVu": "Tên chức vụ",
+    "quyenChucVu": "Quyền",
+    "moTa": "Mô tả",
     "luongCoBan": "Lương cơ bản",
     "phuCap": "Phụ cấp",
     "luongTangCa": "Lương tăng ca",

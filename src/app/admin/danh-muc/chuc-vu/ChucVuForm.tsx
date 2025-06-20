@@ -1,11 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import FormModal from "@/components/basicUI/FormModal";
 import { RoleAdmin } from "@/model/enum";
-import {
-  IdcardOutlined,
-  DollarOutlined,
-  ApartmentOutlined,
-} from "@ant-design/icons";
+import { DollarOutlined, ApartmentOutlined } from "@ant-design/icons";
 import { Col, Form, FormInstance, Input, InputNumber, Row, Select } from "antd";
 import React from "react";
 import "./index.scss";
@@ -50,20 +46,7 @@ const ChucVuForm: React.FC<ChucVuFormProps> = ({
       destroyOnClose
     >
       <Row gutter={16}>
-        <Col span={12}>
-          <Form.Item
-            name="code"
-            label="Mã chức vụ"
-            rules={[{ required: true, message: "Vui lòng nhập mã chức vụ!" }]}
-          >
-            <Input
-              prefix={<IdcardOutlined />}
-              placeholder="Nhập mã chức vụ (VD: CEO)"
-              size="large"
-            />
-          </Form.Item>
-        </Col>
-        <Col span={12}>
+        <Col span={24}>
           <Form.Item
             name="positionName"
             label="Tên chức vụ"
@@ -79,9 +62,17 @@ const ChucVuForm: React.FC<ChucVuFormProps> = ({
       </Row>
 
       <Row gutter={16}>
+        <Col span={24}>
+          <Form.Item name="description" label="Mô tả">
+            <Input.TextArea placeholder="Nhập mô tả" size="large" />
+          </Form.Item>
+        </Col>
+      </Row>
+
+      <Row gutter={16}>
         <Col span={12}>
           <Form.Item
-            name="basicSalary"
+            name="baseSalary"
             label="Lương cơ bản"
             rules={[{ required: true, message: "Vui lòng nhập lương cơ bản!" }]}
           >
@@ -118,7 +109,7 @@ const ChucVuForm: React.FC<ChucVuFormProps> = ({
           </Form.Item>
         </Col>
         <Col span={12}>
-          <Form.Item name="lateFee" label="Phí đi muộn">
+          <Form.Item name="lateFine" label="Phí đi muộn">
             <InputNumber
               prefix={<DollarOutlined />}
               placeholder="Nhập phí đi muộn"
@@ -129,7 +120,7 @@ const ChucVuForm: React.FC<ChucVuFormProps> = ({
         </Col>
         <Col span={24}>
           <Form.Item
-            name="roleCode"
+            name="role"
             label="Quyền"
             rules={[{ required: true, message: "Vui lòng chọn quyền!" }]}
           >
@@ -137,13 +128,6 @@ const ChucVuForm: React.FC<ChucVuFormProps> = ({
               placeholder="Chọn quyền"
               size="large"
               dropdownStyle={{ borderRadius: "10px" }}
-              onChange={() => {
-                // Clear dependent fields when role changes
-                form.setFieldsValue({
-                  managedBy: undefined,
-                  positionCode: undefined,
-                });
-              }}
               options={[
                 { value: RoleAdmin.ADMIN, label: "Admin" },
                 { value: RoleAdmin.HR, label: "HR" },
