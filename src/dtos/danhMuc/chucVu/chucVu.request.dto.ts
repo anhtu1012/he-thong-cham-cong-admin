@@ -5,14 +5,15 @@ import { PositionSchema } from "./chucVu.dto";
  * Schema and type for creating a position
  */
 export const CreatePositionSchema = z.object({
-  code: z.string().min(2, "Code must be at least 2 characters"),
   positionName: z
     .string()
     .min(2, "Position name must be at least 2 characters"),
-  basicSalary: z.string().or(z.number()),
+  role: z.string(),
+  description: z.string().optional(),
+  baseSalary: z.string().or(z.number()),
   allowance: z.string().or(z.number()).optional(),
   overtimeSalary: z.string().or(z.number()).optional(),
-  lateFee: z.string().or(z.number()).optional(),
+  lateFine: z.string().or(z.number()).optional(),
 });
 
 export type CreatePositionRequest = z.infer<typeof CreatePositionSchema>;
@@ -35,10 +36,12 @@ export const UpdatePositionSchema = PositionSchema.omit({
       .string()
       .min(2, "Position name must be at least 2 characters")
       .optional(),
-    basicSalary: z.string().or(z.number()).optional(),
+    role: z.string().optional(),
+    description: z.string().optional(),
+    baseSalary: z.string().or(z.number()).optional(),
     allowance: z.string().or(z.number()).optional(),
     overtimeSalary: z.string().or(z.number()).nullable().optional(),
-    lateFee: z.string().or(z.number()).nullable().optional(),
+    lateFine: z.string().or(z.number()).nullable().optional(),
   });
 
 export type UpdatePositionRequest = z.infer<typeof UpdatePositionSchema>;

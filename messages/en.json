@@ -44,6 +44,8 @@
   "DanhMucChucVu": {
     "maChucVu": "Position Code",
     "tenChucVu": "Position Name",
+    "quyenChucVu": "Role",
+    "moTa": "Description",
     "luongCoBan": "Basic Salary",
     "phuCap": "Allowance",
     "luongTangCa": "Overtime Salary",

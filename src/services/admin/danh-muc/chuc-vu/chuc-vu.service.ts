@@ -31,6 +31,7 @@ class DanhMucChucVuServicesBase extends AxiosService {
     await ValidateBaseClass.validate(formData, UpdatePositionSchema);
     return this.put(`${this.basePath}/${id}`, formData);
   }
+  
   async deleteDanhMucChucVu(id: string): Promise<any> {
     return this.delete(`${this.basePath}/${id}`);
   }

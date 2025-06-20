@@ -11,33 +11,29 @@ import {
 } from "@/dtos/danhMuc/don/don.request.dto";
 import { FormResponseGetItem } from "@/dtos/danhMuc/don/don.response.dto";
 
+export interface SearchParams {
+  quickSearch?: string;
+}
+
 class DanhMucDonServicesBase extends AxiosService {
   protected readonly basePath = "/v1/form";
 
   async getDanhMucDon(
     searchFilter: FilterQueryStringTypeItem[] = [],
-    params?: any
+    params?: SearchParams
   ): Promise<FormResponseGetItem> {
-    if (params && Object.keys(params).length > 0) {
-      const queryParams = new URLSearchParams();
-      
-      Object.entries(params).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          queryParams.append(key, String(value));
-        }
-      });
-      
-      return this.getWithParams(`${this.basePath}`, queryParams);
-    }
-    
-    return this.getWithFilter(`${this.basePath}`, searchFilter);
+    return this.getWithFilter(
+      `${this.basePath}`,
+      searchFilter,
+      params as Record<string, string>
+    );
   }
-  
+
   async createDanhMucDon(formData: CreateFormRequest): Promise<any> {
     await ValidateBaseClass.validate(formData, CreateFormSchema);
     return this.post(`${this.basePath}`, formData);
   }
-  
+
   async updateDanhMucDon(
     id: string | undefined,
     formData: UpdateFormRequest
@@ -45,11 +41,11 @@ class DanhMucDonServicesBase extends AxiosService {
     await ValidateBaseClass.validate(formData, UpdateFormSchema);
     return this.put(`${this.basePath}/${id}`, formData);
   }
-  
+
   async deleteDanhMucDon(id: string): Promise<any> {
     return this.delete(`${this.basePath}/${id}`);
   }
 }
 
 const DanhMucDonServices = new DanhMucDonServicesBase();
-export default DanhMucDonServices; 
+export default DanhMucDonServices;

@@ -9,12 +9,13 @@ import { DanhMucChucVuResponseGetItem } from "@/dtos/danhMuc/chucVu/chucVu.respo
 import DanhMucChucVuServices from "@/services/admin/danh-muc/chuc-vu/chuc-vu.service";
 import { getChangedValues } from "@/utils/client/compareHelpers";
 import { handleFormErrors } from "@/utils/client/formHelpers";
-import { Form } from "antd";
-import type { UploadFile } from "antd/es/upload/interface";
+import { Form, Tag } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import ChucVuForm from "./ChucVuForm";
 import { useTranslations } from "next-intl";
+import { RoleAdmin } from "@/model/enum";
+import { getRoleBadgeStyle } from "@/utils/client/getRoleBadgeStyle";
 
 const DanhMucChucVuManagementPage = () => {
   const t = useTranslations("DanhMucChucVu");
@@ -24,7 +25,6 @@ const DanhMucChucVuManagementPage = () => {
   const [form] = Form.useForm<any>();
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
-  const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [tableData, setTableData] = useState<DanhMucChucVuResponseGetItem[]>(
     []
   );
@@ -56,8 +56,6 @@ const DanhMucChucVuManagementPage = () => {
         setTotalItems(result.count || 0);
       } else {
         toast.error(result.message || "Tải dữ liệu thất bại!");
-      }
-      if (result && result.data) {
       }
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -120,9 +118,44 @@ const DanhMucChucVuManagementPage = () => {
         width: 120,
       },
       {
+        title: t("quyenChucVu"),
+        dataIndex: "role",
+        key: "role",
+        width: 100,
+        render: (role: string) => {
+          const style = getRoleBadgeStyle(role);
+
+          return (
+            <Tag
+              style={{
+                ...style,
+                padding: "4px 12px",
+                borderRadius: "20px",
+                fontSize: "12px",
+                fontWeight: 600,
+              }}
+            >
+              {role === RoleAdmin.ADMIN
+                ? "Admin"
+                : role === RoleAdmin.HR
+                ? "HR"
+                : role === RoleAdmin.MANAGER
+                ? "Manager"
+                : "Staff"}
+            </Tag>
+          );
+        },
+      },
+      {
+        title: t("moTa"),
+        dataIndex: "description",
+        key: "description",
+        width: 150,
+      },
+      {
         title: t("luongCoBan"),
-        dataIndex: "basicSalary",
-        key: "basicSalary",
+        dataIndex: "baseSalary",
+        key: "baseSalary",
         width: 150,
       },
       {
@@ -139,8 +172,8 @@ const DanhMucChucVuManagementPage = () => {
       },
       {
         title: t("phiDiMuon"),
-        dataIndex: "lateFee",
-        key: "lateFee",
+        dataIndex: "lateFine",
+        key: "lateFine",
         width: 120,
       },
     ],
@@ -151,9 +184,8 @@ const DanhMucChucVuManagementPage = () => {
     chucVu: any = null,
     action: "add" | "update" = "update"
   ) => {
-    // First, reset the form and file list before opening the modal
+    // First, reset the form before opening the modal
     form.resetFields();
-    setFileList([]);
 
     // Set editing chucVu state
     setEditingDanhMucChucVu(chucVu);
@@ -189,10 +221,18 @@ const DanhMucChucVuManagementPage = () => {
       try {
         // Validate form fields
         const values = await form.validateFields();
-        values.faceImg = fileList[0]?.url || null; // Handle file upload
         if (values.bod) {
           values.bod = new Date(values.bod).toISOString();
         }
+
+        // Convert numeric fields to numbers
+        if (values.baseSalary)
+          values.baseSalary = parseFloat(values.baseSalary);
+        if (values.allowance) values.allowance = parseFloat(values.allowance);
+        if (values.overtimeSalary)
+          values.overtimeSalary = parseFloat(values.overtimeSalary);
+        if (values.lateFine) values.lateFine = parseFloat(values.lateFine);
+
         const changedValues = getChangedValues(values, editingDanhMucChucVu);
 
         // Check if there are any changes
@@ -232,7 +272,15 @@ const DanhMucChucVuManagementPage = () => {
       try {
         // Validate form fields
         const values = await form.validateFields();
-        values.basicSalary = parseFloat(values.basicSalary);
+
+        // Convert numeric fields to numbers
+        if (values.baseSalary)
+          values.baseSalary = parseFloat(values.baseSalary);
+        if (values.allowance) values.allowance = parseFloat(values.allowance);
+        if (values.overtimeSalary)
+          values.overtimeSalary = parseFloat(values.overtimeSalary);
+        if (values.lateFine) values.lateFine = parseFloat(values.lateFine);
+
         const result: any = await DanhMucChucVuServices.createDanhMucChucVu(
           values
         );
