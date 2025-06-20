@@ -10,7 +10,7 @@ import {
 import { FormResponseGetItem } from "@/dtos/quan-li-don/quan-li-don.response.dto";
 import dayjs from "dayjs";
 
-export interface FromSearchParams {
+export interface FormSearchParams {
   quickSearch?: string;
   fromDate: dayjs.Dayjs;
   toDate: dayjs.Dayjs;
@@ -21,28 +21,9 @@ export interface FromSearchParams {
 class DanhMucDonServicesBase extends AxiosService {
   protected readonly basePath = "/v1/form-description";
 
-  async getDanhMucDon(
-    searchFilter: FilterQueryStringTypeItem[] = [],
-    params?: any
-  ): Promise<FormResponseGetItem> {
-    if (params && Object.keys(params).length > 0) {
-      const queryParams = new URLSearchParams();
-
-      Object.entries(params).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          queryParams.append(key, String(value));
-        }
-      });
-
-      return this.getWithParams(`${this.basePath}`, queryParams);
-    }
-
-    return this.getWithFilter(`${this.basePath}`, searchFilter);
-  }
-
   async filterDanhMucDon(
     searchFilter: FilterQueryStringTypeItem[] = [],
-    params?: FromSearchParams
+    params?: FormSearchParams
   ): Promise<FormResponseGetItem> {
     return this.getWithFilter(
       `${this.basePath}/filter`,
