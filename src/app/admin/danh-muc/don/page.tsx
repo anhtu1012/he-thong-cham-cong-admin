@@ -35,18 +35,19 @@ const DanhMucDonManagementPage = () => {
   ) => {
     setLoading(true);
     try {
-      // Use a simple params object instead of FilterQueryStringTypeItem array
+      const searchFilter: any = [
+        { key: "limit", type: "=", value: limit },
+        { key: "offset", type: "=", value: (page - 1) * limit },
+      ];
+
       const params: any = {
-        page,
-        limit,
+        ...(quickkSearch ? { quickSearch: quickkSearch } : {}),
       };
 
-      // Add quickSearch as a simple query parameter if provided
-      if (quickkSearch && quickkSearch.trim() !== "") {
-        params.quickSearch = quickkSearch;
-      }
-
-      const response = await DanhMucDonServices.getDanhMucDon([], params);
+      const response = await DanhMucDonServices.getDanhMucDon(
+        searchFilter,
+        params
+      );
       setTableData(response.data || []);
       setTotalItems(response.count);
       setLoading(false);
@@ -59,17 +60,27 @@ const DanhMucDonManagementPage = () => {
 
   useEffect(() => {
     getData(currentPage, pageSize, quickSearch);
-  }, [currentPage, pageSize]); // Reload data when page or size changes
+  }, [currentPage, pageSize]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleBeforeExport = async (): Promise<FormItem[]> => {
     setLoading(true);
     try {
       toast.info("Đang chuẩn bị dữ liệu xuất Excel...");
-      const params = {
-        page: 1,
-        limit: 1000, // Get a larger number of records for export
+      const searchFilterExport: any = [
+        {
+          key: "limit",
+          type: "=",
+          value: process.env.NEXT_PUBLIC_LIMIT_QUERY_EXPORT,
+        },
+        { key: "offset", type: "=", value: 0 },
+      ];
+      const params: any = {
+        ...(quickSearch ? { quickSearch: quickSearch } : {}),
       };
-      const response = await DanhMucDonServices.getDanhMucDon([], params);
+      const response = await DanhMucDonServices.getDanhMucDon(
+        searchFilterExport,
+        params
+      );
       setLoading(false);
       return response.data || [];
     } catch (error) {
