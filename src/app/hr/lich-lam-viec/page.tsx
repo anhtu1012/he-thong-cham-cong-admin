@@ -49,203 +49,9 @@ import MonthlyView from "./views/MonthlyView";
 import TimelineView from "./views/TimelineView";
 import WeeklyView from "./views/WeeklyView";
 
-// Sample API response data
-// const sampleApiResponse = {
-//   count: 8,
-//   limit: 100,
-//   page: 1,
-//   data: [
-//     {
-//       id: "4",
-//       createdAt: "2025-06-11T18:00:28.822Z",
-//       updatedAt: "2025-06-11T18:00:28.822Z",
-//       code: "WS2506110009",
-//       userCode: "USER2506100002",
-//       userContractCode: "CONTRACT2506100005",
-//       status: "NOTSTARTED",
-//       date: "2025-06-11T17:50:16.000Z",
-//       fullName: "Họ Staff Tên Viên",
-//       shiftCode: "SHIFT001",
-//       shiftName: "Ca fullday",
-//       branchName: "Chi nhánh Nhà Văn Hóa",
-//       branchCode: "BRANCH2506080001",
-//       addressLine: "Nhà văn hóa sinh viên, Thử Đức, TP. Hồ Chí Minh",
-//       startShiftTime: "1970-01-01T09:00:00.000Z",
-//       endShiftTime: "1970-01-01T17:00:00.000Z",
-//       checkInTime: null,
-//       checkOutTime: null,
-//       positionName: "thu duc",
-//       managerFullName: "Pham HR",
-//     },
-//     {
-//       id: "5",
-//       createdAt: "2025-06-11T18:10:00.000Z",
-//       updatedAt: "2025-06-11T18:10:00.000Z",
-//       code: "WS2506110010",
-//       userCode: "USER2506100002",
-//       userContractCode: "CONTRACT2506100005",
-//       status: "NOTSTARTED",
-//       date: "2025-06-12T08:00:00.000Z",
-//       fullName: "Họ Staff Tên Viên",
-//       shiftCode: "SHIFT001",
-//       shiftName: "Ca fullday",
-//       branchName: "Chi nhánh Nhà Văn Hóa",
-//       branchCode: "BRANCH2506080001",
-//       addressLine: "Nhà văn hóa sinh viên, Thử Đức, TP. Hồ Chí Minh",
-//       startShiftTime: "1970-01-01T09:00:00.000Z",
-//       endShiftTime: "1970-01-01T17:00:00.000Z",
-//       checkInTime: null,
-//       checkOutTime: null,
-//       positionName: "thu duc",
-//       managerFullName: "Pham HR",
-//     },
-//     {
-//       id: "6",
-//       createdAt: "2025-06-11T18:20:00.000Z",
-//       updatedAt: "2025-06-11T18:20:00.000Z",
-//       code: "WS2506110011",
-//       userCode: "USER2506100003",
-//       userContractCode: "CONTRACT2506100006",
-//       status: "NOTSTARTED",
-//       date: "2025-06-13T08:00:00.000Z",
-//       fullName: "Nguyễn Văn A",
-//       shiftCode: "SHIFT001",
-//       shiftName: "Ca fullday",
-//       branchName: "Chi nhánh Tân Bình",
-//       branchCode: "BRANCH2506080002",
-//       addressLine: "123 Lê Văn Sỹ, Tân Bình, TP. Hồ Chí Minh",
-//       startShiftTime: "1970-01-01T09:00:00.000Z",
-//       endShiftTime: "1970-01-01T17:00:00.000Z",
-//       checkInTime: null,
-//       checkOutTime: null,
-//       positionName: "tân bình",
-//       managerFullName: "Nguyen HR",
-//     },
-//     {
-//       id: "7",
-//       createdAt: "2025-06-11T18:30:00.000Z",
-//       updatedAt: "2025-06-11T18:30:00.000Z",
-//       code: "WS2506110012",
-//       userCode: "USER2506100003",
-//       userContractCode: "CONTRACT2506100006",
-//       status: "NOTSTARTED",
-//       date: "2025-06-14T08:00:00.000Z",
-//       fullName: "Nguyễn Văn A",
-//       shiftCode: "SHIFT001",
-//       shiftName: "Ca fullday",
-//       branchName: "Chi nhánh Tân Bình",
-//       branchCode: "BRANCH2506080002",
-//       addressLine: "123 Lê Văn Sỹ, Tân Bình, TP. Hồ Chí Minh",
-//       startShiftTime: "1970-01-01T09:00:00.000Z",
-//       endShiftTime: "1970-01-01T17:00:00.000Z",
-//       checkInTime: null,
-//       checkOutTime: null,
-//       positionName: "tân bình",
-//       managerFullName: "Nguyen HR",
-//     },
-//     {
-//       id: "8",
-//       createdAt: "2025-06-11T18:40:00.000Z",
-//       updatedAt: "2025-06-11T18:40:00.000Z",
-//       code: "WS2506110013",
-//       userCode: "USER2506100004",
-//       userContractCode: "CONTRACT2506100007",
-//       status: "NOTSTARTED",
-//       date: "2025-06-15T08:00:00.000Z",
-//       fullName: "Lê Thị B",
-//       shiftCode: "SHIFT001",
-//       shiftName: "Ca fullday",
-//       branchName: "Chi nhánh Gò Vấp",
-//       branchCode: "BRANCH2506080003",
-//       addressLine: "45 Quang Trung, Gò Vấp, TP. Hồ Chí Minh",
-//       startShiftTime: "1970-01-01T09:00:00.000Z",
-//       endShiftTime: "1970-01-01T17:00:00.000Z",
-//       checkInTime: null,
-//       checkOutTime: null,
-//       positionName: "gò vấp",
-//       managerFullName: "Tran HR",
-//     },
-//     {
-//       id: "9",
-//       createdAt: "2025-06-11T18:50:00.000Z",
-//       updatedAt: "2025-06-11T18:50:00.000Z",
-//       code: "WS2506110014",
-//       userCode: "USER2506100004",
-//       userContractCode: "CONTRACT2506100007",
-//       status: "NOTSTARTED",
-//       date: "2025-06-16T08:00:00.000Z",
-//       fullName: "Lê Thị B",
-//       shiftCode: "SHIFT001",
-//       shiftName: "Ca fullday",
-//       branchName: "Chi nhánh Gò Vấp",
-//       branchCode: "BRANCH2506080003",
-//       addressLine: "45 Quang Trung, Gò Vấp, TP. Hồ Chí Minh",
-//       startShiftTime: "1970-01-01T09:00:00.000Z",
-//       endShiftTime: "1970-01-01T17:00:00.000Z",
-//       checkInTime: null,
-//       checkOutTime: null,
-//       positionName: "gò vấp",
-//       managerFullName: "Tran HR",
-//     },
-//     {
-//       id: "10",
-//       createdAt: "2025-06-11T19:00:00.000Z",
-//       updatedAt: "2025-06-11T19:00:00.000Z",
-//       code: "WS2506110015",
-//       userCode: "USER2506100005",
-//       userContractCode: "CONTRACT2506100008",
-//       status: "NOTSTARTED",
-//       date: "2025-06-17T08:00:00.000Z",
-//       fullName: "Trần Văn C",
-//       shiftCode: "SHIFT001",
-//       shiftName: "Ca fullday",
-//       branchName: "Chi nhánh Bình Thạnh",
-//       branchCode: "BRANCH2506080004",
-//       addressLine: "78 Điện Biên Phủ, Bình Thạnh, TP. Hồ Chí Minh",
-//       startShiftTime: "1970-01-01T09:00:00.000Z",
-//       endShiftTime: "1970-01-01T17:00:00.000Z",
-//       checkInTime: null,
-//       checkOutTime: null,
-//       positionName: "bình thạnh",
-//       managerFullName: "Vo HR",
-//     },
-//     {
-//       id: "11",
-//       createdAt: "2025-06-11T19:10:00.000Z",
-//       updatedAt: "2025-06-11T19:10:00.000Z",
-//       code: "WS2506110016",
-//       userCode: "USER2506100005",
-//       userContractCode: "CONTRACT2506100008",
-//       status: "NOTSTARTED",
-//       date: "2025-06-18T08:00:00.000Z",
-//       fullName: "Trần Văn C",
-//       shiftCode: "SHIFT001",
-//       shiftName: "Ca fullday",
-//       branchName: "Chi nhánh Bình Thạnh",
-//       branchCode: "BRANCH2506080004",
-//       addressLine: "78 Điện Biên Phủ, Bình Thạnh, TP. Hồ Chí Minh",
-//       startShiftTime: "1970-01-01T09:00:00.000Z",
-//       endShiftTime: "1970-01-01T17:00:00.000Z",
-//       checkInTime: null,
-//       checkOutTime: null,
-//       positionName: "bình thạnh",
-//       managerFullName: "Vo HR",
-//     },
-//   ],
-// };
-
 // Transform API data format
 const transformApiScheduleData = (apiData: any[]) => {
   return apiData.map((item, index) => {
-    // Extract time portions from the datetime strings
-    // const startTime = item.startShiftTime
-    //   ? new Date(item.startShiftTime).toISOString().substring(11, 16) // "HH:mm"
-    //   : "08:00";
-
-    // const endTime = item.endShiftTime
-    //   ? new Date(item.endShiftTime).toISOString().substring(11, 16) // "HH:mm"
-    //   : "08:00";
-
     const checkinTime = item.checkInTime
       ? new Date(item.checkInTime).toLocaleTimeString("en-US", {
           hour: "2-digit",
@@ -354,7 +160,23 @@ const WorkSchedulePage = () => {
         start: currentDate.startOf("week"),
         end: currentDate.endOf("week"),
       };
+    } else if (viewType === "month" || viewType === "gantt") {
+      return {
+        start: currentDate.startOf("month"),
+        end: currentDate.endOf("month"),
+      };
+    } else if (
+      viewType === "list" ||
+      viewType === "card" ||
+      viewType === "timeline"
+    ) {
+      // For these views, use the explicitly selected date range from the date pickers
+      return {
+        start: dateRange[0],
+        end: dateRange[1],
+      };
     } else {
+      // Default fallback
       return {
         start: currentDate.startOf("month"),
         end: currentDate.endOf("month"),
@@ -364,8 +186,8 @@ const WorkSchedulePage = () => {
 
   // Now use getDateRange after it's defined
   const [dateRange, setDateRange] = useState<[dayjs.Dayjs, dayjs.Dayjs]>(() => {
-    const range = getDateRange();
-    return [range.start, range.end];
+    // Initialize with current month if not set
+    return [currentDate.startOf("month"), currentDate.endOf("month")];
   });
   const fetchEmployees = async () => {
     setLoading(true);
@@ -409,26 +231,10 @@ const WorkSchedulePage = () => {
   const fetchSchedules = async () => {
     setLoading(true);
     try {
-      // Calculate fromDate and toDate based on viewType
-      let fromDate, toDate;
-
-      if (
-        viewType === "list" ||
-        viewType === "card" ||
-        viewType === "gantt" ||
-        viewType === "timeline"
-      ) {
-        fromDate = dateRange[0]
-          ? dateRange[0].startOf("day").toISOString()
-          : undefined;
-        toDate = dateRange[1]
-          ? dateRange[1].endOf("day").toISOString()
-          : undefined;
-      } else {
-        const range = getDateRange();
-        fromDate = range.start.startOf("day").toISOString();
-        toDate = range.end.endOf("day").toISOString();
-      }
+      // Get date range based on current view type
+      const range = getDateRange();
+      const fromDate = range.start.startOf("day").toISOString();
+      const toDate = range.end.endOf("day").toISOString();
 
       const searchOwnweFilter: any = [
         { key: "limit", type: "=", value: 100 },
@@ -438,8 +244,8 @@ const WorkSchedulePage = () => {
       const result = await WorkingScheduleServices.getWorkingSchedule(
         searchOwnweFilter,
         {
-          ...(fromDate ? { fromDate } : {}),
-          ...(toDate ? { toDate } : {}),
+          fromDate,
+          toDate,
         }
       );
       const transformedData = transformApiScheduleData(result.data);
@@ -563,9 +369,9 @@ const WorkSchedulePage = () => {
   const getStatusTag = (status: string) => {
     const statusMap: Record<string, { color: string; text: string }> = {
       ACTIVE: { color: "green", text: "Đang diễn ra" },
-      NOTSTARTED: { color: "orange", text: "Chưa bắt đầu" },
+      NOTSTARTED: { color: "#1e40af", text: "Chưa bắt đầu" },
       END: { color: "red", text: "Kết thúc" },
-      NOTWORK: { color: "red", text: "Không chấm công" },
+      NOTWORK: { color: "orange", text: "Không chấm công" },
     };
 
     const statusInfo = statusMap[status] || { color: "default", text: status };
@@ -809,7 +615,7 @@ const WorkSchedulePage = () => {
                     style={{ width: "100%" }}
                   />
                 )}
-                {viewType === "month" && (
+                {(viewType === "month" || viewType === "gantt") && (
                   <DatePicker
                     value={currentDate}
                     onChange={(date) => date && setCurrentDate(date)}
@@ -823,7 +629,6 @@ const WorkSchedulePage = () => {
                 )}
                 {(viewType === "list" ||
                   viewType === "card" ||
-                  viewType === "gantt" ||
                   viewType === "timeline") && (
                   <Space.Compact style={{ width: "100%" }}>
                     <DatePicker

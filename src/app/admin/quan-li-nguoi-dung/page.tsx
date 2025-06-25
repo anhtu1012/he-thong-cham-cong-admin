@@ -269,31 +269,30 @@ const UserManagementPage = () => {
           </Tooltip>
         ),
       },
-
-      {
-        title: "Chi nhánh",
-        dataIndex: "branchName",
-        key: "branchName",
-        width: 150,
-      },
-      {
-        title: "Chức vụ",
-        dataIndex: "positionCode",
-        key: "positionCode",
-        width: 180,
-        render: (positionCode: string) => {
-          const position = positions.find(
-            (item) => item.value === positionCode
-          );
-          return <span>{position ? position.label : positionCode}</span>;
-        },
-      },
-      {
-        title: "Người quản lý",
-        dataIndex: "managedBy",
-        key: "managedBy",
-        width: 120,
-      },
+      // {
+      //   title: "Chi nhánh",
+      //   dataIndex: "branchName",
+      //   key: "branchName",
+      //   width: 150,
+      // },
+      // {
+      //   title: "Chức vụ",
+      //   dataIndex: "positionCode",
+      //   key: "positionCode",
+      //   width: 180,
+      //   render: (positionCode: string) => {
+      //     const position = positions.find(
+      //       (item) => item.value === positionCode
+      //     );
+      //     return <span>{position ? position.label : positionCode}</span>;
+      //   },
+      // },
+      // {
+      //   title: "Người quản lý",
+      //   dataIndex: "managedBy",
+      //   key: "managedBy",
+      //   width: 120,
+      // },
       {
         title: "Quyền",
         dataIndex: "roleCode",

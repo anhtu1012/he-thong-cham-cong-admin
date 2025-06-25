@@ -8,7 +8,6 @@ import { getDayNameInVietnamese } from "../../../../utils/dateLocalization";
 interface WeeklyViewProps {
   dateRange: { start: dayjs.Dayjs; end: dayjs.Dayjs };
   scheduleData: any[];
-  employeeList?: any[];
   selectedEmployees: number[];
   selectedDepartment: string;
   attendanceStatuses: Record<string, string>;
@@ -61,8 +60,6 @@ const WeeklyView: React.FC<WeeklyViewProps> = ({
     if (!status) return "";
     return `attendance-${status}`;
   };
-  console.log("employeesWithSchedules", employeesWithSchedules);
-  console.log("selectedEmployees", selectedEmployees);
 
   return (
     <div className="weekly-schedule-view">
@@ -128,11 +125,7 @@ const WeeklyView: React.FC<WeeklyViewProps> = ({
                         {daySchedules.map((schedule) => (
                           <div
                             key={schedule.id}
-                            className={`schedule-item status-${
-                              schedule.status
-                            } ${getAttendanceStatusClass(
-                              schedule.attendanceStatus
-                            )}`}
+                            className={`schedule-item status-${schedule.status} `}
                             onClick={() => handleViewSchedule(schedule)}
                             title={`${schedule.shift} (${schedule.startTime}-${schedule.endTime})`}
                           >
@@ -150,7 +143,9 @@ const WeeklyView: React.FC<WeeklyViewProps> = ({
                             </div>
                             {schedule.attendanceStatus && (
                               <div
-                                className="attendance-indicator"
+                                className={`${getAttendanceStatusClass(
+                                  schedule.attendanceStatus
+                                )}`}
                                 title={
                                   schedule.attendanceStatus ===
                                   attendanceStatuses.ON_TIME
@@ -205,6 +200,28 @@ const WeeklyView: React.FC<WeeklyViewProps> = ({
           <p>Không có nhân viên nào được lên lịch trong tuần này</p>
         </div>
       )}
+
+      {/* <div className="schedule-legend">
+        <div className="legend-title">Trạng thái ca làm:</div>
+        <div className="legend-items">
+          <div className="legend-item">
+            <span className="legend-color status-ACTIVE"></span>
+            <span className="legend-text">Đang hoạt động</span>
+          </div>
+          <div className="legend-item">
+            <span className="legend-color status-NOTSTARTED"></span>
+            <span className="legend-text">Chưa bắt đầu</span>
+          </div>
+          <div className="legend-item">
+            <span className="legend-color status-NOTWORK"></span>
+            <span className="legend-text">Chưa chấm công</span>
+          </div>
+          <div className="legend-item">
+            <span className="legend-color status-END"></span>
+            <span className="legend-text">Đã Kết Thúc</span>
+          </div>
+        </div>
+      </div> */}
     </div>
   );
 };
