@@ -45,17 +45,18 @@ const ChiNhanhForm: React.FC<ChiNhanhFormProps> = ({
   const [input, setInput] = useState("");
   const debouncedInput = useDebounce(input, 500);
   const onSelect = async (addressLine: any, options: any) => {
+    console.log({ addressLine });
 
-    console.log({addressLine});
+    const placeDetail: any = await GoongService.getPlaceDetail(
+      options.place_id
+    );
+    console.log({ options });
 
-    const placeDetail: any = await GoongService.getPlaceDetail(options.place_id);
-    console.log({options});
-    
-    form.setFieldValue("city", options.compound.province)
-    form.setFieldValue("district", options.compound.district)
-    form.setFieldValue("placeId", options.place_id)
-    form.setFieldValue("lat", placeDetail.result.geometry.location.lat)
-    form.setFieldValue("long", placeDetail.result.geometry.location.lng)
+    form.setFieldValue("city", options.compound.province);
+    form.setFieldValue("district", options.compound.district);
+    form.setFieldValue("placeId", options.place_id);
+    form.setFieldValue("lat", placeDetail.result.geometry.location.lat);
+    form.setFieldValue("long", placeDetail.result.geometry.location.lng);
   };
   useEffect(() => {
     const fetchAutocomplete = async () => {
@@ -67,7 +68,7 @@ const ChiNhanhForm: React.FC<ChiNhanhFormProps> = ({
 
         const panel = result.predictions.map((pre: any) => ({
           value: pre.description,
-          ...pre
+          ...pre,
         }));
 
         setAddressOptions(panel);
@@ -100,20 +101,7 @@ const ChiNhanhForm: React.FC<ChiNhanhFormProps> = ({
       destroyOnClose
     >
       <Row gutter={16}>
-        <Col span={12}>
-          <Form.Item
-            name="code"
-            label={t("maChiNhanh")}
-            rules={[{ required: true, message: t("vuilongNhapMaChiNhanh") }]}
-          >
-            <Input
-              prefix={<IdcardOutlined />}
-              placeholder={t("nhapMaChiNhanh")}
-              size="large"
-            />
-          </Form.Item>
-        </Col>
-        <Col span={12}>
+        <Col span={24}>
           <Form.Item
             name="branchName"
             label={t("tenChiNhanh")}
@@ -157,7 +145,6 @@ const ChiNhanhForm: React.FC<ChiNhanhFormProps> = ({
               placeholder={t("nhapThanhPho")}
               size="large"
               readOnly
-              
             />
           </Form.Item>
         </Col>

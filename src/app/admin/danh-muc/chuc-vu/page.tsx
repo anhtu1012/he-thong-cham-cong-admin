@@ -157,24 +157,36 @@ const DanhMucChucVuManagementPage = () => {
         dataIndex: "baseSalary",
         key: "baseSalary",
         width: 150,
+        render: (value: number) => {
+          return value ? value.toLocaleString("vi-VN") + " VND" : "0 VND";
+        },
       },
       {
         title: t("phuCap"),
         dataIndex: "allowance",
         key: "allowance",
         width: 150,
+        render: (value: number) => {
+          return value ? value.toLocaleString("vi-VN") + " VND" : "0 VND";
+        },
       },
       {
         title: t("luongTangCa"),
         dataIndex: "overtimeSalary",
         key: "overtimeSalary",
         width: 180,
+        render: (value: number) => {
+          return value ? value.toLocaleString("vi-VN") + " VND" : "0 VND";
+        },
       },
       {
         title: t("phiDiMuon"),
         dataIndex: "lateFine",
         key: "lateFine",
         width: 120,
+        render: (value: number) => {
+          return value ? value.toLocaleString("vi-VN") + " VND" : "0 VND";
+        },
       },
     ],
     [t]

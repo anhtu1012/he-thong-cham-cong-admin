@@ -28,9 +28,13 @@ const TimelineView: React.FC<TimelineViewProps> = ({
   // Filter schedules in date range and matching employee/department filters
   const filteredSchedules = scheduleData.filter((schedule) => {
     const scheduleDate = dayjs(schedule.date);
+    // Fix date range filtering - the issue is in the condition structure
     const inDateRange =
-      (scheduleDate.isAfter(start) || scheduleDate.isSame(start)) &&
-      (scheduleDate.isBefore(end) || scheduleDate.isSame(end));
+      (scheduleDate.isAfter(start.startOf("day"), "day") ||
+        scheduleDate.isSame(start.startOf("day"), "day")) &&
+      (scheduleDate.isBefore(end.endOf("day"), "day") ||
+        scheduleDate.isSame(end.endOf("day"), "day"));
+
     const matchesEmployeeFilter =
       selectedEmployees.length === 0 ||
       selectedEmployees.includes(schedule.employeeId);
