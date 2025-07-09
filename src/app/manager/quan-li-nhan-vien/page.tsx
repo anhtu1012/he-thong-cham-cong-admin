@@ -10,7 +10,7 @@ import { UserInfor } from "@/dtos/auth/auth.dto";
 import { UserRequestUpdateUsser } from "@/dtos/auth/auth.request.dto";
 import { UserResponseGetItem } from "@/dtos/auth/auth.response.dto";
 import { UserContractItem } from "@/dtos/quan-li-nguoi-dung/contracts/contract.dto";
-import { RoleAdmin } from "@/model/enum";
+import { RoleAdmin } from "@/models/enum";
 import QuanLyHopDongServices from "@/services/admin/quan-li-nguoi-dung/quan-li-hop-dong.service";
 import QlNguoiDungServices from "@/services/admin/quan-li-nguoi-dung/quan-li-nguoi-dung.service";
 import AuthServices from "@/services/auth/api.service";
@@ -469,20 +469,20 @@ const QuanLiNhanVienPage = () => {
         // Validate form fields
         const values = await form.validateFields();
         console.log("Form values:", values);
-        
+
         // Ensure all required fields are present
         if (!values.gender) {
           toast.error("Vui lòng chọn giới tính!");
           setEditLoading(false);
           return;
         }
-        
+
         if (!values.addressCode) {
           toast.error("Vui lòng nhập địa chỉ!");
           setEditLoading(false);
           return;
         }
-        
+
         if (values.dob) {
           values.dob = new Date(values.dob).toISOString();
         }
