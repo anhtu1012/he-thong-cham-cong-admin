@@ -158,8 +158,7 @@ const DailyView: React.FC<DailyViewProps> = ({
                     <div style={{ fontWeight: 600 }}>{checkinTime}</div>
                     {timeDiff && !timeDiff.isOnTime && (
                       <div className="time-diff">
-                        {timeDiff.isLate ? "Trễ" : "Sớm"} {timeDiff.minutes}{" "}
-                        phút
+                        {timeDiff.isLate ? "Trễ" : ""} {timeDiff.minutes} phút
                       </div>
                     )}
                   </div>
@@ -171,36 +170,12 @@ const DailyView: React.FC<DailyViewProps> = ({
               title: "Check-out",
               dataIndex: "checkoutTime",
               key: "checkoutTime",
-              render: (checkoutTime, record) => {
+              render: (checkoutTime) => {
                 if (!checkoutTime) {
                   return <span className="no-time">Chưa check-out</span>;
                 }
 
-                const timeDiff = calculateTimeDifference(
-                  record.endTime,
-                  checkoutTime,
-                  true
-                );
-
-                return (
-                  <div
-                    className={`time-cell ${
-                      timeDiff?.isEarly
-                        ? "early"
-                        : timeDiff?.isOnTime
-                        ? "on-time"
-                        : ""
-                    }`}
-                  >
-                    <div style={{ fontWeight: 600 }}>{checkoutTime}</div>
-                    {timeDiff && !timeDiff.isOnTime && (
-                      <div className="time-diff">
-                        {timeDiff.isEarly ? "Sớm" : "Muộn"} {timeDiff.minutes}{" "}
-                        phút
-                      </div>
-                    )}
-                  </div>
-                );
+                return <div style={{ fontWeight: 600 }}>{checkoutTime}</div>;
               },
               width: 120,
             },

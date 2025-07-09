@@ -67,6 +67,27 @@ const WeeklyView: React.FC<WeeklyViewProps> = ({
         Lịch làm việc tuần: {start.format("DD/MM/YYYY")} -{" "}
         {end.format("DD/MM/YYYY")}
       </h3>
+      <div className="gantt-legend">
+        <div className="legend-title">Trạng thái ca làm:</div>
+        <div className="legend-items">
+          <div className="legend-item">
+            <span className="legend-color status-ACTIVE"></span>
+            <span className="legend-text">Đang hoạt động</span>
+          </div>
+          <div className="legend-item">
+            <span className="legend-color status-NOTSTARTED"></span>
+            <span className="legend-text">Chưa bắt đầu</span>
+          </div>
+          <div className="legend-item">
+            <span className="legend-color status-NOTWORK"></span>
+            <span className="legend-text">Chưa chấm công</span>
+          </div>
+          <div className="legend-item">
+            <span className="legend-color status-END"></span>
+            <span className="legend-text">Hoàn Thành</span>
+          </div>
+        </div>
+      </div>
 
       <div className="weekly-calendar">
         <table className="schedule-table">

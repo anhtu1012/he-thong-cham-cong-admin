@@ -80,10 +80,14 @@ const transformApiScheduleData = (apiData: any[]) => {
 
     // Map attendance status
     let attendanceStatus = attendanceStatuses.NOT_STARTED;
-    if (item.status === "COMPLETED")
-      attendanceStatus = attendanceStatuses.COMPLETED;
-    else if (item.status === "ABSENT")
-      attendanceStatus = attendanceStatuses.ABSENT;
+    if (item.statusTimeKeeping === "STARTED")
+      attendanceStatus = attendanceStatuses.STARTED;
+    else if (item.statusTimeKeeping === "END")
+      attendanceStatus = attendanceStatuses.END;
+    else if (item.statusTimeKeeping === "LATE")
+      attendanceStatus = attendanceStatuses.LATE;
+    else if (item.statusTimeKeeping === "NOCHECKOUT")
+      attendanceStatus = attendanceStatuses.NOCHECKOUT;
 
     // Extract or generate employee ID
     const employeeId = parseInt(item.userCode?.replace("USER", "") || "1");
@@ -117,12 +121,11 @@ const transformApiScheduleData = (apiData: any[]) => {
 
 // Define attendance status types
 const attendanceStatuses = {
-  NOT_STARTED: "not_started",
-  ON_TIME: "on_time",
-  LATE: "late",
-  ABSENT: "absent",
-  EARLY_LEAVE: "early_leave",
-  COMPLETED: "completed",
+  NOT_STARTED: "NOT_STARTED",
+  STARTED: "STARTED",
+  LATE: "LATE",
+  END: "END",
+  NOCHECKOUT: "NOCHECKOUT",
 };
 
 const WorkSchedulePage = () => {
@@ -385,12 +388,12 @@ const WorkSchedulePage = () => {
     > = {
       [attendanceStatuses.NOT_STARTED]: {
         color: "default",
-        text: "Chưa bắt đầu",
+        text: "Chưa có chấm công",
         icon: <ClockCircleOutlined />,
       },
-      [attendanceStatuses.ON_TIME]: {
+      [attendanceStatuses.STARTED]: {
         color: "green",
-        text: "Đúng giờ",
+        text: "Đã check-in",
         icon: <CheckCircleOutlined />,
       },
       [attendanceStatuses.LATE]: {
@@ -398,17 +401,12 @@ const WorkSchedulePage = () => {
         text: "Đi trễ",
         icon: <WarningOutlined />,
       },
-      [attendanceStatuses.ABSENT]: {
+      [attendanceStatuses.NOCHECKOUT]: {
         color: "red",
-        text: "Vắng mặt",
+        text: "Không check-out",
         icon: <CloseCircleOutlined />,
       },
-      [attendanceStatuses.EARLY_LEAVE]: {
-        color: "volcano",
-        text: "Về sớm",
-        icon: <ClockCircleOutlined />,
-      },
-      [attendanceStatuses.COMPLETED]: {
+      [attendanceStatuses.END]: {
         color: "green",
         text: "Hoàn thành",
         icon: <CheckCircleOutlined />,
@@ -732,12 +730,14 @@ const WorkSchedulePage = () => {
                       value: attendanceStatuses.NOT_STARTED,
                       label: "Chưa bắt đầu",
                     },
-                    { value: attendanceStatuses.ON_TIME, label: "Đúng giờ" },
+                    { value: attendanceStatuses.STARTED, label: "Đã check-in" },
                     { value: attendanceStatuses.LATE, label: "Đi trễ" },
-                    { value: attendanceStatuses.ABSENT, label: "Vắng mặt" },
-                    { value: attendanceStatuses.EARLY_LEAVE, label: "Về sớm" },
                     {
-                      value: attendanceStatuses.COMPLETED,
+                      value: attendanceStatuses.NOCHECKOUT,
+                      label: "Không check-out",
+                    },
+                    {
+                      value: attendanceStatuses.END,
                       label: "Hoàn thành",
                     },
                   ]}
@@ -1112,23 +1112,19 @@ const WorkSchedulePage = () => {
                       label: "🕐 Chưa bắt đầu",
                     },
                     {
-                      value: attendanceStatuses.ON_TIME,
-                      label: "✅ Đúng giờ",
+                      value: attendanceStatuses.STARTED,
+                      label: "✅ Đã check-in",
                     },
                     {
                       value: attendanceStatuses.LATE,
                       label: "⏰ Đi trễ",
                     },
                     {
-                      value: attendanceStatuses.ABSENT,
-                      label: "❌ Vắng mặt",
+                      value: attendanceStatuses.NOCHECKOUT,
+                      label: "❌ Không check-out",
                     },
                     {
-                      value: attendanceStatuses.EARLY_LEAVE,
-                      label: "🏃 Về sớm",
-                    },
-                    {
-                      value: attendanceStatuses.COMPLETED,
+                      value: attendanceStatuses.END,
                       label: "🎉 Hoàn thành",
                     },
                   ]}
