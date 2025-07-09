@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import FormModal from "@/components/basicUI/FormModal";
-import { RoleAdmin } from "@/model/enum";
+import { RoleAdmin } from "@/models/enum";
 import {
   CalendarOutlined,
   HomeOutlined,

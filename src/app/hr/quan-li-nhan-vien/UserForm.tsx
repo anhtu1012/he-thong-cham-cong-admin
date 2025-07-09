@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import FormModal from "@/components/basicUI/FormModal";
-import { RoleAdmin } from "@/model/enum";
+import { RoleAdmin } from "@/models/enum";
 import SelectServices from "@/services/select/select.service";
 import {
   CalendarOutlined,
@@ -92,7 +92,10 @@ const UserForm: React.FC<UserFormProps> = ({
   const loadManagers = async (branch: string, role: string) => {
     setLoadingManagers(true);
     try {
-      const managersData = await SelectServices.getSelectManagers([branch], role);
+      const managersData = await SelectServices.getSelectManagers(
+        [branch],
+        role
+      );
       if (managersData) {
         setManagers(managersData);
       } else {
@@ -363,9 +366,7 @@ const UserForm: React.FC<UserFormProps> = ({
                   positionCode: undefined,
                 });
               }}
-              options={[
-                { value: RoleAdmin.STAFF, label: "Staff" },
-              ]}
+              options={[{ value: RoleAdmin.STAFF, label: "Staff" }]}
             />
           </Form.Item>
         </Col>
@@ -465,4 +466,4 @@ const UserForm: React.FC<UserFormProps> = ({
   );
 };
 
-export default UserForm; 
+export default UserForm;

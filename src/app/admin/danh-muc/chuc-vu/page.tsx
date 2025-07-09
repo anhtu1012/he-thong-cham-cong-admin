@@ -14,7 +14,7 @@ import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import ChucVuForm from "./ChucVuForm";
 import { useTranslations } from "next-intl";
-import { RoleAdmin } from "@/model/enum";
+import { RoleAdmin } from "@/models/enum";
 import { getRoleBadgeStyle } from "@/utils/client/getRoleBadgeStyle";
 
 const DanhMucChucVuManagementPage = () => {

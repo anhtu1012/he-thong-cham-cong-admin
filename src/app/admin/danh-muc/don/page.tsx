@@ -4,7 +4,7 @@
 import ActionButton from "@/components/basicUI/ActionButton";
 import CInputLabel from "@/components/basicUI/CInputLabel";
 import Ctable from "@/components/basicUI/Ctable";
-import { RoleAdmin } from "@/model/enum";
+import { RoleAdmin } from "@/models/enum";
 import { getChangedValues } from "@/utils/client/compareHelpers";
 import { handleFormErrors } from "@/utils/client/formHelpers";
 import { Form, Tag } from "antd";
