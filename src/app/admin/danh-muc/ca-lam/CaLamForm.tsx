@@ -3,12 +3,9 @@ import FormModal from "@/components/basicUI/FormModal";
 import { ClockCircleOutlined } from "@ant-design/icons";
 import { Col, Form, FormInstance, Input, Row, TimePicker } from "antd";
 import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
 import { useTranslations } from "next-intl";
 import React from "react";
 import "./index.scss";
-
-dayjs.extend(utc);
 
 // Utility function to convert string time to dayjs object
 const convertToDateTime = (value: string | null | undefined) => {
@@ -16,6 +13,12 @@ const convertToDateTime = (value: string | null | undefined) => {
 
   // If value is already a dayjs object, return it
   if (dayjs.isDayjs(value)) return value;
+
+  // Handle ISO string format (e.g., "1970-01-01T01:30:00.000Z")
+  if (typeof value === "string" && value.includes("T") && value.includes("Z")) {
+    const dayjsObj = dayjs.utc(value);
+    return dayjs().hour(dayjsObj.hour()).minute(dayjsObj.minute()).second(0);
+  }
 
   // Handle string format "HH:mm"
   if (typeof value === "string" && value.includes(":")) {

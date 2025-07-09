@@ -142,7 +142,8 @@
     "nhapThoiGianNghiTrua": "Nhập giờ nghỉ trưa",
     "gioNghiTrua": "Giờ nghĩ trưa",
     "ngayTao": "Ngày tạo",
-    "ngayCapNhat": "Ngày cập nhật"
+    "ngayCapNhat": "Ngày cập nhật",
+    "vuilongNhapThoiGianNghiTrua": "Vui lòng nhập giờ nghĩ trưa"
   },
   "DanhMucChiNhanh": {
     "maChiNhanh": "Mã chi nhánh",

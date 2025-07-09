@@ -43,12 +43,41 @@ export const vietnamTimeToUtc = (vietnamTimeString: string): Date => {
   }
 };
 
+// Helper function để parse thời gian mà giữ nguyên giá trị đã truyền vào
+const parseTimeString = (timeString: string): Date => {
+  try {
+    // Parse thành các thành phần thời gian
+    const dateMatch = timeString.match(/(\d{4})-(\d{2})-(\d{2})/);
+    const timeMatch = timeString.match(/(\d{2}):(\d{2}):(\d{2})/);
+
+    if (dateMatch && timeMatch) {
+      const year = parseInt(dateMatch[1]);
+      const month = parseInt(dateMatch[2]) - 1; // Month is 0-indexed
+      const day = parseInt(dateMatch[3]);
+      const hour = parseInt(timeMatch[1]);
+      const minute = parseInt(timeMatch[2]);
+      const second = parseInt(timeMatch[3]);
+
+      // Tạo Date object với giá trị chính xác, không bị chuyển đổi múi giờ
+      return new Date(year, month, day, hour, minute, second);
+    }
+
+    // Fallback: sử dụng cách cũ nếu không parse được
+    return new Date(timeString);
+  } catch (error) {
+    console.error("Error parsing time string:", error);
+    return new Date(timeString);
+  }
+};
+
 // Format thời gian hiển thị (mặc định sử dụng thời gian truyền vào, nếu vn: true thì chuyển sang giờ VN)
 export const formatDateTime = (
   timeString: string,
   vn: boolean = false
 ): string => {
   if (!timeString) return "";
+  console.log("Input Time String:", timeString);
+  console.log("VN Mode:", vn);
 
   try {
     let dateToFormat: Date;
@@ -57,9 +86,10 @@ export const formatDateTime = (
       // Chuyển đổi từ UTC sang giờ Việt Nam
       dateToFormat = utcToVietnamTime(timeString);
     } else {
-      // Sử dụng thời gian như đã truyền vào
-      dateToFormat = new Date(timeString);
+      // Sử dụng helper function để parse thời gian chính xác
+      dateToFormat = parseTimeString(timeString);
     }
+    console.log("Formatted Date:", dateToFormat);
 
     return dateToFormat.toLocaleTimeString(vn ? "vi-VN" : "en-US", {
       hour: "2-digit",
@@ -76,6 +106,7 @@ export const formatDateTime = (
 // Format ngày tháng hiển thị (mặc định sử dụng thời gian truyền vào, nếu vn: true thì chuyển sang giờ VN)
 export const formatDate = (dateString: string, vn: boolean = false): string => {
   if (!dateString) return "";
+  console.log("Input Date String:", dateString, "VN Mode:", vn);
 
   try {
     let dateToFormat: Date;
@@ -83,7 +114,7 @@ export const formatDate = (dateString: string, vn: boolean = false): string => {
     if (vn) {
       dateToFormat = utcToVietnamTime(dateString);
     } else {
-      dateToFormat = new Date(dateString);
+      dateToFormat = parseTimeString(dateString);
     }
 
     return dateToFormat.toLocaleDateString(vn ? "vi-VN" : "en-US", {
@@ -111,7 +142,7 @@ export const formatFullDateTime = (
     if (vn) {
       dateToFormat = utcToVietnamTime(dateTimeString);
     } else {
-      dateToFormat = new Date(dateTimeString);
+      dateToFormat = parseTimeString(dateTimeString);
     }
 
     return dateToFormat.toLocaleString(vn ? "vi-VN" : "en-US", {

@@ -142,7 +142,8 @@
     "nhapThoiGianNghiTrua": "Enter Lunch Break",
     "gioNghiTrua": "Lunch Break",
     "ngayTao": "CreateAt",
-    "ngayCapNhat": "UpdateAt"
+    "ngayCapNhat": "UpdateAt",
+    "vuilongNhapThoiGianNghiTrua": "Please Enter time.."
   },
   "DanhMucChiNhanh": {
     "maChiNhanh": "Branch Code",
