@@ -61,7 +61,7 @@ export const formatDateTime = (
       dateToFormat = new Date(timeString);
     }
 
-    return dateToFormat.toLocaleTimeString("vi-VN", {
+    return dateToFormat.toLocaleTimeString(vn ? "vi-VN" : "en-US", {
       hour: "2-digit",
       minute: "2-digit",
       hour12: false,
@@ -86,7 +86,7 @@ export const formatDate = (dateString: string, vn: boolean = false): string => {
       dateToFormat = new Date(dateString);
     }
 
-    return dateToFormat.toLocaleDateString("vi-VN", {
+    return dateToFormat.toLocaleDateString(vn ? "vi-VN" : "en-US", {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
@@ -114,7 +114,7 @@ export const formatFullDateTime = (
       dateToFormat = new Date(dateTimeString);
     }
 
-    return dateToFormat.toLocaleString("vi-VN", {
+    return dateToFormat.toLocaleString(vn ? "vi-VN" : "en-US", {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
