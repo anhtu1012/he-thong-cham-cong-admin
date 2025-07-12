@@ -1,50 +1,50 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
+import CdatePicker from "@/components/basicUI/CdatePicker";
 import CInputLabel from "@/components/basicUI/CInputLabel";
 import Ctable from "@/components/basicUI/Ctable";
 import FilterSection from "@/components/basicUI/FilterSection";
-import {
-  Tag,
-  Tooltip,
-  Button,
-  Space,
-  Popconfirm,
-  Form,
-  Row,
-  Col,
-  DatePicker,
-} from "antd";
-import { useEffect, useMemo, useState } from "react";
-import { toast } from "react-toastify";
-import { useTranslations } from "next-intl";
-import dayjs from "dayjs";
-import "./index.scss";
+import Cselect from "@/components/Cselect";
+import { FormItem as FormDescriptionItem } from "@/dtos/danhMuc/don/don.dto";
+import { FormItem } from "@/dtos/quan-li-don/quan-li-don";
+import { selectAuthLogin } from "@/lib/store/slices/loginSlice";
+import FormDescriptionServices from "@/services/admin/danh-muc/don/don.service";
+import DanhMucDonServices from "@/services/admin/quan-li-don/quan-li-don.service";
 import {
   CheckCircleOutlined,
-  CloseCircleOutlined,
   CalendarOutlined,
-  EyeOutlined,
+  ClockCircleOutlined,
   FileTextOutlined,
+  CommentOutlined,
+  EditOutlined,
+  EyeOutlined,
 } from "@ant-design/icons";
-import Cselect from "@/components/Cselect";
-import styles from "../../../components/styles/styles.module.scss";
+import {
+  Button,
+  Col,
+  Form,
+  Row,
+  Space,
+  Tag,
+  Tooltip,
+  Modal,
+  Checkbox,
+  Input,
+  Card,
+  Typography,
+} from "antd";
+import dayjs from "dayjs";
+import { useTranslations } from "next-intl";
+import { useEffect, useMemo, useState } from "react";
+import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
+import "./index.scss";
 
-// Sample data interface for QuanLiDon
-interface QuanLiDonItem {
-  id: string;
-  code: string;
-  reason: string;
-  status: string;
-  file: string | null;
-  startTime: string;
-  endTime: string;
-  approvedTime: string | null;
-  formCode: string;
-  submittedBy: string;
-  approvedBy: string;
-  department?: string;
-  comments?: string;
-}
+const { Title, Text } = Typography;
+
+// Use FormItem from our DTO
+type QuanLiDonItem = FormItem;
 
 // Format date function
 const formatDate = (dateString: string | null): string => {
@@ -55,13 +55,13 @@ const formatDate = (dateString: string | null): string => {
 // Map status values to display labels
 const getStatusLabel = (status: string): string => {
   switch (status) {
-    case "pending":
+    case "PENDING":
       return "Chờ xử lý";
-    case "approved":
+    case "APPROVED":
       return "Đã duyệt";
-    case "rejected":
+    case "REJECTED":
       return "Từ chối";
-    case "cancelled":
+    case "CANCELED":
       return "Đã hủy";
     default:
       return status;
@@ -71,141 +71,50 @@ const getStatusLabel = (status: string): string => {
 // Get status tag color
 const getStatusTagColor = (status: string): string => {
   switch (status) {
-    case "pending":
+    case "PENDING":
       return "warning";
-    case "approved":
+    case "APPROVED":
       return "success";
-    case "rejected":
+    case "REJECTED":
       return "error";
-    case "cancelled":
+    case "CANCELED":
       return "default";
     default:
       return "blue";
   }
 };
 
-// Sample form codes data
-const formCodesData = [
-  { value: "DON001", label: "Đơn xin nghỉ phép" },
-  { value: "DON002", label: "Đơn xin tăng ca" },
-  { value: "DON003", label: "Đơn xin nghỉ không lương" },
-];
-
-// Sample status options
-const statusOptions = [
-  { value: "pending", label: "Chờ xử lý" },
-  { value: "approved", label: "Đã duyệt" },
-  { value: "rejected", label: "Từ chối" },
-  { value: "cancelled", label: "Đã hủy" },
-];
-
-// Sample department options
-const departmentOptions = [
-  { value: "IT", label: "Phòng IT" },
-  { value: "HR", label: "Phòng Nhân sự" },
-  { value: "FINANCE", label: "Phòng Tài chính" },
-  { value: "SALES", label: "Phòng Kinh doanh" },
-  { value: "MARKETING", label: "Phòng Marketing" },
-];
-
 interface FilterValues {
-  startDate?: dayjs.Dayjs;
-  endDate?: dayjs.Dayjs;
-  formCode?: string;
-  status?: string;
-  department?: string;
+  fromDate: dayjs.Dayjs;
+  toDate: dayjs.Dayjs;
+  formId?: string;
 }
 
-const QuanLiDonHRPage = () => {
+const QuanLiDonPage = () => {
   const t = useTranslations("QuanLiDon");
+  const { userProfile } = useSelector(selectAuthLogin);
 
-  // Sample data with department field added
-  const sampleData: QuanLiDonItem[] = [
-    {
-      id: "1",
-      code: "DYC001",
-      reason: "Nghỉ phép có lương",
-      status: "approved",
-      file: "don001.pdf",
-      startTime: "2025-05-15T08:00:00.000Z",
-      endTime: "2026-01-16T17:00:00.000Z",
-      approvedTime: "2025-05-25T10:30:00.000Z",
-      formCode: "DON001",
-      submittedBy: "user1",
-      approvedBy: "user3",
-      department: "IT",
-      comments: "Đã kiểm tra, nhân viên đủ điều kiện nghỉ phép",
-    },
-    {
-      id: "2",
-      code: "DYC002",
-      reason: "Xin làm thêm giờ",
-      status: "rejected",
-      file: "don002.pdf",
-      startTime: "2025-05-20T18:00:00.000Z",
-      endTime: "2026-06-20T21:00:00.000Z",
-      approvedTime: "2025-05-25T14:15:00.000Z",
-      formCode: "DON002",
-      submittedBy: "user2",
-      approvedBy: "user3",
-      department: "SALES",
-      comments: "Không có ngân sách cho tăng ca tháng này",
-    },
-    {
-      id: "3",
-      code: "DYC003",
-      reason: "Nghỉ không lương",
-      status: "pending",
-      file: "don003.pdf",
-      startTime: "2025-05-25T08:00:00.000Z",
-      endTime: "2026-07-27T17:00:00.000Z",
-      approvedTime: null,
-      formCode: "DON003",
-      submittedBy: "user4",
-      approvedBy: "user3",
-      department: "MARKETING",
-      comments: "",
-    },
-    {
-      id: "4",
-      code: "DYC004",
-      reason: "Xin nghỉ ốm",
-      status: "pending",
-      file: "don004.pdf",
-      startTime: "2025-03-10T08:00:00.000Z",
-      endTime: "2026-08-12T17:00:00.000Z",
-      approvedTime: null,
-      formCode: "DON001",
-      submittedBy: "user1",
-      approvedBy: "user3",
-      department: "HR",
-      comments: "",
-    },
-    {
-      id: "5",
-      code: "DYC005",
-      reason: "Xin nghỉ việc riêng",
-      status: "pending",
-      file: "don005.pdf",
-      startTime: "2025-05-18T08:00:00.000Z",
-      endTime: "2026-09-18T17:00:00.000Z",
-      approvedTime: null,
-      formCode: "DON002",
-      submittedBy: "user2",
-      approvedBy: "user3",
-      department: "FINANCE",
-      comments: "",
-    },
-  ];
-
+  // We'll get data from API instead of using sample data
+  const [formTypes, setFormTypes] = useState<
+    { value: string; label: string }[]
+  >([]);
+  const [formTypesLoading, setFormTypesLoading] = useState<boolean>(false);
   const [quickSearch, setQuickSearch] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
-  const [tableData, setTableData] = useState<QuanLiDonItem[]>(sampleData);
+  const [tableData, setTableData] = useState<QuanLiDonItem[]>([]);
   const [totalItems, setTotalItems] = useState<number>(0);
   const [loading, setLoading] = useState(false);
   const [formFilter] = Form.useForm<FilterValues>();
-  const [commentText, setCommentText] = useState<{ [key: string]: string }>({});
+
+  // State for approval modal
+  const [isApprovalModalVisible, setIsApprovalModalVisible] =
+    useState<boolean>(false);
+  const [selectedRecord, setSelectedRecord] = useState<QuanLiDonItem | null>(
+    null
+  );
+  const [isConfirmed, setIsConfirmed] = useState<boolean>(false);
+  const [response, setResponse] = useState<string>("");
 
   const getData = async (
     page = currentPage,
@@ -215,102 +124,111 @@ const QuanLiDonHRPage = () => {
   ) => {
     setLoading(true);
     try {
-      // Simulate API call with setTimeout
-      setTimeout(() => {
-        let filteredData = [...sampleData];
+      const searchFilter: any = [
+        { key: "limit", type: "=", value: limit },
+        { key: "offset", type: "=", value: (page - 1) * limit },
+      ];
 
-        // Apply quick search filter if provided
-        if (quickkSearch && quickkSearch.trim() !== "") {
-          const searchTerm = quickkSearch.toLowerCase();
-          filteredData = filteredData.filter(
-            (item) =>
-              item.code.toLowerCase().includes(searchTerm) ||
-              item.reason.toLowerCase().includes(searchTerm) ||
-              item.formCode.toLowerCase().includes(searchTerm) ||
-              (item.department &&
-                item.department.toLowerCase().includes(searchTerm))
-          );
-        }
+      // searchFilter.push({
+      //   key: "reason",
+      //   type: FilterOperationType.IContains,
+      //   value: "Đưa con đi học",
+      // });
 
-        // Apply filters if provided
-        if (filters) {
-          // Filter by form code
-          if (filters.formCode) {
-            filteredData = filteredData.filter(
-              (item) => item.formCode === filters.formCode
-            );
-          }
-
-          // Filter by status
-          if (filters.status) {
-            filteredData = filteredData.filter(
-              (item) => item.status === filters.status
-            );
-          }
-
-          // Filter by department
-          if (filters.department) {
-            filteredData = filteredData.filter(
-              (item) => item.department === filters.department
-            );
-          }
-
-          // Filter by start date range
-          if (filters.startDate) {
-            const filterStartDate = filters.startDate.startOf("day");
-            filteredData = filteredData.filter((item) => {
-              const itemStartDate = dayjs(item.startTime);
-              return (
-                itemStartDate.isAfter(filterStartDate) ||
-                itemStartDate.isSame(filterStartDate, "day")
-              );
-            });
-          }
-
-          // Filter by end date range
-          if (filters.endDate) {
-            const filterEndDate = filters.endDate.endOf("day");
-            filteredData = filteredData.filter((item) => {
-              const itemEndDate = dayjs(item.endTime);
-              return (
-                itemEndDate.isBefore(filterEndDate) ||
-                itemEndDate.isSame(filterEndDate, "day")
-              );
-            });
-          }
-        }
-
-        // Calculate pagination
-        const startIndex = (page - 1) * limit;
-        const endIndex = startIndex + limit;
-        const paginatedData = filteredData.slice(startIndex, endIndex);
-
-        setTableData(paginatedData);
-        setTotalItems(filteredData.length);
-        setLoading(false);
-      }, 300); // Reduced delay for better UX
+      const params: any = {
+        ...(quickkSearch ? { quickSearch: quickkSearch } : {}),
+        ...(filters && filters.formId ? { formId: filters.formId } : {}),
+        ...(filters && filters.fromDate !== undefined
+          ? { fromDate: filters.fromDate.startOf("day").toISOString() }
+          : {}),
+        ...(filters && filters.toDate !== undefined
+          ? { toDate: filters.toDate.endOf("day").toISOString() }
+          : {}),
+      };
+      const response = await DanhMucDonServices.filterDanhMucDon(
+        searchFilter,
+        params
+      );
+      setTableData(response.data);
+      //Reverse the data array before setting it to state
+      // const reversedData = [...response.data].reverse();
+      // setTableData(reversedData);
+      setTotalItems(response.count);
+      setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
+      toast.error("Lỗi khi tải dữ liệu đơn!");
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    getData(currentPage, pageSize, quickSearch);
-  }, []); // Reload data when page or size changes
+    getData(currentPage, pageSize, quickSearch, formFilter.getFieldsValue());
+    fetchFormTypes();
+  }, [currentPage, pageSize]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Fetch form types for the dropdown
+  const fetchFormTypes = async () => {
+    try {
+      setFormTypesLoading(true);
+      const searchFilter: any = [
+        { key: "limit", type: "=", value: 100 },
+        { key: "offset", type: "=", value: 0 },
+      ];
+      const params: any = {};
+      const response = await FormDescriptionServices.getDanhMucDon(
+        searchFilter,
+        params
+      );
+      const formOptions = response.data.map((form: FormDescriptionItem) => ({
+        value: form.id,
+        label: form.title,
+      }));
+      setFormTypes(formOptions);
+      setFormTypesLoading(false);
+    } catch (error) {
+      console.error("Error fetching form types:", error);
+      toast.error("Lỗi khi tải danh sách biểu mẫu!");
+      setFormTypesLoading(false);
+    }
+  };
 
   const handleBeforeExport = async (): Promise<QuanLiDonItem[]> => {
     setLoading(true);
     try {
       toast.info("Đang chuẩn bị dữ liệu xuất Excel...");
 
-      // Simulate API call for export
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          setLoading(false);
-          resolve(sampleData);
-        }, 500);
-      });
+      const searchFilterExport: any = [
+        {
+          key: "limit",
+          type: "=",
+          value: process.env.NEXT_PUBLIC_LIMIT_QUERY_EXPORT,
+        },
+        { key: "offset", type: "=", value: 0 },
+      ];
+      const params: any = {
+        ...(quickSearch ? { quickSearch: quickSearch } : {}),
+        ...(formFilter.getFieldValue("formId")
+          ? { formId: formFilter.getFieldValue("formId") }
+          : {}),
+        ...(formFilter.getFieldValue("fromDate") !== undefined
+          ? {
+              fromDate: formFilter
+                .getFieldValue("fromDate")
+                .startOf("day")
+                .toISOString(),
+            }
+          : {}),
+        ...(formFilter.getFieldValue("toDate") !== undefined
+          ? { toDate: formFilter.getFieldValue("toDate").toISOString() }
+          : {}),
+      };
+      const response = await DanhMucDonServices.filterDanhMucDon(
+        searchFilterExport,
+        params
+      );
+      setLoading(false);
+      return response.data;
     } catch (error) {
       console.error("Error fetching export data:", error);
       toast.error("Lỗi khi tải dữ liệu để xuất Excel!");
@@ -319,71 +237,105 @@ const QuanLiDonHRPage = () => {
     }
   };
 
-  const handleApprove = (record: QuanLiDonItem) => {
-    // Create current time for the approval timestamp
-    const currentTime = new Date().toISOString();
-
-    // Update the table data with the new status, approval time, and comment
-    const updatedData = tableData.map((item) => {
-      if (item.id === record.id) {
-        return {
-          ...item,
-          status: "approved",
-          approvedTime: currentTime,
-          comments: commentText[record.id] || item.comments || "Đã duyệt",
-        };
-      }
-      return item;
-    });
-
-    setTableData(updatedData);
-    toast.success(`Đã duyệt đơn: ${record.code}`);
-
-    // Clear comment for this record
-    setCommentText((prev) => {
-      const newComments = { ...prev };
-      delete newComments[record.id];
-      return newComments;
-    });
+  // Show approval modal instead of directly approving
+  const showApprovalModal = (record: QuanLiDonItem) => {
+    setSelectedRecord(record);
+    setIsConfirmed(false);
+    setResponse("");
+    setIsApprovalModalVisible(true);
   };
 
-  const handleReject = (record: QuanLiDonItem) => {
-    // Validate if there's a rejection reason
-    if (!commentText[record.id]) {
-      toast.error("Vui lòng nhập lý do từ chối đơn");
+  // Handle modal cancel
+  const handleModalCancel = () => {
+    setIsApprovalModalVisible(false);
+    setSelectedRecord(null);
+    setIsConfirmed(false);
+    setResponse("");
+  };
+
+  // Handle reject action from modal
+  const handleRejectFromModal = async () => {
+    if (!selectedRecord) return;
+
+    try {
+      setLoading(true);
+      // Create current time for the rejection timestamp
+      const currentTime = new Date().toISOString();
+
+      // Prepare update data
+      const updateData = {
+        status: "REJECTED",
+        approvedTime: currentTime,
+        approvedBy: userProfile.code, // Get user code from Redux store
+        response: response, // Add rejection response
+      };
+
+      // Call API to update status
+      await DanhMucDonServices.updateFormStatus(selectedRecord.id, updateData);
+
+      // Close modal
+      setIsApprovalModalVisible(false);
+      setSelectedRecord(null);
+      setIsConfirmed(false);
+      setResponse("");
+
+      // Refresh data
+      getData(currentPage, pageSize, quickSearch, formFilter.getFieldsValue());
+
+      toast.success(
+        `Đã từ chối: ${selectedRecord.formTitle} của ${selectedRecord.submittedBy}`
+      );
+    } catch (error) {
+      console.error("Error rejecting form:", error);
+      toast.error("Lỗi khi từ chối đơn!");
+      setLoading(false);
+    }
+  };
+
+  // Handle modal submit
+  const handleModalSubmit = async () => {
+    if (!isConfirmed || !selectedRecord) {
+      toast.warning("Vui lòng xác nhận trước khi duyệt đơn!");
       return;
     }
 
-    // Create current time for the approval timestamp
-    const currentTime = new Date().toISOString();
+    try {
+      setLoading(true);
+      // Create current time for the approval timestamp
+      const currentTime = new Date().toISOString();
 
-    // Update the table data with the new status, approval time, and comment
-    const updatedData = tableData.map((item) => {
-      if (item.id === record.id) {
-        return {
-          ...item,
-          status: "rejected",
-          approvedTime: currentTime,
-          comments: commentText[record.id],
-        };
-      }
-      return item;
-    });
+      // Prepare update data
+      const updateData = {
+        status: "APPROVED",
+        approvedTime: currentTime,
+        approvedBy: userProfile.code, // Get user code from Redux store
+        response: response, // Add approval response
+      };
 
-    setTableData(updatedData);
-    toast.success(`Đã từ chối đơn: ${record.code}`);
+      // Call API to update status
+      await DanhMucDonServices.updateFormStatus(selectedRecord.id, updateData);
 
-    // Clear comment for this record
-    setCommentText((prev) => {
-      const newComments = { ...prev };
-      delete newComments[record.id];
-      return newComments;
-    });
+      // Close modal
+      setIsApprovalModalVisible(false);
+      setSelectedRecord(null);
+      setIsConfirmed(false);
+      setResponse("");
+
+      // Refresh data
+      getData(currentPage, pageSize, quickSearch, formFilter.getFieldsValue());
+
+      toast.success(
+        `Đã duyệt: ${selectedRecord.formTitle} của ${selectedRecord.submittedBy}`
+      );
+    } catch (error) {
+      console.error("Error approving form:", error);
+      toast.error("Lỗi khi duyệt đơn!");
+      setLoading(false);
+    }
   };
 
-  const handleViewDetails = (record: QuanLiDonItem) => {
-    // In a real application, this would open a modal or navigate to a details page
-    toast.info(`Xem chi tiết đơn: ${record.code}`);
+  const handleFormAction = async (record: QuanLiDonItem) => {
+    showApprovalModal(record);
   };
 
   const columns = useMemo(
@@ -392,6 +344,18 @@ const QuanLiDonHRPage = () => {
         title: t("maDon"),
         dataIndex: "code",
         key: "code",
+        width: 180,
+      },
+      {
+        title: t("nguoiNop"),
+        dataIndex: "submittedBy",
+        key: "submittedBy",
+        width: 150,
+      },
+      {
+        title: t("tieuDeDon"),
+        dataIndex: "formTitle",
+        key: "formTitle",
         width: 120,
       },
       {
@@ -418,18 +382,6 @@ const QuanLiDonHRPage = () => {
             {getStatusLabel(status)}
           </Tag>
         ),
-      },
-      {
-        title: "Phòng ban",
-        dataIndex: "department",
-        key: "department",
-        width: 120,
-        render: (department: string) => {
-          const deptLabel =
-            departmentOptions.find((d) => d.value === department)?.label ||
-            department;
-          return deptLabel;
-        },
       },
       {
         title: t("tapTin"),
@@ -459,47 +411,12 @@ const QuanLiDonHRPage = () => {
         width: 150,
         render: (approvedTime: string) => formatDate(approvedTime),
       },
-      {
-        title: t("maBieuMau"),
-        dataIndex: "formCode",
-        key: "formCode",
-        width: 120,
-      },
-      {
-        title: t("nguoiNop"),
-        dataIndex: "submittedBy",
-        key: "submittedBy",
-        width: 150,
-        render: (submittedBy: string) => {
-          const users = {
-            user1: "Nguyễn Văn A",
-            user2: "Trần Thị B",
-            user3: "Lê Văn C",
-            user4: "Phạm Thị D",
-          };
-          return users[submittedBy as keyof typeof users] || submittedBy;
-        },
-      },
+
       {
         title: t("nguoiDuyet"),
         dataIndex: "approvedBy",
         key: "approvedBy",
         width: 150,
-        render: (approvedBy: string) => {
-          const users = {
-            user1: "Nguyễn Văn A",
-            user2: "Trần Thị B",
-            user3: "Lê Văn C",
-            user4: "Phạm Thị D",
-          };
-          return users[approvedBy as keyof typeof users] || approvedBy;
-        },
-      },
-      {
-        title: "Ghi chú",
-        dataIndex: "comments",
-        key: "comments",
-        width: 200,
       },
     ],
     [t]
@@ -509,114 +426,34 @@ const QuanLiDonHRPage = () => {
   const actionColumn = useMemo(
     () => ({
       render: (record: QuanLiDonItem) => {
-        // Different confirmation messages based on current status
-        const approveConfirmTitle = "Xác nhận duyệt đơn";
-        const approveConfirmDescription = `Bạn có chắc chắn muốn duyệt đơn ${record.code}?`;
-
-        const rejectConfirmTitle = "Xác nhận từ chối đơn";
-        const rejectConfirmDescription = `Bạn có chắc chắn muốn từ chối đơn ${record.code}?`;
-
-        return (
-          <Space size="small">
-            {/* View details button */}
-            <Tooltip title="Xem chi tiết">
+        // Đơn đã được duyệt hoặc từ chối - chỉ có thể xem
+        if (record.status === "APPROVED" || record.status === "REJECTED") {
+          return (
+            <Tooltip title="Xem chi tiết đơn">
               <Button
                 type="text"
                 size="small"
                 icon={<EyeOutlined style={{ color: "#1890ff" }} />}
-                onClick={() => handleViewDetails(record)}
+                onClick={() => handleFormAction(record)}
               />
             </Tooltip>
+          );
+        }
 
-            {/* Approve button - only available for pending requests */}
-            {record.status === "pending" && (
-              <Popconfirm
-                title={approveConfirmTitle}
-                description={
-                  <>
-                    {approveConfirmDescription}
-                    <div style={{ marginTop: 8 }}>
-                      <textarea
-                        placeholder="Ghi chú (không bắt buộc)"
-                        style={{ width: "100%", marginTop: 8 }}
-                        value={commentText[record.id] || ""}
-                        onChange={(e) =>
-                          setCommentText((prev) => ({
-                            ...prev,
-                            [record.id]: e.target.value,
-                          }))
-                        }
-                      />
-                    </div>
-                  </>
-                }
-                okText="Xác nhận"
-                cancelText="Hủy"
-                onConfirm={() => handleApprove(record)}
-              >
-                <Tooltip title="Duyệt đơn">
-                  <Button
-                    type="text"
-                    size="small"
-                    icon={<CheckCircleOutlined style={{ color: "#52c41a" }} />}
-                  />
-                </Tooltip>
-              </Popconfirm>
-            )}
-
-            {/* Reject button - only available for pending requests */}
-            {record.status === "pending" && (
-              <Popconfirm
-                title={rejectConfirmTitle}
-                description={
-                  <>
-                    {rejectConfirmDescription}
-                    <div style={{ marginTop: 8 }}>
-                      <textarea
-                        placeholder="Lý do từ chối (bắt buộc)"
-                        style={{ width: "100%", marginTop: 8 }}
-                        value={commentText[record.id] || ""}
-                        onChange={(e) =>
-                          setCommentText((prev) => ({
-                            ...prev,
-                            [record.id]: e.target.value,
-                          }))
-                        }
-                      />
-                    </div>
-                  </>
-                }
-                okText="Xác nhận"
-                cancelText="Hủy"
-                onConfirm={() => handleReject(record)}
-              >
-                <Tooltip title="Từ chối đơn">
-                  <Button
-                    type="text"
-                    size="small"
-                    danger
-                    icon={<CloseCircleOutlined />}
-                  />
-                </Tooltip>
-              </Popconfirm>
-            )}
-
-            {/* Download file button - for all forms with attachments */}
-            {record.file && (
-              <Tooltip title="Tải xuống tệp đính kèm">
-                <Button
-                  type="text"
-                  size="small"
-                  icon={<FileTextOutlined style={{ color: "#722ed1" }} />}
-                  onClick={() => toast.info(`Đang tải xuống: ${record.file}`)}
-                />
-              </Tooltip>
-            )}
-          </Space>
+        // Đơn đang chờ xử lý - có thể xử lý
+        return (
+          <Tooltip title="Xử lý đơn">
+            <Button
+              type="text"
+              size="small"
+              icon={<EditOutlined style={{ color: "#1890ff" }} />}
+              onClick={() => handleFormAction(record)}
+            />
+          </Tooltip>
         );
       },
     }),
-    [tableData, t, commentText]
+    []
   );
 
   const handlePageChange = (page: number, size: number) => {
@@ -637,74 +474,84 @@ const QuanLiDonHRPage = () => {
   return (
     <>
       {/* Filter Section */}
-      <Form form={formFilter} onFinish={onFinish} className="from-quey">
-        <FilterSection onReset={resetFilters}>
+      <Form
+        form={formFilter}
+        onFinish={onFinish}
+        className="from-quey"
+        initialValues={{
+          fromDate: dayjs().startOf("day"),
+          toDate: dayjs().endOf("day"),
+        }}
+      >
+        <FilterSection
+          onReset={resetFilters}
+          onSearch={() => formFilter.submit()}
+        >
           <Row gutter={[16, 16]}>
             <Col xs={24} sm={12} md={6} lg={6}>
-              <Form.Item name="startDate" label="Thời gian bắt đầu">
-                <DatePicker
-                  style={{ width: "100%" }}
-                  format="DD/MM/YYYY"
-                  placeholder="Chọn thời gian bắt đầu"
+              <Form.Item
+                name="fromDate"
+                rules={[
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      const endDate = getFieldValue("datePlugOut");
+                      if (!value || !endDate || value.isBefore(endDate)) {
+                        return Promise.resolve();
+                      }
+                      return Promise.reject(
+                        new Error("Ngày vào không thể lớn hơn ngày ra")
+                      );
+                    },
+                  }),
+                ]}
+              >
+                <CdatePicker
+                  label="Từ ngày"
+                  placeholder="date"
+                  showTime
+                  style={{ width: "100%", height: "33px" }}
+                  format="YYYY-MM-DD  HH:mm:ss"
                 />
               </Form.Item>
             </Col>
 
             <Col xs={24} sm={12} md={6} lg={6}>
-              <Form.Item name="endDate" label="Thời gian kết thúc">
-                <DatePicker
-                  style={{ width: "100%" }}
-                  format="DD/MM/YYYY"
-                  placeholder="Chọn thời gian kết thúc"
+              <Form.Item
+                name="toDate"
+                rules={[
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      const startDate = getFieldValue("datePlugIn");
+                      if (!value || !startDate || value.isAfter(startDate)) {
+                        return Promise.resolve();
+                      }
+                      return Promise.reject(
+                        new Error("Ngày ra không thể bé hơn ngày vào")
+                      );
+                    },
+                  }),
+                ]}
+              >
+                <CdatePicker
+                  placeholder="date"
+                  label="Đến ngày"
+                  showTime
+                  style={{ width: "100%", height: "33px" }}
+                  format="YYYY-MM-DD HH:mm:ss"
                 />
               </Form.Item>
             </Col>
 
             <Col xs={24} sm={12} md={6} lg={6}>
-              <Form.Item name="formCode" label="Mã biểu mẫu">
+              <Form.Item name="formId">
                 <Cselect
                   allowClear
                   showSearch
-                  placeholder="Chọn mã biểu mẫu"
-                  options={formCodesData}
+                  label="Tiêu đề đơn"
+                  options={formTypes}
+                  disabled={formTypesLoading}
                 />
               </Form.Item>
-            </Col>
-
-            <Col xs={24} sm={12} md={6} lg={6}>
-              <Form.Item name="status" label="Trạng thái">
-                <Cselect
-                  allowClear
-                  showSearch
-                  placeholder="Chọn trạng thái"
-                  options={statusOptions}
-                />
-              </Form.Item>
-            </Col>
-
-            <Col xs={24} sm={12} md={6} lg={6}>
-              <Form.Item name="department" label="Phòng ban">
-                <Cselect
-                  allowClear
-                  showSearch
-                  placeholder="Chọn phòng ban"
-                  options={departmentOptions}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Row justify="end" className={styles.actionButtonsRow}>
-            <Col>
-              <Space>
-                <Button
-                  type="primary"
-                  icon={<CalendarOutlined />}
-                  htmlType="submit"
-                >
-                  Tìm kiếm
-                </Button>
-              </Space>
             </Col>
           </Row>
         </FilterSection>
@@ -749,12 +596,227 @@ const QuanLiDonHRPage = () => {
           showActions
           actionColumn={actionColumn}
           stickyHeader
-          tableId="hr_quan_li_don_v2"
+          tableId="admin_quan_li_don_v2"
           onBeforeExport={handleBeforeExport}
         />
       </div>
+
+      {/* Approval Confirmation Modal */}
+      <Modal
+        title={
+          <div
+            style={{ display: "flex", alignItems: "center", color: "#1890ff" }}
+          >
+            <CheckCircleOutlined style={{ marginRight: 8, fontSize: 20 }} />
+            <span style={{ fontSize: 18, fontWeight: 600 }}>
+              {selectedRecord &&
+              (selectedRecord.status === "APPROVED" ||
+                selectedRecord.status === "REJECTED")
+                ? "Chi tiết đơn"
+                : "Xử lý đơn"}
+            </span>
+          </div>
+        }
+        open={isApprovalModalVisible}
+        onCancel={handleModalCancel}
+        width={600}
+        bodyStyle={{ padding: "0px" }}
+        style={{ top: 20 }}
+        footer={
+          selectedRecord &&
+          (selectedRecord.status === "APPROVED" ||
+            selectedRecord.status === "REJECTED")
+            ? [
+                <Button
+                  key="reject"
+                  danger
+                  disabled={true}
+                  style={{ marginRight: 8 }}
+                >
+                  Từ chối đơn
+                </Button>,
+                <Button
+                  key="submit"
+                  type="primary"
+                  disabled={true}
+                  style={{ backgroundColor: "#d9d9d9", borderColor: "#d9d9d9" }}
+                >
+                  Xác nhận duyệt
+                </Button>,
+              ]
+            : [
+                <Button key="reject" danger onClick={handleRejectFromModal}>
+                  Từ chối đơn
+                </Button>,
+                <Button
+                  key="submit"
+                  type="primary"
+                  onClick={handleModalSubmit}
+                  disabled={!isConfirmed}
+                  style={{ backgroundColor: "#1890ff", borderColor: "#1890ff" }}
+                >
+                  Xác nhận duyệt
+                </Button>,
+              ]
+        }
+      >
+        {selectedRecord && (
+          <>
+            <Card
+              bordered={false}
+              style={{
+                marginBottom: 20,
+                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.09)",
+              }}
+            >
+              <Title
+                level={4}
+                style={{
+                  color: "#1890ff",
+                  marginBottom: 16,
+                  borderBottom: "1px solid #f0f0f0",
+                  paddingBottom: 10,
+                }}
+              >
+                {selectedRecord.formTitle}
+              </Title>
+
+              <Row gutter={[16, 16]}>
+                <Col span={24}>
+                  <Space>
+                    <Tag
+                      color={getStatusTagColor(selectedRecord.status)}
+                      style={{
+                        fontWeight: 600,
+                        padding: "2px 10px",
+                        borderRadius: 12,
+                      }}
+                    >
+                      {getStatusLabel(selectedRecord.status)}
+                    </Tag>
+                    <Text type="secondary">Mã đơn: {selectedRecord.code}</Text>
+                  </Space>
+                </Col>
+
+                <Col span={12}>
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <CalendarOutlined
+                      style={{ marginRight: 8, color: "#1890ff" }}
+                    />
+                    <div>
+                      <Text strong>Thời gian bắt đầu:</Text>
+                      <div>{formatDate(selectedRecord.startTime)}</div>
+                    </div>
+                  </div>
+                </Col>
+
+                <Col span={12}>
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <ClockCircleOutlined
+                      style={{ marginRight: 8, color: "#1890ff" }}
+                    />
+                    <div>
+                      <Text strong>Thời gian kết thúc:</Text>
+                      <div>{formatDate(selectedRecord.endTime)}</div>
+                    </div>
+                  </div>
+                </Col>
+
+                <Col span={24}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "flex-start",
+                      marginTop: 8,
+                    }}
+                  >
+                    <FileTextOutlined
+                      style={{ marginRight: 8, color: "#1890ff", marginTop: 4 }}
+                    />
+                    <div>
+                      <Text strong>Lý do:</Text>
+                      <div
+                        style={{
+                          backgroundColor: "#f9f9f9",
+                          padding: "8px 12px",
+                          borderRadius: 4,
+                          border: "1px solid #f0f0f0",
+                          marginTop: 4,
+                        }}
+                      >
+                        {selectedRecord.reason}
+                      </div>
+                    </div>
+                  </div>
+                </Col>
+              </Row>
+            </Card>
+
+            <div style={{ marginBottom: 20 }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  marginBottom: 8,
+                }}
+              >
+                <CommentOutlined style={{ marginRight: 8, color: "#1890ff" }} />
+                <Text strong>
+                  {selectedRecord.status === "APPROVED" ||
+                  selectedRecord.status === "REJECTED"
+                    ? "Phản hồi:"
+                    : "Nhập phản hồi:"}
+                </Text>
+              </div>
+              <Input.TextArea
+                value={
+                  selectedRecord.status === "APPROVED" ||
+                  selectedRecord.status === "REJECTED"
+                    ? selectedRecord.response || "Không có phản hồi"
+                    : response
+                }
+                onChange={(e) => setResponse(e.target.value)}
+                placeholder="Nhập phản hồi của bạn"
+                rows={3}
+                style={{
+                  borderRadius: 4,
+                  resize: "none",
+                  border: "1px solid #d9d9d9",
+                }}
+                disabled={
+                  selectedRecord.status === "APPROVED" ||
+                  selectedRecord.status === "REJECTED"
+                }
+              />
+            </div>
+
+            <div
+              style={{
+                backgroundColor: "#e6f7ff",
+                border: "1px solid #91d5ff",
+                borderRadius: 4,
+                padding: 12,
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              <Checkbox
+                checked={selectedRecord.status === "APPROVED" || isConfirmed}
+                onChange={(e) => setIsConfirmed(e.target.checked)}
+                style={{ marginRight: 8 }}
+                disabled={
+                  selectedRecord &&
+                  (selectedRecord.status === "APPROVED" ||
+                    selectedRecord.status === "REJECTED")
+                }
+              />
+              <Text>Đơn cộng giờ</Text>
+            </div>
+          </>
+        )}
+      </Modal>
     </>
   );
 };
 
-export default QuanLiDonHRPage;
+export default QuanLiDonPage;

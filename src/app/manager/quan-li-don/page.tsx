@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+
 import CdatePicker from "@/components/basicUI/CdatePicker";
 import CInputLabel from "@/components/basicUI/CInputLabel";
 import Ctable from "@/components/basicUI/Ctable";
@@ -10,16 +11,40 @@ import { FormItem } from "@/dtos/quan-li-don/quan-li-don";
 import { selectAuthLogin } from "@/lib/store/slices/loginSlice";
 import FormDescriptionServices from "@/services/admin/danh-muc/don/don.service";
 import DanhMucDonServices from "@/services/admin/quan-li-don/quan-li-don.service";
-import { CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
-import { Button, Col, Form, Row, Space, Tag, Tooltip } from "antd";
+import {
+  CheckCircleOutlined,
+  CalendarOutlined,
+  ClockCircleOutlined,
+  FileTextOutlined,
+  CommentOutlined,
+  EditOutlined,
+  EyeOutlined,
+} from "@ant-design/icons";
+import {
+  Button,
+  Col,
+  Form,
+  Row,
+  Space,
+  Tag,
+  Tooltip,
+  Modal,
+  Checkbox,
+  Input,
+  Card,
+  Typography,
+} from "antd";
 import dayjs from "dayjs";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import "./index.scss";
+
+const { Title, Text } = Typography;
 
 // Use FormItem from our DTO
-type DuyetNghiPhepItem = FormItem;
+type QuanLiDonItem = FormItem;
 
 // Format date function
 const formatDate = (dateString: string | null): string => {
@@ -65,7 +90,7 @@ interface FilterValues {
   formId?: string;
 }
 
-const DuyetNghiPhepPage = () => {
+const QuanLiDonPage = () => {
   const t = useTranslations("QuanLiDon");
   const { userProfile } = useSelector(selectAuthLogin);
 
@@ -77,10 +102,19 @@ const DuyetNghiPhepPage = () => {
   const [quickSearch, setQuickSearch] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
-  const [tableData, setTableData] = useState<DuyetNghiPhepItem[]>([]);
+  const [tableData, setTableData] = useState<QuanLiDonItem[]>([]);
   const [totalItems, setTotalItems] = useState<number>(0);
   const [loading, setLoading] = useState(false);
   const [formFilter] = Form.useForm<FilterValues>();
+
+  // State for approval modal
+  const [isApprovalModalVisible, setIsApprovalModalVisible] =
+    useState<boolean>(false);
+  const [selectedRecord, setSelectedRecord] = useState<QuanLiDonItem | null>(
+    null
+  );
+  const [isConfirmed, setIsConfirmed] = useState<boolean>(false);
+  const [response, setResponse] = useState<string>("");
 
   const getData = async (
     page = currentPage,
@@ -141,10 +175,10 @@ const DuyetNghiPhepPage = () => {
         { key: "limit", type: "=", value: 100 },
         { key: "offset", type: "=", value: 0 },
       ];
-
+      const params: any = {};
       const response = await FormDescriptionServices.getDanhMucDon(
         searchFilter,
-        {}
+        params
       );
       const formOptions = response.data.map((form: FormDescriptionItem) => ({
         value: form.id,
@@ -159,7 +193,7 @@ const DuyetNghiPhepPage = () => {
     }
   };
 
-  const handleBeforeExport = async (): Promise<DuyetNghiPhepItem[]> => {
+  const handleBeforeExport = async (): Promise<QuanLiDonItem[]> => {
     setLoading(true);
     try {
       toast.info("Đang chuẩn bị dữ liệu xuất Excel...");
@@ -203,7 +237,68 @@ const DuyetNghiPhepPage = () => {
     }
   };
 
-  const handleApprove = async (record: DuyetNghiPhepItem) => {
+  // Show approval modal instead of directly approving
+  const showApprovalModal = (record: QuanLiDonItem) => {
+    setSelectedRecord(record);
+    setIsConfirmed(false);
+    setResponse("");
+    setIsApprovalModalVisible(true);
+  };
+
+  // Handle modal cancel
+  const handleModalCancel = () => {
+    setIsApprovalModalVisible(false);
+    setSelectedRecord(null);
+    setIsConfirmed(false);
+    setResponse("");
+  };
+
+  // Handle reject action from modal
+  const handleRejectFromModal = async () => {
+    if (!selectedRecord) return;
+
+    try {
+      setLoading(true);
+      // Create current time for the rejection timestamp
+      const currentTime = new Date().toISOString();
+
+      // Prepare update data
+      const updateData = {
+        status: "REJECTED",
+        approvedTime: currentTime,
+        approvedBy: userProfile.code, // Get user code from Redux store
+        response: response, // Add rejection response
+      };
+
+      // Call API to update status
+      await DanhMucDonServices.updateFormStatus(selectedRecord.id, updateData);
+
+      // Close modal
+      setIsApprovalModalVisible(false);
+      setSelectedRecord(null);
+      setIsConfirmed(false);
+      setResponse("");
+
+      // Refresh data
+      getData(currentPage, pageSize, quickSearch, formFilter.getFieldsValue());
+
+      toast.success(
+        `Đã từ chối: ${selectedRecord.formTitle} của ${selectedRecord.submittedBy}`
+      );
+    } catch (error) {
+      console.error("Error rejecting form:", error);
+      toast.error("Lỗi khi từ chối đơn!");
+      setLoading(false);
+    }
+  };
+
+  // Handle modal submit
+  const handleModalSubmit = async () => {
+    if (!isConfirmed || !selectedRecord) {
+      toast.warning("Vui lòng xác nhận trước khi duyệt đơn!");
+      return;
+    }
+
     try {
       setLoading(true);
       // Create current time for the approval timestamp
@@ -214,15 +309,24 @@ const DuyetNghiPhepPage = () => {
         status: "APPROVED",
         approvedTime: currentTime,
         approvedBy: userProfile.code, // Get user code from Redux store
+        response: response, // Add approval response
       };
 
       // Call API to update status
-      await DanhMucDonServices.updateFormStatus(record.id, updateData);
+      await DanhMucDonServices.updateFormStatus(selectedRecord.id, updateData);
+
+      // Close modal
+      setIsApprovalModalVisible(false);
+      setSelectedRecord(null);
+      setIsConfirmed(false);
+      setResponse("");
 
       // Refresh data
       getData(currentPage, pageSize, quickSearch, formFilter.getFieldsValue());
 
-      toast.success(`Đã duyệt: ${record.formTitle} của ${record.submittedBy}`);
+      toast.success(
+        `Đã duyệt: ${selectedRecord.formTitle} của ${selectedRecord.submittedBy}`
+      );
     } catch (error) {
       console.error("Error approving form:", error);
       toast.error("Lỗi khi duyệt đơn!");
@@ -230,33 +334,8 @@ const DuyetNghiPhepPage = () => {
     }
   };
 
-  const handleReject = async (record: DuyetNghiPhepItem) => {
-    try {
-      setLoading(true);
-      // Create current time for the approval timestamp
-      const currentTime = new Date().toISOString();
-
-      // Prepare update data
-      const updateData = {
-        status: "REJECTED",
-        approvedTime: currentTime,
-        approvedBy: userProfile.code, // Get user code from Redux store
-      };
-
-      // Call API to update status
-      await DanhMucDonServices.updateFormStatus(record.id, updateData);
-
-      // Refresh data
-      getData(currentPage, pageSize, quickSearch, formFilter.getFieldsValue());
-
-      toast.success(
-        `Đã từ chối: ${record.formTitle} của ${record.submittedBy}`
-      );
-    } catch (error) {
-      console.error("Error rejecting form:", error);
-      toast.error("Lỗi khi từ chối đơn!");
-      setLoading(false);
-    }
+  const handleFormAction = async (record: QuanLiDonItem) => {
+    showApprovalModal(record);
   };
 
   const columns = useMemo(
@@ -277,7 +356,7 @@ const DuyetNghiPhepPage = () => {
         title: t("tieuDeDon"),
         dataIndex: "formTitle",
         key: "formTitle",
-        width: 120,
+        width: 180,
       },
       {
         title: t("lyDo"),
@@ -346,68 +425,31 @@ const DuyetNghiPhepPage = () => {
   // Define action column for our table
   const actionColumn = useMemo(
     () => ({
-      render: (record: DuyetNghiPhepItem) => {
-        // Đơn đã được duyệt không thể chỉnh sửa
-        if (record.status === "APPROVED") {
+      render: (record: QuanLiDonItem) => {
+        // Đơn đã được duyệt hoặc từ chối - chỉ có thể xem
+        if (record.status === "APPROVED" || record.status === "REJECTED") {
           return (
-            <Space size="small">
-              <Tooltip title="Đơn đã được duyệt">
-                <Button
-                  type="text"
-                  size="small"
-                  icon={<CheckCircleOutlined style={{ color: "#bfbfbf" }} />}
-                  disabled={true}
-                />
-              </Tooltip>
-              <Tooltip title="Đơn đã được duyệt không thể từ chối">
-                <Button
-                  type="text"
-                  size="small"
-                  danger
-                  icon={<CloseCircleOutlined />}
-                  disabled={true}
-                />
-              </Tooltip>
-            </Space>
-          );
-        }
-
-        // Đơn đang chờ xử lý hoặc đã bị từ chối
-        return (
-          <Space size="small">
-            {/* Approve button - luôn có thể duyệt đơn nếu chưa được duyệt */}
-            <Tooltip title="Duyệt đơn">
+            <Tooltip title="Xem chi tiết đơn">
               <Button
                 type="text"
                 size="small"
-                icon={<CheckCircleOutlined style={{ color: "#52c41a" }} />}
-                onClick={() => handleApprove(record)}
+                icon={<EyeOutlined style={{ color: "#1890ff" }} />}
+                onClick={() => handleFormAction(record)}
               />
             </Tooltip>
+          );
+        }
 
-            {/* Reject button - chỉ có thể từ chối đơn đang chờ xử lý */}
-            {record.status !== "REJECTED" ? (
-              <Tooltip title="Từ chối đơn">
-                <Button
-                  type="text"
-                  size="small"
-                  danger
-                  icon={<CloseCircleOutlined />}
-                  onClick={() => handleReject(record)}
-                />
-              </Tooltip>
-            ) : (
-              <Tooltip title="Đơn đã bị từ chối">
-                <Button
-                  type="text"
-                  size="small"
-                  danger
-                  icon={<CloseCircleOutlined />}
-                  disabled={true}
-                />
-              </Tooltip>
-            )}
-          </Space>
+        // Đơn đang chờ xử lý - có thể xử lý
+        return (
+          <Tooltip title="Xử lý đơn">
+            <Button
+              type="text"
+              size="small"
+              icon={<EditOutlined style={{ color: "#1890ff" }} />}
+              onClick={() => handleFormAction(record)}
+            />
+          </Tooltip>
         );
       },
     }),
@@ -436,10 +478,10 @@ const DuyetNghiPhepPage = () => {
         form={formFilter}
         onFinish={onFinish}
         className="from-quey"
-        // initialValues={{
-        //   fromDate: dayjs().startOf("day"),
-        //   toDate: dayjs().endOf("day"),
-        // }}
+        initialValues={{
+          fromDate: dayjs().startOf("day"),
+          toDate: dayjs().endOf("day"),
+        }}
       >
         <FilterSection
           onReset={resetFilters}
@@ -554,12 +596,227 @@ const DuyetNghiPhepPage = () => {
           showActions
           actionColumn={actionColumn}
           stickyHeader
-          tableId="manager_duyet_nghi_phep"
+          tableId="admin_quan_li_don_v2"
           onBeforeExport={handleBeforeExport}
         />
       </div>
+
+      {/* Approval Confirmation Modal */}
+      <Modal
+        title={
+          <div
+            style={{ display: "flex", alignItems: "center", color: "#1890ff" }}
+          >
+            <CheckCircleOutlined style={{ marginRight: 8, fontSize: 20 }} />
+            <span style={{ fontSize: 18, fontWeight: 600 }}>
+              {selectedRecord &&
+              (selectedRecord.status === "APPROVED" ||
+                selectedRecord.status === "REJECTED")
+                ? "Chi tiết đơn"
+                : "Xử lý đơn"}
+            </span>
+          </div>
+        }
+        open={isApprovalModalVisible}
+        onCancel={handleModalCancel}
+        width={600}
+        bodyStyle={{ padding: "0px" }}
+        style={{ top: 20 }}
+        footer={
+          selectedRecord &&
+          (selectedRecord.status === "APPROVED" ||
+            selectedRecord.status === "REJECTED")
+            ? [
+                <Button
+                  key="reject"
+                  danger
+                  disabled={true}
+                  style={{ marginRight: 8 }}
+                >
+                  Từ chối đơn
+                </Button>,
+                <Button
+                  key="submit"
+                  type="primary"
+                  disabled={true}
+                  style={{ backgroundColor: "#d9d9d9", borderColor: "#d9d9d9" }}
+                >
+                  Xác nhận duyệt
+                </Button>,
+              ]
+            : [
+                <Button key="reject" danger onClick={handleRejectFromModal}>
+                  Từ chối đơn
+                </Button>,
+                <Button
+                  key="submit"
+                  type="primary"
+                  onClick={handleModalSubmit}
+                  disabled={!isConfirmed}
+                  style={{ backgroundColor: "#1890ff", borderColor: "#1890ff" }}
+                >
+                  Xác nhận duyệt
+                </Button>,
+              ]
+        }
+      >
+        {selectedRecord && (
+          <>
+            <Card
+              bordered={false}
+              style={{
+                marginBottom: 20,
+                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.09)",
+              }}
+            >
+              <Title
+                level={4}
+                style={{
+                  color: "#1890ff",
+                  marginBottom: 16,
+                  borderBottom: "1px solid #f0f0f0",
+                  paddingBottom: 10,
+                }}
+              >
+                {selectedRecord.formTitle}
+              </Title>
+
+              <Row gutter={[16, 16]}>
+                <Col span={24}>
+                  <Space>
+                    <Tag
+                      color={getStatusTagColor(selectedRecord.status)}
+                      style={{
+                        fontWeight: 600,
+                        padding: "2px 10px",
+                        borderRadius: 12,
+                      }}
+                    >
+                      {getStatusLabel(selectedRecord.status)}
+                    </Tag>
+                    <Text type="secondary">Mã đơn: {selectedRecord.code}</Text>
+                  </Space>
+                </Col>
+
+                <Col span={12}>
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <CalendarOutlined
+                      style={{ marginRight: 8, color: "#1890ff" }}
+                    />
+                    <div>
+                      <Text strong>Thời gian bắt đầu:</Text>
+                      <div>{formatDate(selectedRecord.startTime)}</div>
+                    </div>
+                  </div>
+                </Col>
+
+                <Col span={12}>
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <ClockCircleOutlined
+                      style={{ marginRight: 8, color: "#1890ff" }}
+                    />
+                    <div>
+                      <Text strong>Thời gian kết thúc:</Text>
+                      <div>{formatDate(selectedRecord.endTime)}</div>
+                    </div>
+                  </div>
+                </Col>
+
+                <Col span={24}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "flex-start",
+                      marginTop: 8,
+                    }}
+                  >
+                    <FileTextOutlined
+                      style={{ marginRight: 8, color: "#1890ff", marginTop: 4 }}
+                    />
+                    <div>
+                      <Text strong>Lý do:</Text>
+                      <div
+                        style={{
+                          backgroundColor: "#f9f9f9",
+                          padding: "8px 12px",
+                          borderRadius: 4,
+                          border: "1px solid #f0f0f0",
+                          marginTop: 4,
+                        }}
+                      >
+                        {selectedRecord.reason}
+                      </div>
+                    </div>
+                  </div>
+                </Col>
+              </Row>
+            </Card>
+
+            <div style={{ marginBottom: 20 }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  marginBottom: 8,
+                }}
+              >
+                <CommentOutlined style={{ marginRight: 8, color: "#1890ff" }} />
+                <Text strong>
+                  {selectedRecord.status === "APPROVED" ||
+                  selectedRecord.status === "REJECTED"
+                    ? "Phản hồi:"
+                    : "Nhập phản hồi:"}
+                </Text>
+              </div>
+              <Input.TextArea
+                value={
+                  selectedRecord.status === "APPROVED" ||
+                  selectedRecord.status === "REJECTED"
+                    ? selectedRecord.response || "Không có phản hồi"
+                    : response
+                }
+                onChange={(e) => setResponse(e.target.value)}
+                placeholder="Nhập phản hồi của bạn"
+                rows={3}
+                style={{
+                  borderRadius: 4,
+                  resize: "none",
+                  border: "1px solid #d9d9d9",
+                }}
+                disabled={
+                  selectedRecord.status === "APPROVED" ||
+                  selectedRecord.status === "REJECTED"
+                }
+              />
+            </div>
+
+            <div
+              style={{
+                backgroundColor: "#e6f7ff",
+                border: "1px solid #91d5ff",
+                borderRadius: 4,
+                padding: 12,
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              <Checkbox
+                checked={selectedRecord.status === "APPROVED" || isConfirmed}
+                onChange={(e) => setIsConfirmed(e.target.checked)}
+                style={{ marginRight: 8 }}
+                disabled={
+                  selectedRecord &&
+                  (selectedRecord.status === "APPROVED" ||
+                    selectedRecord.status === "REJECTED")
+                }
+              />
+              <Text>Đơn cộng giờ</Text>
+            </div>
+          </>
+        )}
+      </Modal>
     </>
   );
 };
 
-export default DuyetNghiPhepPage;
+export default QuanLiDonPage;

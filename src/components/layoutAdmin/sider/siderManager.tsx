@@ -2,7 +2,7 @@
 
 import {
   BellOutlined,
-  CheckCircleOutlined,
+
   ClockCircleOutlined,
   DashboardOutlined,
   FileTextOutlined,
@@ -85,9 +85,9 @@ const SiderManagerComponent: React.FC<SiderProps> = ({ collapsed }) => {
       "data-index": 2,
     },
     {
-      key: "/manager/duyet-nghi-phep",
-      icon: <CheckCircleOutlined />,
-      label: "Duyệt nghỉ phép",
+      key: "/manager/quan-li-don",
+      icon: <FileTextOutlined />,
+      label: "Quản lí đơn",
       "data-index": 3,
     },
     {
