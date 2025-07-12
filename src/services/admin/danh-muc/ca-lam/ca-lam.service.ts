@@ -33,8 +33,8 @@ class DanhMucCaLamServicesBase extends AxiosService {
     return this.put(`${this.basePath}/${id}`, formData);
   }
 
-  async deleteDanhMucCaLam(id: string): Promise<any> {
-    return this.delete(`${this.basePath}/${id}`);
+  async deleteDanhMucCaLam(id: string, status: { status: string }): Promise<any> {
+    return this.delete(`${this.basePath}/${id}`, status);
   }
 }
 

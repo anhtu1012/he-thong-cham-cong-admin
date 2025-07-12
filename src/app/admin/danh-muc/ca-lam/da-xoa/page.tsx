@@ -1,19 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import ActionButton from "@/components/basicUI/ActionButton";
 import CInputLabel from "@/components/basicUI/CInputLabel";
 import Ctable from "@/components/basicUI/Ctable";
-import { handleFormErrors } from "@/utils/client/formHelpers";
-import { Button, Form } from "antd";
+import { Button, Space, Tooltip, Popconfirm } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
-import CaLamForm from "./CaLamForm";
 import { useTranslations } from "next-intl";
 import DanhMucCaLamServices from "@/services/admin/danh-muc/ca-lam/ca-lam.service";
 import { formatDateTime } from "@/utils/dateTime";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
+import { ArrowLeftOutlined, ReloadOutlined } from "@ant-design/icons";
+import { useRouter } from "next/navigation";
 dayjs.extend(utc);
 
 // Sample data interface for CaLam
@@ -27,18 +26,15 @@ interface CaLamItem {
   delayTime: string; // Format "HH:mm"
 }
 
-const DanhMucCaLamManagementPage = () => {
+function CaLamDaXoa() {
   const t = useTranslations("DanhMucCaLam");
+  const router = useRouter();
   const [quickSearch, setQuickSearch] = useState<string>("");
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [editingDanhMucCaLam, setEditingDanhMucCaLam] = useState<any>(null);
-  const [form] = Form.useForm<any>();
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
   const [tableData, setTableData] = useState<CaLamItem[]>([]);
   const [totalItems, setTotalItems] = useState<number>(0);
   const [loading, setLoading] = useState(false);
-  const [editLoading, setEditLoading] = useState(false);
   
   const getData = async (
     page = currentPage,
@@ -50,7 +46,7 @@ const DanhMucCaLamManagementPage = () => {
       const params: any = {
         page,
         limit,
-        status: "ACTIVE"
+        status: "NOTACTIVE", // Only get deleted/inactive shifts
       };
       if (quickkSearch && quickkSearch.trim() !== "") {
         params.quickSearch = quickkSearch;
@@ -75,6 +71,7 @@ const DanhMucCaLamManagementPage = () => {
       const params = {
         page: 1,
         limit: 1000,
+        status: "NOTACTIVE",
       };
       const response = await DanhMucCaLamServices.getDanhMucCaLam([], params);
       setLoading(false);
@@ -150,125 +147,53 @@ const DanhMucCaLamManagementPage = () => {
     [t]
   );
 
-  const showModal = async (
-    caLam: any = null,
-    action: "add" | "update" = "update"
-  ) => {
-    // First, reset the form before opening the modal
-    form.resetFields();
-
-    // Set editing caLam state
-    setEditingDanhMucCaLam(caLam);
-
-    // Open the modal first so the transition appears smoother
-    setIsModalVisible(true);
-
-    if (caLam && action === "update") {
-      // Use setTimeout to ensure the modal is rendered before populating data
-      setTimeout(() => {
-        form.setFieldsValue({
-          ...caLam,
-        });
-      }, 100);
-    } else {
-      // Set default values after a small delay to ensure modal is ready
-      setTimeout(() => {
-        form.setFieldsValue({
-          ...caLam,
-        });
-      }, 100);
-    }
-  };
-
-  const handleCancel = () => {
-    setIsModalVisible(false);
-    setEditingDanhMucCaLam(null);
-    setEditLoading(false);
-    form.resetFields();
-  };
-
-  const handleSubmit = async () => {
-    const values = await form.validateFields();
-    // Chỉ gửi đúng 3 trường cần thiết
-    const submitData = {
-      name: values.name,
-      lunchBreak: values.lunchBreak
-        ? dayjs.isDayjs(values.lunchBreak)
-          ? values.lunchBreak.format("HH:mm")
-          : typeof values.lunchBreak === "object" &&
-            values.lunchBreak instanceof Date
-          ? dayjs(values.lunchBreak).format("HH:mm")
-          : values.lunchBreak
-        : null,
-      startTime:
-        values.startTime && typeof values.startTime !== "string"
-          ? values.startTime.toISOString()
-          : values.startTime,
-      endTime:
-        values.endTime && typeof values.endTime !== "string"
-          ? values.endTime.toISOString()
-          : values.endTime,
-    };
-    try {
-      setEditLoading(true);
-      if (editingDanhMucCaLam && editingDanhMucCaLam.id) {
-        await DanhMucCaLamServices.updateDanhMucCaLam(
-          editingDanhMucCaLam.id,
-          submitData
-        );
-        toast.success("Cập nhật thành công!");
-        setIsModalVisible(false);
-        getData();
-      } else {
-        await DanhMucCaLamServices.createDanhMucCaLam(submitData);
-        toast.success("Thêm mới thành công!");
-        setIsModalVisible(false);
-        form.resetFields();
-        getData();
-      }
-    } catch (error: any) {
-      console.log("Lỗi xác thực biểu mẫu:", error);
-      handleFormErrors(form, error);
-    } finally {
-      setEditLoading(false);
-    }
-  };
-
-  const handleDelete = async (record: any) => {
+  const handleRevert = async (record: any) => {
     try {
       await DanhMucCaLamServices.deleteDanhMucCaLam(record.id, {
-        status: "NOTACTIVE",
+        status: "ACTIVE",
       });
-      toast.success("Xóa thành công!");
+      toast.success("Khôi phục thành công!");
       getData();
     } catch (error: any) {
-      toast.error(error.message || "Có lỗi xảy ra khi xóa");
+      toast.error(error.message || "Có lỗi xảy ra khi khôi phục");
     }
   };
 
-  // Define action column for our table using the new ActionButton component
+  // Define action column for our table using custom buttons
   const actionColumn = useMemo(
     () => ({
       render: (record: any) => (
-        <ActionButton
-          record={record}
-          // onUpdate={() => showModal(record, "update")}
-          onDelete={() => handleDelete(record)}
-          tooltips={{
-            view: t("xemChiTiet"),
-            // update: t("chinhSua"),
-            delete: t("xoa"),
-          }}
-        />
+        <Space size="small">
+          <Tooltip title="Khôi phục">
+            <Popconfirm
+              title="Xác nhận khôi phục"
+              description="Bạn có chắc chắn muốn khôi phục ca làm này không?"
+              okText="Khôi phục"
+              cancelText="Hủy"
+              onConfirm={() => handleRevert(record)}
+            >
+              <Button
+                type="primary"
+                icon={<ReloadOutlined />}
+                size="small"
+                style={{ backgroundColor: "#52c41a", borderColor: "#52c41a" }}
+              />
+            </Popconfirm>
+          </Tooltip>
+        </Space>
       ),
     }),
-    [showModal, handleDelete]
+    [handleRevert, t]
   );
 
   const handlePageChange = (page: number, size: number) => {
     setCurrentPage(page);
     setPageSize(size);
     getData(page, size, quickSearch);
+  };
+
+  const handleGoBack = () => {
+    router.push("/admin/danh-muc/ca-lam");
   };
 
   return (
@@ -297,15 +222,12 @@ const DanhMucCaLamManagementPage = () => {
               gap: "12px",
             }}
           >
-            <Button variant="dashed" color="danger" href="/admin/danh-muc/ca-lam/da-xoa">
-              Ca làm đã xóa
+            <Button 
+              icon={<ArrowLeftOutlined />}
+              onClick={handleGoBack}
+            >
+              Quay lại danh sách ca làm
             </Button>
-            <ActionButton
-              onAdd={() => showModal(null, "add")}
-              tooltips={{
-                add: t("themMoi"),
-              }}
-            />
           </div>
         </div>
 
@@ -323,20 +245,12 @@ const DanhMucCaLamManagementPage = () => {
           showActions
           actionColumn={actionColumn}
           stickyHeader
-          tableId="admin_danh_muc_ca_lam"
+          tableId="admin_danh_muc_ca_lam_da_xoa"
           onBeforeExport={handleBeforeExport}
         />
       </div>
-      <CaLamForm
-        form={form}
-        editingData={editingDanhMucCaLam}
-        isModalVisible={isModalVisible}
-        handleCancel={handleCancel}
-        handleSubmit={handleSubmit}
-        editLoading={editLoading}
-      />
     </>
   );
-};
+}
 
-export default DanhMucCaLamManagementPage;
+export default CaLamDaXoa

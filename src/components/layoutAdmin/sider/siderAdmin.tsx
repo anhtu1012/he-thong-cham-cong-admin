@@ -9,6 +9,7 @@ import {
   DashboardOutlined,
   FileTextOutlined,
   FormOutlined,
+  ScheduleOutlined,
   SettingOutlined,
   UserOutlined,
 } from "@ant-design/icons";
@@ -98,6 +99,12 @@ const SiderComponent: React.FC<SiderProps> = ({ collapsed }) => {
       icon: <FileTextOutlined />,
       label: "Quản lí đơn",
       "data-index": 3,
+    },
+    {
+      key: "/admin/lich-lam-viec",
+      icon: <ScheduleOutlined />,
+      label: "Quản lí lịch làm việc",
+      "data-index": 10,
     },
     {
       key: "danh-muc",
