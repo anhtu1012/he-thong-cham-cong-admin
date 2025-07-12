@@ -74,9 +74,9 @@ export class AxiosService extends Authorization implements RepositoryPort {
     return response.data;
   }
 
-  async delete<T>(url: string): Promise<T> {
+  async delete<T, FromData = any>(url: string, data?: FromData): Promise<T> {
     const http = await this._http();
-    const response = await http.delete<T>(url);
+    const response = await http.delete<T>(url, { data });
     return response.data;
   }
 
