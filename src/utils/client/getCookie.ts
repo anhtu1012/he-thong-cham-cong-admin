@@ -8,10 +8,11 @@ export function getCookieDECODE(name: string): string | null {
   const parts = value.split(`; ${name}=`);
   if (parts.length === 2) {
     // Giải mã giá trị của cookie trước khi trả về
-    return decodeURIComponent(parts.pop()!.split(';').shift()!); // Giải mã giá trị
+    return decodeURIComponent(parts.pop()!.split(";").shift()!); // Giải mã giá trị
   }
   return null;
 }
+
 export function setCookie(name: string, value: any, days?: number): void {
   let expires = "";
   if (days !== undefined) {
@@ -50,4 +51,17 @@ export function setLocalStorageOBJ(name: string, value: any): void {
   // Sử dụng JSON.stringify để lưu trữ giá trị dưới dạng chuỗi
   const encodedValue = JSON.stringify(value);
   localStorage.setItem(name, encodedValue); // Lưu trữ trong localStorage
+}
+
+export function clearCookie(name: string): void {
+  document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+}
+
+export function clearAllCookies(): void {
+  const cookies = document.cookie.split("; ");
+  for (const cookie of cookies) {
+    const eqPos = cookie.indexOf("=");
+    const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+    document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+  }
 }

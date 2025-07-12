@@ -41,14 +41,17 @@ import { selectAuthLogin } from "@/lib/store/slices/loginSlice";
 import WorkingScheduleServices from "@/services/quan-li-lich-lam-viec/working-schedule.service";
 import SelectServices from "@/services/select/select.service";
 import { useSelector } from "react-redux";
-import CardView from "./views/CardView";
-import DailyView from "./views/DailyView";
-import DetailView from "./views/DetailView";
-import GanttView from "./views/GanttView";
-import ListView from "./views/ListView";
-import MonthlyView from "./views/MonthlyView";
-import TimelineView from "./views/TimelineView";
-import WeeklyView from "./views/WeeklyView";
+
+import DetailView from "@/components/ViewComponent/DetailView";
+import {
+  CardView,
+  DailyView,
+  GanttView,
+  ListView,
+  MonthlyView,
+  TimelineView,
+  WeeklyView,
+} from "./views";
 
 // Transform API data format
 const transformApiScheduleData = (apiData: any[]) => {
@@ -331,7 +334,6 @@ const WorkSchedulePage = () => {
     try {
       setIsLoading(true);
       const values = await form.validateFields();
-      console.log("All form values:", values);
 
       if (currentSchedule) {
         let updateData;
@@ -339,7 +341,9 @@ const WorkSchedulePage = () => {
 
         // Check if editing is allowed
         if (currentStatus === "END" || currentStatus === "ACTIVE") {
-          toast.error("Không thể chỉnh sửa lịch làm việc đã hoàn thành hoặc đang hoạt động");
+          toast.error(
+            "Không thể chỉnh sửa lịch làm việc đã hoàn thành hoặc đang hoạt động"
+          );
           return;
         }
 
@@ -348,7 +352,7 @@ const WorkSchedulePage = () => {
           updateData = {
             shiftCode: values.shiftCode,
             branchCode: values.branchCode,
-            status: currentStatus, // Keep original status
+            status: values.status, // Keep original status
           };
         } else if (currentStatus === "NOTWORK") {
           // Only allow updating forget status
@@ -413,7 +417,7 @@ const WorkSchedulePage = () => {
       NOTSTARTED: { color: "#1e40af", text: "Chưa bắt đầu" },
       END: { color: "orange", text: "Hoàn thành" },
       FORGET: { color: "orange", text: "Hoàn thành (Quên chấm công)" },
-      NOTWORK: { color: "red", text: "Không chấm công" },
+      NOTWORK: { color: "red", text: "Vắng mặt" },
     };
 
     const statusInfo = statusMap[status] || { color: "default", text: status };
@@ -954,7 +958,10 @@ const WorkSchedulePage = () => {
             borderRadius: "8px",
             fontWeight: 600,
           },
-          disabled: currentSchedule && (currentSchedule.status === "END" || currentSchedule.status === "ACTIVE"),
+          disabled:
+            currentSchedule &&
+            (currentSchedule.status === "END" ||
+              currentSchedule.status === "ACTIVE"),
         }}
         cancelButtonProps={{
           size: "large",
@@ -1181,25 +1188,24 @@ const WorkSchedulePage = () => {
               </h4>
 
               {/* Show status info */}
-              <div
-                style={{
-                  marginBottom: "16px",
-                  padding: "12px",
-                  background: "#f8fafc",
-                  borderRadius: "8px",
-                  border: "1px solid #e2e8f0",
-                }}
+              <Form.Item
+                name="status"
+                label={<span style={{ fontWeight: 600 }}>Trạng thái</span>}
               >
-                <span style={{ fontSize: "12px", color: "#64748b", fontWeight: 600 }}>
-                  TRẠNG THÁI HIỆN TẠI: 
-                </span>
-                <span style={{ marginLeft: "8px" }}>
-                  {getStatusTag(currentSchedule.status)}
-                </span>
-              </div>
+                <Select
+                  value={currentSchedule.status}
+                  disabled={currentSchedule.status !== "NOTSTARTED"}
+                  options={[
+                    { value: "NOTSTARTED", label: "Chưa bắt đầu" },
+                    { value: "NOTWORK", label: "Vắng mặt" },
+                  ]}
+                  style={{ width: "100%", borderRadius: "8px" }}
+                />
+              </Form.Item>
 
               {/* Show fields based on status */}
-              {(currentSchedule.status === "END" || currentSchedule.status === "ACTIVE") && (
+              {(currentSchedule.status === "END" ||
+                currentSchedule.status === "ACTIVE") && (
                 <div
                   style={{
                     padding: "16px",
@@ -1210,7 +1216,8 @@ const WorkSchedulePage = () => {
                   }}
                 >
                   <p style={{ margin: 0, color: "#92400e", fontWeight: 500 }}>
-                    ⚠️ Lịch làm việc này đã hoàn thành hoặc đang hoạt động, không thể chỉnh sửa.
+                    ⚠️ Lịch làm việc này đã hoàn thành hoặc đang hoạt động,
+                    không thể chỉnh sửa.
                   </p>
                 </div>
               )}
@@ -1220,9 +1227,9 @@ const WorkSchedulePage = () => {
                 name="shiftCode"
                 label={<span style={{ fontWeight: 600 }}>Ca làm việc</span>}
                 rules={[
-                  { 
-                    required: currentSchedule.status === "NOTSTARTED", 
-                    message: "Vui lòng chọn ca làm việc" 
+                  {
+                    required: currentSchedule.status === "NOTSTARTED",
+                    message: "Vui lòng chọn ca làm việc",
                   },
                 ]}
               >
@@ -1239,10 +1246,10 @@ const WorkSchedulePage = () => {
                 name="branchCode"
                 label={<span style={{ fontWeight: 600 }}>Chi nhánh</span>}
                 rules={[
-                  { 
-                    required: currentSchedule.status === "NOTSTARTED", 
-                    message: "Vui lòng chọn chi nhánh" 
-                  }
+                  {
+                    required: currentSchedule.status === "NOTSTARTED",
+                    message: "Vui lòng chọn chi nhánh",
+                  },
                 ]}
               >
                 <Select
@@ -1259,7 +1266,9 @@ const WorkSchedulePage = () => {
               {currentSchedule.status === "NOTWORK" && (
                 <Form.Item
                   name="forgetStatus"
-                  label={<span style={{ fontWeight: 600 }}>Trạng thái đặc biệt</span>}
+                  label={
+                    <span style={{ fontWeight: 600 }}>Trạng thái đặc biệt</span>
+                  }
                   valuePropName="checked"
                 >
                   <Checkbox style={{ color: "#ef4444", fontWeight: 600 }}>
@@ -1279,7 +1288,8 @@ const WorkSchedulePage = () => {
                   }}
                 >
                   <p style={{ margin: 0, fontSize: "13px", color: "#dc2626" }}>
-                    💡 Chỉ có thể đánh dấu &quot;quên chấm công&quot; cho lịch có trạng thái &quot;Không chấm công&quot;
+                    💡 Chỉ có thể đánh dấu &quot;quên chấm công&quot; cho lịch
+                    có trạng thái &quot;Vắng mặt&quot;
                   </p>
                 </div>
               )}

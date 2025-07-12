@@ -11,7 +11,7 @@ import {
   EnvironmentOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
-import { getDayNameInVietnamese } from "../../../../utils/dateLocalization";
+import { getDayNameInVietnamese } from "../../utils/dateLocalization";
 
 interface DetailViewProps {
   currentSchedule: any;
@@ -241,13 +241,14 @@ const DetailView: React.FC<DetailViewProps> = ({
                       <div className="time-value">
                         {currentSchedule.checkinTime || "——"}
                       </div>
-                      {currentSchedule.checkinTime && (lateMinutes > 0 ? (
-                        <div className="time-diff late">
-                          Trễ {lateMinutes} phút
-                        </div>
-                      ) : (
-                        <div className="time-diff right">Đúng giờ</div>
-                      ))}
+                      {currentSchedule.checkinTime &&
+                        (lateMinutes > 0 ? (
+                          <div className="time-diff late">
+                            Trễ {lateMinutes} phút
+                          </div>
+                        ) : (
+                          <div className="time-diff right">Đúng giờ</div>
+                        ))}
                     </Card>
                   </Col>
 
@@ -257,13 +258,14 @@ const DetailView: React.FC<DetailViewProps> = ({
                       <div className="time-value">
                         {currentSchedule.checkoutTime || "——"}
                       </div>
-                      {currentSchedule.checkoutTime && (earlyMinutes > 0 ? (
-                        <div className="time-diff early">
-                          Về sớm {earlyMinutes} phút
-                        </div>
-                      ) : (
-                        <div className="time-diff right">Đúng giờ</div>
-                      ))}
+                      {currentSchedule.checkoutTime &&
+                        (earlyMinutes > 0 ? (
+                          <div className="time-diff early">
+                            Về sớm {earlyMinutes} phút
+                          </div>
+                        ) : (
+                          <div className="time-diff right">Đúng giờ</div>
+                        ))}
                     </Card>
                   </Col>
                 </Row>

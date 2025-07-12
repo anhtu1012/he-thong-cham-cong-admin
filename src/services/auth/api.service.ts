@@ -1,3 +1,4 @@
+import { AxiosService } from "@/apis/axios.base";
 import { ValidateBaseClass } from "@/apis/ddd/validate.class.base";
 
 import {
@@ -11,7 +12,6 @@ import {
   UserResponseLogoutItem,
   UserResponseRegisterItem,
 } from "@/dtos/auth/auth.response.dto";
-import { AxiosService } from "../../apis/axios.base";
 
 class AuthServicesBase extends AxiosService {
   protected readonly basePath = "/v1/auth";

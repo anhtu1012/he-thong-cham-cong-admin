@@ -208,7 +208,7 @@ const GanttView: React.FC<GanttViewProps> = ({
             </div>
             <div className="legend-item">
               <span className="legend-color status-NOTWORK"></span>
-              <span className="legend-text">Không chấm công</span>
+              <span className="legend-text">Vắng mặt</span>
             </div>
             <div className="legend-item">
               <span className="legend-color status-END"></span>
