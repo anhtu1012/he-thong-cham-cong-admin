@@ -15,6 +15,7 @@ export const FormItemSchema = z.object({
   formTitle: z.string(),
   submittedBy: z.string(),
   approvedBy: z.string(),
+  response: z.string().nullable(),
   formCode: z.string(),
 });
 
@@ -43,6 +44,7 @@ export const UpdateStatusSchema = z.object({
   status: z.string(),
   approvedTime: z.string().nullable(),
   approvedBy: z.string().nullable(),
+  response: z.string().nullable(),
 });
 
 export type UpdateStatusRequest = z.infer<typeof UpdateStatusSchema>; 

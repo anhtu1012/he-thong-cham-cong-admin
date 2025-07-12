@@ -217,6 +217,7 @@ const DuyetNghiPhepPage = () => {
         status: "APPROVED",
         approvedTime: currentTime,
         approvedBy: userProfile.code, // Get user code from Redux store
+        response: null, // Thêm trường response
       };
 
       // Call API to update status
@@ -244,6 +245,7 @@ const DuyetNghiPhepPage = () => {
         status: "REJECTED",
         approvedTime: currentTime,
         approvedBy: userProfile.code, // Get user code from Redux store
+        response: null, // Thêm trường response
       };
 
       // Call API to update status

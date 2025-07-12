@@ -3,7 +3,7 @@
 import {
   BellOutlined,
   CheckCircleOutlined,
-  ClockCircleOutlined,
+
   FileTextOutlined,
   HomeOutlined,
   ScheduleOutlined,
@@ -81,14 +81,14 @@ const SiderHrComponent: React.FC<SiderProps> = ({ collapsed }) => {
     },
     {
       key: "/hr/quan-li-don",
-      icon: <ClockCircleOutlined />,
+      icon: <FileTextOutlined />,
       label: "Quản lý đơn",
       "data-index": 2,
     },
     {
       key: "/hr/duyet-nghi-phep",
       icon: <CheckCircleOutlined />,
-      label: "Duyệt nghỉ phép",
+      label: "Xử lý đơn",
       "data-index": 3,
     },
     {
