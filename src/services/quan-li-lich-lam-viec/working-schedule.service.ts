@@ -35,6 +35,17 @@ class WorkingScheduleServicesBase extends AxiosService {
   async createWorkingSchedule(data: CreateWorkingSchedule): Promise<any> {
     return this.post(`${this.basePath}/tao-lich-lam`, data);
   }
+
+  async updateWorkingSchedule(
+    id: string,
+    data: {
+      shiftCode?: any;
+      status: any;
+      branchCode?: any;
+    }
+  ): Promise<any> {
+    return this.put(`/v1/working-schedule/${id}`, data);
+  }
 }
 
 const WorkingScheduleServices = new WorkingScheduleServicesBase();
