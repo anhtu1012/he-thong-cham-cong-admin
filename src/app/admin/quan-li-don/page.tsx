@@ -113,7 +113,7 @@ const QuanLiDonPage = () => {
   const [selectedRecord, setSelectedRecord] = useState<QuanLiDonItem | null>(
     null
   );
-  const [isConfirmed, setIsConfirmed] = useState<boolean>(false);
+  const [isStatusOverTime, setIsStatusOverTime] = useState<boolean>(false);
   const [response, setResponse] = useState<string>("");
 
   const getData = async (
@@ -240,7 +240,7 @@ const QuanLiDonPage = () => {
   // Show approval modal instead of directly approving
   const showApprovalModal = (record: QuanLiDonItem) => {
     setSelectedRecord(record);
-    setIsConfirmed(false);
+    setIsStatusOverTime(false);
     setResponse("");
     setIsApprovalModalVisible(true);
   };
@@ -249,7 +249,7 @@ const QuanLiDonPage = () => {
   const handleModalCancel = () => {
     setIsApprovalModalVisible(false);
     setSelectedRecord(null);
-    setIsConfirmed(false);
+    setIsStatusOverTime(false);
     setResponse("");
   };
 
@@ -276,7 +276,7 @@ const QuanLiDonPage = () => {
       // Close modal
       setIsApprovalModalVisible(false);
       setSelectedRecord(null);
-      setIsConfirmed(false);
+      setIsStatusOverTime(false);
       setResponse("");
 
       // Refresh data
@@ -294,8 +294,7 @@ const QuanLiDonPage = () => {
 
   // Handle modal submit
   const handleModalSubmit = async () => {
-    if (!isConfirmed || !selectedRecord) {
-      toast.warning("Vui lòng xác nhận trước khi duyệt đơn!");
+    if (!selectedRecord) {
       return;
     }
 
@@ -310,6 +309,7 @@ const QuanLiDonPage = () => {
         approvedTime: currentTime,
         approvedBy: userProfile.code, // Get user code from Redux store
         response: response, // Add approval response
+        statusOvertime: isStatusOverTime,
       };
 
       // Call API to update status
@@ -318,7 +318,7 @@ const QuanLiDonPage = () => {
       // Close modal
       setIsApprovalModalVisible(false);
       setSelectedRecord(null);
-      setIsConfirmed(false);
+      setIsStatusOverTime(false);
       setResponse("");
 
       // Refresh data
@@ -652,7 +652,6 @@ const QuanLiDonPage = () => {
                   key="submit"
                   type="primary"
                   onClick={handleModalSubmit}
-                  disabled={!isConfirmed}
                   style={{ backgroundColor: "#1890ff", borderColor: "#1890ff" }}
                 >
                   Xác nhận duyệt
@@ -801,8 +800,8 @@ const QuanLiDonPage = () => {
               }}
             >
               <Checkbox
-                checked={selectedRecord.status === "APPROVED" || isConfirmed}
-                onChange={(e) => setIsConfirmed(e.target.checked)}
+                checked={isStatusOverTime}
+                onChange={(e) => setIsStatusOverTime(e.target.checked)}
                 style={{ marginRight: 8 }}
                 disabled={
                   selectedRecord &&

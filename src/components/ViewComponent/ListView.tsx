@@ -3,7 +3,7 @@ import React from "react";
 import type { JSX } from "react";
 import { List, Button } from "antd";
 import dayjs from "dayjs";
-import { getDayNameInVietnamese } from "../../../../utils/dateLocalization";
+import { getDayNameInVietnamese } from "../../utils/dateLocalization";
 
 interface ListViewProps {
   dateRange: { start: dayjs.Dayjs; end: dayjs.Dayjs };

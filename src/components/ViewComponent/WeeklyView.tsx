@@ -3,7 +3,7 @@ import React from "react";
 import { Button } from "antd";
 import { EnvironmentOutlined, PlusOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
-import { getDayNameInVietnamese } from "../../../../utils/dateLocalization";
+import { getDayNameInVietnamese } from "../../utils/dateLocalization";
 
 interface WeeklyViewProps {
   dateRange: { start: dayjs.Dayjs; end: dayjs.Dayjs };
@@ -80,7 +80,7 @@ const WeeklyView: React.FC<WeeklyViewProps> = ({
           </div>
           <div className="legend-item">
             <span className="legend-color status-NOTWORK"></span>
-            <span className="legend-text">Không chấm công</span>
+            <span className="legend-text">Vắng mặt</span>
           </div>
           <div className="legend-item">
             <span className="legend-color status-END"></span>

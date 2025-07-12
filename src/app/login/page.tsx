@@ -4,13 +4,14 @@
 
 import { setAuthData } from "@/lib/store/slices/loginSlice";
 import AuthServices from "@/services/auth/api.service";
+import { clearAllCookies, setCookie } from "@/utils/client/getCookie";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { Button, Checkbox, Form, Input, Typography } from "antd";
 import { useForm } from "antd/es/form/Form";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 import backgroundImage from "../../../public/assets/image/BackgroundFaceAI.png";
@@ -28,15 +29,17 @@ const LoginPage: React.FC = () => {
   const [isNavigating, setIsNavigating] = useState(false);
   const dispatch = useDispatch();
   const router = useRouter();
+  useEffect(() => {
+    // Kiểm tra nếu đã đăng nhập thì chuyển hướng đến trang chính
+    clearAllCookies();
+  }, [router]);
   const onFinish = async (values: any) => {
     if (isLogin || isNavigating) return;
     setIsLogin(true);
     try {
       const res = await AuthServices.login(values);
-      document.cookie = "token=; Max-Age=0; path=/;";
-      document.cookie = "refreshToken=; Max-Age=0; path=/;";
-      AuthServices.setToken(res.accessToken);
-      AuthServices.setRefreshToken(res.refreshToken);
+      setCookie("token", res.accessToken);
+      setCookie("refreshToken", res.refreshToken);
       dispatch(setAuthData(res));
       toast.success("Đăng nhập thành công"); //t("success")
       setIsNavigating(true);

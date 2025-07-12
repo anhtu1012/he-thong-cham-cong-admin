@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NEXT_PUBLIC_SITE_URL } from "@/constants/api-constants";
+// Đã loại bỏ import AuthServices để tránh vòng lặp import
 import { isValidToken } from "@/utils/client/api";
 import { filterQueryString } from "@/utils/client/filterQueryString ";
 import { getCookie } from "@/utils/client/getCookie";
@@ -87,7 +88,7 @@ export class AxiosService extends Authorization implements RepositoryPort {
     });
 
     http.interceptors.request.use(async (config) => {
-      // Read token from cookie each time to ensure we have the latest value
+      // Lấy token trực tiếp từ cookie để tránh vòng lặp import
       const token = getCookie("token");
       const refreshTokenn = getCookie("refreshToken");
 
@@ -115,12 +116,9 @@ export class AxiosService extends Authorization implements RepositoryPort {
               `${process.env.NEXT_PUBLIC_SITE_URL}/v1/auth/refresh-token`,
               { refreshToken: refreshTokenn }
             );
-            // console.log("Token refreshed successfully:", res.data);
-            document.cookie = "token=; Max-Age=0; path=/;";
-            document.cookie = "refreshToken=; Max-Age=0; path=/;";
-            // Set cookies with proper configuration
-            this.setCookieSecurely("token", res.data.accessToken);
-            this.setCookieSecurely("refreshToken", res.data.refreshToken);
+            // Set cookies trực tiếp
+            document.cookie = `token=${res.data.accessToken}; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/; secure; SameSite=Strict`;
+            document.cookie = `refreshToken=${res.data.refreshToken}; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/; secure; SameSite=Strict`;
 
             // Update the token we'll use for this request
             header.Authorization = `Bearer ${res.data.accessToken}`;

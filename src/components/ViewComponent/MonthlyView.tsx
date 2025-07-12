@@ -3,7 +3,7 @@ import React from "react";
 import { Calendar } from "antd";
 import dayjs from "dayjs";
 import locale from "antd/es/date-picker/locale/vi_VN";
-import { getMonthNameInVietnamese } from "../../../../utils/dateLocalization";
+import { getMonthNameInVietnamese } from "../../utils/dateLocalization";
 
 interface MonthlyViewProps {
   currentDate: dayjs.Dayjs;
