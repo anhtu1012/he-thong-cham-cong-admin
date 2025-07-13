@@ -46,10 +46,10 @@
     "tenChucVu": "Tên chức vụ",
     "quyenChucVu": "Quyền",
     "moTa": "Mô tả",
-    "luongCoBan": "Lương cơ bản",
+    "luongCoBan": "Lương cơ bản/giờ",
     "phuCap": "Phụ cấp",
-    "luongTangCa": "Lương tăng ca",
-    "phiDiMuon": "Phí đi muộn",
+    "luongTangCa": "Lương tăng ca/giờ",
+    "phiDiMuon": "Phí đi muộn/lần",
     "timKiem": "Tìm kiếm...",
     "themMoi": "Thêm người dùng mới",
     "xemChiTiet": "Xem thông tin chi tiết",
@@ -110,7 +110,11 @@
     "vuilongChonNguoiNop": "Vui lòng chọn người nộp!",
     "chonNguoiNop": "Chọn người nộp",
     "vuilongChonNguoiDuyet": "Vui lòng chọn người duyệt!",
-    "chonNguoiDuyet": "Chọn người duyệt"
+    "chonNguoiDuyet": "Chọn người duyệt",
+    "trangThaiChoXuLy": "Chờ xử lý",
+    "trangThaiDaDuyet": "Đã duyệt",
+    "trangThaiDaTuChoi": "Từ chối",
+    "trangThaiDaHuy": "Đã hủy"
   },
   "DanhMucCaLam": {
     "maCaLam": "Mã ca làm",

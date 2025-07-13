@@ -46,10 +46,10 @@
     "tenChucVu": "Position Name",
     "quyenChucVu": "Role",
     "moTa": "Description",
-    "luongCoBan": "Basic Salary",
+    "luongCoBan": "Basic Salary / hour",
     "phuCap": "Allowance",
-    "luongTangCa": "Overtime Salary",
-    "phiDiMuon": "Late Fee",
+    "luongTangCa": "Overtime Salary/hour",
+    "phiDiMuon": "Late Fee/time",
     "timKiem": "Search...",
     "themMoi": "Add new user",
     "xemChiTiet": "View details",
@@ -110,7 +110,11 @@
     "vuilongChonNguoiNop": "Please select submitter!",
     "chonNguoiNop": "Select submitter",
     "vuilongChonNguoiDuyet": "Please select approver!",
-    "chonNguoiDuyet": "Select approver"
+    "chonNguoiDuyet": "Select approver",
+    "trangThaiChoXuLy": "PENDING",
+    "trangThaiDaDuyet": "APPROVED",
+    "trangThaiDaTuChoi": "REJECTED",
+    "trangThaiDaHuy": "CANCELED"
   },
   "DanhMucCaLam": {
     "maCaLam": "Shift Code",
