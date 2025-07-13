@@ -183,7 +183,7 @@ const DanhMucChucVuManagementPage = () => {
         title: t("phiDiMuon"),
         dataIndex: "lateFine",
         key: "lateFine",
-        width: 120,
+        width: 150,
         render: (value: number) => {
           return value ? value.toLocaleString("vi-VN") + " VND" : "0 VND";
         },

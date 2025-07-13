@@ -40,6 +40,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import "./index.scss";
+import { FilterOperationType } from "@chax-at/prisma-filter-common";
 
 const { Title, Text } = Typography;
 
@@ -88,6 +89,7 @@ interface FilterValues {
   fromDate: dayjs.Dayjs;
   toDate: dayjs.Dayjs;
   formId?: string;
+  status?: string;
 }
 
 const QuanLiDonPage = () => {
@@ -129,11 +131,13 @@ const QuanLiDonPage = () => {
         { key: "offset", type: "=", value: (page - 1) * limit },
       ];
 
-      // searchFilter.push({
-      //   key: "reason",
-      //   type: FilterOperationType.IContains,
-      //   value: "Đưa con đi học",
-      // });
+      if (filters?.status) {
+        searchFilter.push({
+          key: "status",
+          type: FilterOperationType.Eq,
+          value: filters?.status,
+        });
+      }
 
       const params: any = {
         ...(quickkSearch ? { quickSearch: quickkSearch } : {}),
@@ -206,6 +210,14 @@ const QuanLiDonPage = () => {
         },
         { key: "offset", type: "=", value: 0 },
       ];
+      if (formFilter.getFieldValue("status")) {
+        searchFilterExport.push({
+          key: "status",
+          type: FilterOperationType.Eq,
+          value: formFilter.getFieldValue("status"),
+        });
+      }
+
       const params: any = {
         ...(quickSearch ? { quickSearch: quickSearch } : {}),
         ...(formFilter.getFieldValue("formId")
@@ -550,6 +562,22 @@ const QuanLiDonPage = () => {
                   label="Tiêu đề đơn"
                   options={formTypes}
                   disabled={formTypesLoading}
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={6} lg={6}>
+              <Form.Item name="status">
+                <Cselect
+                  allowClear
+                  showSearch
+                  label="Trạng thái"
+                  options={[
+                    { value: null, label: "Tất cả" },
+                    { value: "PENDING", label: t("trangThaiChoXuLy") },
+                    { value: "APPROVED", label: t("trangThaiDaDuyet") },
+                    { value: "REJECTED", label: t("trangThaiDaTuChoi") },
+                    { value: "CANCELED", label: t("trangThaiDaHuy") },
+                  ]}
                 />
               </Form.Item>
             </Col>
