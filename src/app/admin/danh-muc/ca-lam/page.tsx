@@ -4,16 +4,16 @@
 import ActionButton from "@/components/basicUI/ActionButton";
 import CInputLabel from "@/components/basicUI/CInputLabel";
 import Ctable from "@/components/basicUI/Ctable";
+import DanhMucCaLamServices from "@/services/admin/danh-muc/ca-lam/ca-lam.service";
 import { handleFormErrors } from "@/utils/client/formHelpers";
+import { formatDateTimeMain } from "@/utils/dateTime";
 import { Button, Form } from "antd";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import CaLamForm from "./CaLamForm";
-import { useTranslations } from "next-intl";
-import DanhMucCaLamServices from "@/services/admin/danh-muc/ca-lam/ca-lam.service";
-import { formatDateTime } from "@/utils/dateTime";
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
 
 // Sample data interface for CaLam
@@ -39,7 +39,7 @@ const DanhMucCaLamManagementPage = () => {
   const [totalItems, setTotalItems] = useState<number>(0);
   const [loading, setLoading] = useState(false);
   const [editLoading, setEditLoading] = useState(false);
-  
+
   const getData = async (
     page = currentPage,
     limit = pageSize,
@@ -50,7 +50,7 @@ const DanhMucCaLamManagementPage = () => {
       const params: any = {
         page,
         limit,
-        status: "ACTIVE"
+        status: "ACTIVE",
       };
       if (quickkSearch && quickkSearch.trim() !== "") {
         params.quickSearch = quickkSearch;
@@ -105,14 +105,14 @@ const DanhMucCaLamManagementPage = () => {
         dataIndex: "startTime",
         key: "startTime",
         width: 160,
-        render: (time: string) => formatDateTime(time),
+        render: (time: string) => formatDateTimeMain(time),
       },
       {
         title: t("gioKetThuc"),
         dataIndex: "endTime",
         key: "endTime",
         width: 160,
-        render: (time: string) => formatDateTime(time),
+        render: (time: string) => formatDateTimeMain(time),
       },
       {
         title: t("soGioLam"),
@@ -297,7 +297,11 @@ const DanhMucCaLamManagementPage = () => {
               gap: "12px",
             }}
           >
-            <Button variant="dashed" color="danger" href="/admin/danh-muc/ca-lam/da-xoa">
+            <Button
+              variant="dashed"
+              color="danger"
+              href="/admin/danh-muc/ca-lam/da-xoa"
+            >
               Ca làm đã xóa
             </Button>
             <ActionButton
