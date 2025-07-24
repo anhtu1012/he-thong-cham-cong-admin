@@ -2,8 +2,6 @@
 
 import {
   BellOutlined,
-  CheckCircleOutlined,
-
   FileTextOutlined,
   HomeOutlined,
   ScheduleOutlined,

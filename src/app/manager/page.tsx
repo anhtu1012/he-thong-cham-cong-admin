@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { selectAuthLogin } from "@/lib/store/slices/loginSlice";
 import QlNguoiDungServices from "@/services/admin/quan-li-nguoi-dung/quan-li-nguoi-dung.service";
@@ -6,18 +7,13 @@ import {
   CheckCircleOutlined,
   ClockCircleOutlined,
   CloseCircleOutlined,
-  EnvironmentOutlined,
   FileTextOutlined,
   TeamOutlined,
-  UserOutlined,
   WarningOutlined,
 } from "@ant-design/icons";
 import {
-  Avatar,
   Card,
   Col,
-  List,
-  Progress,
   Row,
   Space,
   Statistic,
@@ -67,29 +63,7 @@ const leaveRequests = [
   },
 ];
 
-const departmentStats = [
-  {
-    name: "Phòng Kỹ thuật",
-    total: 20,
-    present: 18,
-    late: 1,
-    absent: 1,
-  },
-  {
-    name: "Phòng Kinh doanh",
-    total: 15,
-    present: 14,
-    late: 1,
-    absent: 0,
-  },
-  {
-    name: "Phòng Nhân sự",
-    total: 10,
-    present: 9,
-    late: 1,
-    absent: 0,
-  },
-];
+
 
 function Dashboard() {
   const t = useTranslations("Dashboard");
