@@ -224,11 +224,11 @@
   },
   "Dashboard": {
     "title": "Tổng quan",
-    "tongNhanVien": "Tổng nhân viên",
+    "tongNhanVien": "Tổng nhân viên quản lý",
     "diLamHomNay": "Đi làm hôm nay",
     "diMuonHomNay": "Đi muộn hôm nay",
     "vangMatHomNay": "Vắng mặt hôm nay",
-    "donNghiPhepGanDay": "Đơn nghỉ phép gần đây",
+    "donNghiPhepGanDay": "Đơn xin phép gần đây",
     "xemTatCa": "Xem tất cả",
     "hoatDongGanDay": "Hoạt động gần đây",
     "thongKeTheoPhongBan": "Thống kê theo phòng ban",
