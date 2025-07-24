@@ -33,7 +33,7 @@ interface FormValues {
   isActive: boolean;
 }
 
-const QuanLiNhanVienPage = () => {
+const UserManagementPage = () => {
   const [quickSearch, setQuickSearch] = useState<string>("");
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingUser, setEditingUser] = useState<any>(null);
@@ -111,8 +111,8 @@ const QuanLiNhanVienPage = () => {
       ];
 
       const result: any = await QlNguoiDungServices.getUser(searchOwnweFilter, {
-        ...(quickkSearch ? { quickSearch: quickkSearch } : {}),
-        ...(value.role ? { role: value.role } : {}),
+        ...(quickkSearch ? { quickSearch: quickSearch } : {}),
+        ...(value.role ? { role: value.role } : {role: "R4"}),
         ...(value.positionCode ? { positionCode: value.positionCode } : {}),
         ...(value.branchCode ? { branchCode: value.branchCode } : {}),
         ...(typeof value.isActive === "boolean"
@@ -185,7 +185,6 @@ const QuanLiNhanVienPage = () => {
       setLoading(false);
     }
   };
-
   /**
    * Xử lý chuyển từ chế độ xem sang chế độ chỉnh sửa
    * Logic đơn giản hóa, chỉ đổi trạng thái
@@ -270,30 +269,30 @@ const QuanLiNhanVienPage = () => {
           </Tooltip>
         ),
       },
-      {
-        title: "Chi nhánh",
-        dataIndex: "branchName",
-        key: "branchName",
-        width: 150,
-      },
-      {
-        title: "Chức vụ",
-        dataIndex: "positionCode",
-        key: "positionCode",
-        width: 180,
-        render: (positionCode: string) => {
-          const position = positions.find(
-            (item) => item.value === positionCode
-          );
-          return <span>{position ? position.label : positionCode}</span>;
-        },
-      },
-      {
-        title: "Người quản lý",
-        dataIndex: "managedBy",
-        key: "managedBy",
-        width: 120,
-      },
+      // {
+      //   title: "Chi nhánh",
+      //   dataIndex: "branchName",
+      //   key: "branchName",
+      //   width: 150,
+      // },
+      // {
+      //   title: "Chức vụ",
+      //   dataIndex: "positionCode",
+      //   key: "positionCode",
+      //   width: 180,
+      //   render: (positionCode: string) => {
+      //     const position = positions.find(
+      //       (item) => item.value === positionCode
+      //     );
+      //     return <span>{position ? position.label : positionCode}</span>;
+      //   },
+      // },
+      // {
+      //   title: "Người quản lý",
+      //   dataIndex: "managedBy",
+      //   key: "managedBy",
+      //   width: 120,
+      // },
       {
         title: "Quyền",
         dataIndex: "roleCode",
@@ -331,8 +330,8 @@ const QuanLiNhanVienPage = () => {
       },
       {
         title: "Địa chỉ",
-        dataIndex: "addressCode",
-        key: "addressCode",
+        dataIndex: "address",
+        key: "address",
         width: 200,
       },
       {
@@ -393,8 +392,6 @@ const QuanLiNhanVienPage = () => {
           ...user,
           // Convert date string to dayjs object for DatePicker
           dob: user.dob ? dayjs(user.dob) : null,
-          // Ensure addressCode is set (fallback to address if addressCode doesn't exist)
-          addressCode: user.addressCode || user.address || "",
         });
       }, 100);
     } else {
@@ -469,20 +466,6 @@ const QuanLiNhanVienPage = () => {
         // Validate form fields
         const values = await form.validateFields();
         console.log("Form values:", values);
-
-        // Ensure all required fields are present
-        if (!values.gender) {
-          toast.error("Vui lòng chọn giới tính!");
-          setEditLoading(false);
-          return;
-        }
-
-        if (!values.addressCode) {
-          toast.error("Vui lòng nhập địa chỉ!");
-          setEditLoading(false);
-          return;
-        }
-
         if (values.dob) {
           values.dob = new Date(values.dob).toISOString();
         }
@@ -512,7 +495,6 @@ const QuanLiNhanVienPage = () => {
       }
     }
   };
-
   const handleSubmitContract = async (values: UserContractItem) => {
     setContactLoading(true);
     try {
@@ -653,7 +635,12 @@ const QuanLiNhanVienPage = () => {
                   allowClear
                   showSearch
                   label="Quyền"
-                  options={[{ value: RoleAdmin.STAFF, label: "Staff" }]}
+                  options={[
+                    // { value: RoleAdmin.ADMIN, label: "Admin" },
+                    // { value: RoleAdmin.HR, label: "HR" },
+                    // { value: RoleAdmin.MANAGER, label: "Manager" },
+                    { value: RoleAdmin.STAFF, label: "Staff" },
+                  ]}
                 />
               </Form.Item>
             </Col>
@@ -744,7 +731,7 @@ const QuanLiNhanVienPage = () => {
           showActions
           actionColumn={actionColumn}
           stickyHeader
-          tableId="hr_quan_li_nguoi_dung"
+          tableId="admin_quan_li_nguoi_dung"
           onBeforeExport={handleBeforeExport}
         />
       </div>
@@ -756,8 +743,6 @@ const QuanLiNhanVienPage = () => {
         handleSubmit={handleSubmit}
         editLoading={editLoading}
         fileList={fileList}
-        brands={brands}
-        positions={positions}
         handleUploadChange={handleUploadChange}
       />
       {/* UserContactForm với các prop đã tối ưu */}
@@ -781,4 +766,4 @@ const QuanLiNhanVienPage = () => {
   );
 };
 
-export default QuanLiNhanVienPage;
+export default UserManagementPage;

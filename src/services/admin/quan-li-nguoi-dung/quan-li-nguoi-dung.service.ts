@@ -28,6 +28,12 @@ class QlNguoiDungServicesBase extends AxiosService {
   async deleteUser(id: string): Promise<any> {
     return this.delete(`${this.basePath}/${id}`);
   }
+  async getUserByManagement(
+    searchFilter: FilterQueryStringTypeItem[] = [],
+    params?: any
+  ): Promise<any> {
+    return this.getWithFilter(`/v1/business/user-by-management`, searchFilter, params)
+  }
 }
 
 const QlNguoiDungServices = new QlNguoiDungServicesBase();
