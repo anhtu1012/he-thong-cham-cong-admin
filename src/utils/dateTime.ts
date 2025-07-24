@@ -1,3 +1,5 @@
+import dayjs from "dayjs";
+
 // Múi giờ Việt Nam (UTC+7)
 export const VIETNAM_TIMEZONE = "Asia/Ho_Chi_Minh";
 export const VIETNAM_TIMEZONE_OFFSET = 7; // UTC+7
@@ -76,9 +78,6 @@ export const formatDateTime = (
   vn: boolean = false
 ): string => {
   if (!timeString) return "";
-  console.log("Input Time String:", timeString);
-  console.log("VN Mode:", vn);
-
   try {
     let dateToFormat: Date;
 
@@ -184,4 +183,10 @@ export const dateToVietnamString = (date: Date): string => {
   return date.toLocaleString("vi-VN", {
     timeZone: VIETNAM_TIMEZONE,
   });
+};
+
+// forrmatDateTime
+export const formatDateTimeMain = (date: string): string => {
+  const dateTime = dayjs(date).format("HH:mm");
+  return dateTime;
 };
