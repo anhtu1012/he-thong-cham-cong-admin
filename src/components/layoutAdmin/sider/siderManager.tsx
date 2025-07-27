@@ -2,7 +2,6 @@
 
 import {
   BellOutlined,
-
   ClockCircleOutlined,
   DashboardOutlined,
   FileTextOutlined,
@@ -13,7 +12,7 @@ import { Layout, Menu } from "antd";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import "../../layoutAdmin/index.scss";
-
+import { GiMoneyStack } from "react-icons/gi";
 const { Sider } = Layout;
 
 interface SiderProps {
@@ -97,16 +96,22 @@ const SiderManagerComponent: React.FC<SiderProps> = ({ collapsed }) => {
       "data-index": 4,
     },
     {
+      key: "/manager/quan-ly-luong",
+      icon: <GiMoneyStack color="green" />,
+      label: "Quản lý Lương",
+      "data-index": 5,
+    },
+    {
       key: "/manager/thong-bao",
       icon: <BellOutlined />,
       label: "Thông báo",
-      "data-index": 5,
+      "data-index": 6,
     },
     {
       key: "/manager/bao-cao",
       icon: <FileTextOutlined />,
       label: "Báo cáo",
-      "data-index": 6,
+      "data-index": 7,
     },
   ];
 
