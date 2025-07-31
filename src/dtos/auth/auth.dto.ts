@@ -27,6 +27,7 @@ export const UserInforSchema = z.object({
   updatedAt: z.string().or(z.date()).optional(),
   updatedBy: z.string().optional(),
   isActive: z.boolean().optional(),
+  note: z.string().optional(),
 });
 
 export type UserInfor = z.infer<typeof UserInforSchema>;
