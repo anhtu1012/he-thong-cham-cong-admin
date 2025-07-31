@@ -22,7 +22,7 @@ export const UserRequestRegisterSchema = z.object({
   firstName: z.string(),
   lastName: z.string(),
   email: z.string().email("Invalid email format"),
-  faceImg: z.string().optional(),
+  faceImg: z.string().optional().or(z.null()),
   contract: z.string().optional(),
   dob: z.string().refine((value) => {
     try {
@@ -64,7 +64,7 @@ export const UserRequestChangePasswordSchema = UserInforSchema.omit({
     firstName: z.string().optional(),
     lastName: z.string().optional(),
     email: z.string().email("Invalid email format").optional(),
-    faceImg: z.string().optional(),
+    faceImg: z.string().optional().or(z.null()),
     dob: z.string().or(z.date()).optional(),
     addressCode: z
       .string()

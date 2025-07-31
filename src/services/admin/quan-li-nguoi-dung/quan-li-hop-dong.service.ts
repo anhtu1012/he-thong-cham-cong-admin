@@ -2,12 +2,12 @@
 import { AxiosService } from "@/apis/axios.base";
 import { ValidateBaseClass } from "@/apis/ddd/validate.class.base";
 import {
-  CreateContractSchema,
-  UpdateContractSchema,
+  CreateContractFormSchema,
+  UpdateContractFormSchema,
 } from "@/dtos/quan-li-nguoi-dung/contracts/contract.dto";
 import {
-  CreateContractRequest,
-  UpdateContractRequest,
+  CreateContractFormRequest,
+  UpdateContractFormRequest,
 } from "@/dtos/quan-li-nguoi-dung/contracts/contract.request.dto";
 import { UserContractResponseGetItem } from "@/dtos/quan-li-nguoi-dung/contracts/contract.response.dto";
 
@@ -18,17 +18,69 @@ class QuanLyHopDongServicesBase extends AxiosService {
     return this.get(`${this.basePath}/${id}`);
   }
 
-  async createContract(formData: CreateContractRequest): Promise<any> {
-    await ValidateBaseClass.validate(formData, CreateContractSchema);
-    return this.post(`${this.basePath}/create-contract-with-branch`, formData);
+  async createContract(formData: CreateContractFormRequest): Promise<any> {
+    await ValidateBaseClass.validate(formData, CreateContractFormSchema);
+
+    // Check if there's a file to upload
+    if (formData.contractPdf instanceof File) {
+      const formDataObj = new FormData();
+
+      // Add all fields to FormData
+      Object.keys(formData).forEach((key) => {
+        const value = (formData as any)[key];
+        if (key === "contractPdf" && value instanceof File) {
+          formDataObj.append(key, value);
+        } else if (key === "branchCodes" && Array.isArray(value)) {
+          value.forEach((code: string) =>
+            formDataObj.append("branchCodes[]", code)
+          );
+        } else if (value !== undefined && value !== null) {
+          formDataObj.append(key, value.toString());
+        }
+      });
+
+      return this.post(
+        `${this.basePath}/create-contract-with-branch`,
+        formDataObj
+      );
+    } else {
+      // No file, send as regular JSON
+      return this.post(
+        `${this.basePath}/create-contract-with-branch`,
+        formData
+      );
+    }
   }
 
   async updateContract(
     id: string,
-    formData: UpdateContractRequest
+    formData: UpdateContractFormRequest
   ): Promise<any> {
-    await ValidateBaseClass.validate(formData, UpdateContractSchema);
-    return this.put(`${this.basePath}/${id}`, formData);
+    await ValidateBaseClass.validate(formData, UpdateContractFormSchema);
+
+    // Check if there's a file to upload
+    if (formData.contractPdf instanceof File) {
+      const formDataObj = new FormData();
+
+      // Add all fields to FormData
+      Object.keys(formData).forEach((key) => {
+        const value = (formData as any)[key];
+        if (key === "contractPdf" && value instanceof File) {
+          formDataObj.append(key, value);
+        } else if (key === "branchCodes" && Array.isArray(value)) {
+          value.forEach((code: string) =>
+            formDataObj.append("branchCodes[]", code)
+          );
+        } else if (value !== undefined && value !== null) {
+          formDataObj.append(key, value.toString());
+        }
+      });
+
+      return this.put(`/v1/user-contract/${id}`, formDataObj);
+    } else {
+      // No file, send as regular JSON
+      return this.put(`/v1/user-contract/${id}`, formData);
+    }
   }
 
   async deleteContract(id: string): Promise<any> {
@@ -39,6 +91,13 @@ class QuanLyHopDongServicesBase extends AxiosService {
     userCode: string
   ): Promise<UserContractResponseGetItem> {
     return this.getWithFilter(`${this.basePath}/by-user-code/${userCode}`);
+  }
+  async getContractsByUserCodeHistory(
+    userCode: string
+  ): Promise<UserContractResponseGetItem[]> {
+    return this.getWithFilter(
+      `${this.basePath}/by-user-code-array/${userCode}`
+    );
   }
 }
 

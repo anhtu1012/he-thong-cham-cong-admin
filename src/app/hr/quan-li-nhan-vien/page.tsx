@@ -23,7 +23,7 @@ import type { UploadFile } from "antd/es/upload/interface";
 import dayjs from "dayjs";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
-import UserContactForm from "./UserContactForm";
+import UserContactForm from "../../../components/QuanLiNguoiDungComponents/UserContactForm";
 import UserForm from "./UserForm";
 
 interface FormValues {
@@ -38,7 +38,7 @@ const UserManagementPage = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingUser, setEditingUser] = useState<any>(null);
   const [form] = Form.useForm<any>();
-  const [formValues] = Form.useForm<UserContractItem>();
+  const [contractForm] = Form.useForm<UserContractItem>(); // Đổi tên từ formValues thành contractForm để rõ ràng hơn
   const [formFilter] = Form.useForm<FormValues>();
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
@@ -52,6 +52,9 @@ const UserManagementPage = () => {
   const [isContactModalVisible, setIsContactModalVisible] = useState(false);
   const [isViewMode, setIsViewMode] = useState(false);
   const [selectedContact, setSelectedContact] = useState<any>(null);
+  const [selectedContactHistory, setSelectedContactHistory] = useState<
+    UserContractItem[]
+  >([]);
   const [ueserDetails, setUserDetails] = useState<UserInfor>();
   const [contactLoading, setContactLoading] = useState(false);
 
@@ -112,7 +115,7 @@ const UserManagementPage = () => {
 
       const result: any = await QlNguoiDungServices.getUser(searchOwnweFilter, {
         ...(quickkSearch ? { quickSearch: quickSearch } : {}),
-        ...(value.role ? { role: value.role } : {role: "R4"}),
+        ...(value.role ? { role: value.role } : {}),
         ...(value.positionCode ? { positionCode: value.positionCode } : {}),
         ...(value.branchCode ? { branchCode: value.branchCode } : {}),
         ...(typeof value.isActive === "boolean"
@@ -139,6 +142,35 @@ const UserManagementPage = () => {
     fetchFiter();
     getData(currentPage, pageSize, quickSearch);
   }, []); // Reload data when page or size changes
+
+  // Setup file list when editing contract with existing PDF
+  useEffect(() => {
+    console.log("useEffect - selectedContact:", selectedContact);
+    console.log("useEffect - isContactModalVisible:", isContactModalVisible);
+
+    if (selectedContact && selectedContact.contractPdf) {
+      console.log(
+        "Setting up file list for existing contract with PDF:",
+        selectedContact.contractPdf
+      );
+      const existingFile: UploadFile = {
+        uid: "-1",
+        name: "contract.pdf",
+        status: "done",
+        url: selectedContact.contractPdf,
+      };
+      setFileList([existingFile]);
+
+      // Also set form field value for existing contracts
+      if (typeof selectedContact.contractPdf === "string") {
+        contractForm.setFieldValue("contractPdf", selectedContact.contractPdf);
+      }
+    } else if (!isContactModalVisible) {
+      console.log("Clearing file list - modal not visible");
+      setFileList([]);
+      contractForm.setFieldValue("contractPdf", undefined);
+    }
+  }, [selectedContact, isContactModalVisible]);
 
   const handleBeforeExport = async (): Promise<UserInfor[]> => {
     setLoading(true);
@@ -209,11 +241,13 @@ const UserManagementPage = () => {
       const contact = await QuanLyHopDongServices.getContractsByUserCode(
         record.code
       );
-
+      const contactHistory =
+        await QuanLyHopDongServices.getContractsByUserCodeHistory(record.code);
       // Kiểm tra nếu có dữ liệu hợp đồng, hiển thị dạng xem
       // Ngược lại, hiển thị form thêm mới
       if (contact.id) {
         setSelectedContact(contact);
+        setSelectedContactHistory(contactHistory);
         setIsViewMode(true);
       } else {
         setIsViewMode(false);
@@ -330,8 +364,8 @@ const UserManagementPage = () => {
       },
       {
         title: "Địa chỉ",
-        dataIndex: "address",
-        key: "address",
+        dataIndex: "addressCode",
+        key: "addressCode",
         width: 200,
       },
       {
@@ -422,9 +456,10 @@ const UserManagementPage = () => {
       try {
         // Validate form fields
         const values = await form.validateFields();
-        values.faceImg = fileList[0]?.url || null; // Handle file upload
-        if (values.dob) {
-          values.dob = new Date(values.dob).toISOString();
+        // Defensive: handle faceImg and dob
+        values.faceImg = fileList[0]?.url || fileList[0]?.response?.url || null;
+        if (values.dob && dayjs.isDayjs(values.dob)) {
+          values.dob = values.dob.toISOString();
         }
         const changedValues = getChangedValues(values, editingUser);
 
@@ -495,53 +530,82 @@ const UserManagementPage = () => {
       }
     }
   };
-  const handleSubmitContract = async (values: UserContractItem) => {
+  const handleSubmitContract = async (
+    contractId: string | undefined = undefined
+  ) => {
     setContactLoading(true);
     try {
-      console.log("Submitting contract values:", values);
+      // Get form values including file
+      const rawFormData = contractForm.getFieldsValue();
+      // Validate required fields
+      await contractForm.validateFields();
 
-      if (values.startTime) {
-        values.startTime = new Date(values.startTime).toISOString();
+      // Process form data for API
+      const processedData: any = { ...rawFormData };
+
+      // Process date values
+      if (processedData.startTime) {
+        processedData.startTime = new Date(
+          processedData.startTime
+        ).toISOString();
       }
-      if (values.endTime) {
-        values.endTime = new Date(values.endTime).toISOString();
+      if (processedData.endTime) {
+        processedData.endTime = new Date(processedData.endTime).toISOString();
       }
-      // thêm truờng userCode vào values
-      const result = await QuanLyHopDongServices.createContract(values);
+
+      processedData.userCode = ueserDetails?.code || "";
+
+      // Xử lý contractPdf: nếu là File thì giữ, nếu là string (url) thì xóa khỏi payload (backend sẽ giữ file cũ)
+      if (processedData.contractPdf) {
+        if (typeof processedData.contractPdf === "string") {
+          // Nếu là string (url) thì không gửi lên backend
+          delete processedData.contractPdf;
+        }
+        // Nếu là File thì giữ nguyên để upload
+      }
+
+      let result;
+      if (contractId) {
+        // Nếu có contractId, gọi API update
+        result = await QuanLyHopDongServices.updateContract(
+          contractId,
+          processedData
+        );
+      } else {
+        // Nếu không có, gọi API tạo mới
+        result = await QuanLyHopDongServices.createContract(processedData);
+      }
+
       if (result) {
-        toast.success("Thêm mới thành công!");
-        getData(currentPage, pageSize, quickSearch); // Refresh data after adding
+        toast.success(
+          contractId ? "Cập nhật thành công!" : "Thêm mới thành công!"
+        );
+        getData(currentPage, pageSize, quickSearch); // Refresh data after adding/updating
         setIsModalVisible(false);
-        formValues.resetFields();
+        contractForm.resetFields();
+        setFileList([]); // Clear file list
         handleCloseContactModal();
       } else {
-        toast.error(result.message || "Thêm mới thất bại!");
+        toast.error(
+          result.message ||
+            (contractId ? "Cập nhật thất bại!" : "Thêm mới thất bại!")
+        );
       }
     } catch (error: any) {
       console.log("Form validation error:", error);
 
-      handleFormErrors<UserRequestUpdateUsser>(formValues, error);
+      handleFormErrors<UserRequestUpdateUsser>(contractForm, error);
 
       if (error.response && error.response.data) {
         console.log("API error:", error.response.data);
 
         handleFormErrors<UserRequestUpdateUsser>(
-          formValues,
+          contractForm,
           error.response.data
         );
       }
     } finally {
       setContactLoading(false);
-    }
-  };
-
-  const handleDelete = async (record: any) => {
-    try {
-      await QlNguoiDungServices.deleteUser(record.id);
-      toast.success("Xóa thành công!");
-      getData(currentPage, pageSize, quickSearch, formFilter.getFieldsValue());
-    } catch (error: any) {
-      toast.error(error.message);
     }
   };
 
@@ -582,7 +646,6 @@ const UserManagementPage = () => {
         <ActionButton
           record={record}
           onUpdate={() => showModal(record, "update")}
-          onDelete={() => handleDelete(record)}
           tooltips={{
             view: "Xem thông tin chi tiết",
             update: "Chỉnh sửa thông tin người dùng",
@@ -605,7 +668,20 @@ const UserManagementPage = () => {
   }: {
     fileList: UploadFile[];
   }) => {
+    console.log("handleUploadChange called with:", newFileList);
     setFileList(newFileList);
+
+    // Update form field value with the file object or url
+    if (newFileList.length > 0) {
+      const latestFile = newFileList[newFileList.length - 1];
+      if (latestFile.originFileObj) {
+        contractForm.setFieldValue("contractPdf", latestFile.originFileObj);
+      } else if (latestFile.url) {
+        contractForm.setFieldValue("contractPdf", latestFile.url);
+      }
+    } else {
+      contractForm.setFieldValue("contractPdf", undefined);
+    }
   };
 
   const onFinish = async (values: FormValues) => {
@@ -636,9 +712,9 @@ const UserManagementPage = () => {
                   showSearch
                   label="Quyền"
                   options={[
-                    // { value: RoleAdmin.ADMIN, label: "Admin" },
-                    // { value: RoleAdmin.HR, label: "HR" },
-                    // { value: RoleAdmin.MANAGER, label: "Manager" },
+                    { value: RoleAdmin.ADMIN, label: "Admin" },
+                    { value: RoleAdmin.HR, label: "HR" },
+                    { value: RoleAdmin.MANAGER, label: "Manager" },
                     { value: RoleAdmin.STAFF, label: "Staff" },
                   ]}
                 />
@@ -754,11 +830,14 @@ const UserManagementPage = () => {
         contactData={selectedContact}
         positions={positions}
         branches={brands}
-        form={formValues}
+        form={contractForm}
         ueserDetails={ueserDetails}
+        selectedContactHistory={selectedContactHistory}
         onSwitchToEditMode={handleSwitchToEditMode}
-        handleSubmit={() => {
-          handleSubmitContract(formValues.getFieldsValue());
+        fileList={fileList}
+        handleUploadChange={handleUploadChange}
+        handleSubmit={(contractId) => {
+          handleSubmitContract(contractId || undefined);
           // Có thể reload dữ liệu nếu cần
         }}
       />

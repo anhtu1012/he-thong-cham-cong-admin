@@ -25,6 +25,7 @@ import {
 } from "antd";
 import { UploadFile } from "antd/es/upload/interface";
 import dayjs from "dayjs";
+import { useEffect, useState } from "react";
 import styles from "../../../components/styles/styles.module.scss";
 import "./index.scss";
 
@@ -51,6 +52,32 @@ const UserForm: React.FC<UserFormProps> = ({
   fileList,
   handleUploadChange,
 }) => {
+  const [displayFileList, setDisplayFileList] = useState<UploadFile[]>([]);
+
+  // Convert faceImg URL to fileList format when editingUser changes
+  useEffect(() => {
+    if (
+      editingUser &&
+      editingUser.faceImg &&
+      typeof editingUser.faceImg === "string"
+    ) {
+      // If faceImg is a URL, convert it to fileList format
+      const imageFile: UploadFile = {
+        uid: "-1",
+        name: "face-image.jpg",
+        status: "done",
+        url: editingUser.faceImg,
+      };
+      setDisplayFileList([imageFile]);
+    } else if (fileList && fileList.length > 0) {
+      // Use provided fileList if available
+      setDisplayFileList(fileList);
+    } else {
+      // Clear fileList if no image
+      setDisplayFileList([]);
+    }
+  }, [editingUser, fileList]);
+
   const uploadButton = (
     <div>
       <PlusOutlined />
@@ -303,21 +330,20 @@ const UserForm: React.FC<UserFormProps> = ({
 
       <Row gutter={16}>
         <Col span={24}>
-          <Form.Item
-            name="faceImg"
-            label="Hình ảnh khuôn mặt"
-            valuePropName="fileList"
-            getValueFromEvent={(e) => e && e.fileList}
-          >
+          <Form.Item name="faceImg" label="Hình ảnh khuôn mặt">
             <Upload
               listType="picture-card"
-              fileList={fileList}
-              onChange={handleUploadChange}
+              fileList={displayFileList}
+              onChange={(info) => {
+                setDisplayFileList(info.fileList);
+                handleUploadChange(info);
+              }}
+              disabled
               beforeUpload={() => false}
               maxCount={1}
               className={styles.faceImageUpload}
             >
-              {fileList.length >= 1 ? null : uploadButton}
+              {displayFileList.length >= 1 ? null : uploadButton}
             </Upload>
           </Form.Item>
         </Col>
