@@ -88,12 +88,12 @@ const SiderComponent: React.FC<SiderProps> = ({ collapsed }) => {
       label: "Quản lý người dùng",
       "data-index": 1,
     },
-    {
-      key: "/admin/quan-ly-cham-cong",
-      icon: <ClockCircleOutlined />,
-      label: "Quản lý chấm công",
-      "data-index": 2,
-    },
+    // {
+    //   key: "/admin/quan-ly-cham-cong",
+    //   icon: <ClockCircleOutlined />,
+    //   label: "Quản lý chấm công",
+    //   "data-index": 2,
+    // },
     {
       key: "/admin/quan-ly-don",
       icon: <FileTextOutlined />,

@@ -8,7 +8,6 @@ import {
   UserRequestChangePasswordSchema,
   UserRequestUpdateUsser,
 } from "@/dtos/auth/auth.request.dto";
-
 class QlNguoiDungServicesBase extends AxiosService {
   protected readonly basePath = "/v1/user";
 
@@ -16,8 +15,13 @@ class QlNguoiDungServicesBase extends AxiosService {
     searchFilter: FilterQueryStringTypeItem[] = [],
     params?: any
   ): Promise<UserResponseGetItem> {
-    return this.getWithFilter(`${this.basePath}`, searchFilter, params);
+    return this.getWithFilter(`/v1/business/get-user-by-management`, searchFilter, params);
   }
+
+  async getUserByCode(userCode: string): Promise<any> {
+    return this.get(`/v1/business/get-user-by-management?userCode=${userCode}`);
+  }
+
   async updateUser(
     id: string | undefined,
     formData: UserRequestUpdateUsser

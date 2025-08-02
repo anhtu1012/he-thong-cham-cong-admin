@@ -21,11 +21,11 @@ import { EyeFilled } from "@ant-design/icons";
 import { Button, Col, Form, Row, Switch, Tag, Tooltip } from "antd";
 import type { UploadFile } from "antd/es/upload/interface";
 import dayjs from "dayjs";
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import UserContactForm from "../../../components/QuanLiNguoiDungComponents/UserContactForm";
 import UserForm from "./UserForm";
-import { FilterOperationType } from "@chax-at/prisma-filter-common";
 
 interface FormValues {
   role?: string;
@@ -107,27 +107,31 @@ const UserManagementPage = () => {
     quickkSearch?: string,
     value: FormValues = { isActive: true }
   ) => {
+    console.log(quickkSearch, value);
+    
     setLoading(true);
     try {
       const searchOwnweFilter: any[] = [
         { key: "limit", type: "=", value: limit },
         { key: "offset", type: "=", value: (page - 1) * limit },
       ];
-      searchOwnweFilter.push({
-        key: "roleCode",
-        type: FilterOperationType.NotInStrings,
-        value: ["R1"]
-      })
+      // searchOwnweFilter.push({
+      //   key: "roleCode",
+      //   type: FilterOperationType.NotInStrings,
+      //   value: ["R1"],
+      // });
 
-      const result: any = await QlNguoiDungServices.getUser(searchOwnweFilter, {
-        ...(quickkSearch ? { quickSearch: quickSearch } : {}),
-        ...(value.role ? { role: value.role } : {}),
-        ...(value.positionCode ? { positionCode: value.positionCode } : {}),
-        ...(value.branchCode ? { branchCode: value.branchCode } : {}),
-        ...(typeof value.isActive === "boolean"
-          ? { isActive: value.isActive }
-          : {}),
-      });
+      const result: any = await QlNguoiDungServices.getUser(searchOwnweFilter, 
+      //   {
+      //   ...(quickkSearch ? { quickSearch: quickSearch } : {}),
+      //   ...(value.role ? { role: value.role } : {}),
+      //   ...(value.positionCode ? { positionCode: value.positionCode } : {}),
+      //   ...(value.branchCode ? { branchCode: value.branchCode } : {}),
+      //   ...(typeof value.isActive === "boolean"
+      //     ? { isActive: value.isActive }
+      //     : {}),
+      // }
+    );
 
       if (result.data) {
         setTableData(result.data);
@@ -649,15 +653,28 @@ const UserManagementPage = () => {
   const actionColumn = useMemo(
     () => ({
       render: (record: any) => (
-        <ActionButton
-          record={record}
-          onUpdate={() => showModal(record, "update")}
-          tooltips={{
-            view: "Xem thông tin chi tiết",
-            update: "Chỉnh sửa thông tin người dùng",
-            delete: "Xóa người dùng",
-          }}
-        />
+        <>
+          <ActionButton
+            record={record}
+            onUpdate={() => showModal(record, "update")}
+            tooltips={{
+              view: "Xem thông tin chi tiết",
+              update: "Chỉnh sửa thông tin người dùng",
+              delete: "Xóa người dùng",
+            }}
+          />
+          <Link href={`/manager/quan-ly-nhan-vien/${record?.code}`} style={{marginLeft: 4}}>
+            <ActionButton 
+              record={record}
+              onView={() => {}}
+              tooltips={{
+                view: "Xem thông tin chi tiết",
+                update: "Chỉnh sửa thông tin người dùng",
+                delete: "Xóa người dùng",
+              }}
+            />
+          </Link>
+        </>
       ),
     }),
     []
@@ -718,7 +735,7 @@ const UserManagementPage = () => {
                   showSearch
                   label="Quyền"
                   options={[
-                    { value: RoleAdmin.ADMIN, label: "Admin" },
+                    // { value: RoleAdmin.ADMIN, label: "Admin" },
                     { value: RoleAdmin.HR, label: "HR" },
                     { value: RoleAdmin.MANAGER, label: "Manager" },
                     { value: RoleAdmin.STAFF, label: "Staff" },
