@@ -189,23 +189,25 @@ const WeeklyView: React.FC<WeeklyViewProps> = ({
                             )}
                           </div>
                         ))}
-                        <Button
-                          type="dashed"
-                          size="small"
-                          icon={<PlusOutlined />}
-                          onClick={() => {
-                            form.setFieldsValue({
-                              userCode: employee.userCode,
-                              date: d,
-                            });
-                            handleAddSchedule();
-                          }}
-                          title={`Thêm lịch làm việc cho ${
-                            employee.name
-                          } ngày ${d.format("DD/MM/YYYY")}`}
-                        >
-                          Thêm ca
-                        </Button>
+                        {!d.isBefore(dayjs(), "day") && (
+                          <Button
+                            type="dashed"
+                            size="small"
+                            icon={<PlusOutlined />}
+                            onClick={() => {
+                              form.setFieldsValue({
+                                userCode: employee.userCode,
+                                date: d,
+                              });
+                              handleAddSchedule();
+                            }}
+                            title={`Thêm lịch làm việc cho ${
+                              employee.fullName
+                            } ngày ${d.format("DD/MM/YYYY")}`}
+                          >
+                            Thêm ca
+                          </Button>
+                        )}
                       </td>
                     );
                   })}

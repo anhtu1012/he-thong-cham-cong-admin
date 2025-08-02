@@ -7,7 +7,7 @@ const useSocket = (): Socket => {
 
   const socket = useMemo(() => {
     const s = io(process.env.NEXT_PUBLIC_SOCKET_URL, {
-      transports: ["polling", "websocket"],
+      transports: ["websocket"],
       reconnection: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 3000,

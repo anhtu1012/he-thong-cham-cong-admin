@@ -26,8 +26,6 @@ const GanttView: React.FC<GanttViewProps> = ({
   const { start, end } = dateRange;
   const days: any = [];
   let day = start;
-  console.log("Selected Employees:", scheduleData);
-
   // References for synchronizing scroll
   const headerRef = useRef<HTMLDivElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
@@ -167,18 +165,20 @@ const GanttView: React.FC<GanttViewProps> = ({
                               </div>
                             </Tooltip>
                           ))}
-                          <div
-                            className="gantt-add-button"
-                            onClick={() => {
-                              form.setFieldsValue({
-                                userCode: employee.userCode,
-                                date: day,
-                              });
-                              handleAddSchedule();
-                            }}
-                          >
-                            <span className="add-icon">+</span>
-                          </div>
+                          {!day.isBefore(dayjs(), "day") && (
+                            <div
+                              className="gantt-add-button"
+                              onClick={() => {
+                                form.setFieldsValue({
+                                  userCode: employee.userCode,
+                                  date: day,
+                                });
+                                handleAddSchedule();
+                              }}
+                            >
+                              <span className="add-icon">+</span>
+                            </div>
+                          )}
                         </div>
                       );
                     })}

@@ -19,7 +19,7 @@ interface DetailViewProps {
   scheduleData: any[];
   setDetailView: (show: boolean) => void;
   handleEditSchedule: (schedule: any) => void;
-  handleDeleteSchedule: (id: number) => void;
+  handleDeleteSchedule: (id: string) => void;
   handleViewSchedule: (schedule: any) => void;
   getAttendanceTag: (status: string) => JSX.Element;
   getStatusTag: (status: string) => JSX.Element;

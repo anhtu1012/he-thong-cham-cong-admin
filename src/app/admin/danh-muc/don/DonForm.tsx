@@ -92,7 +92,6 @@ const DonForm: React.FC<DonFormProps> = ({
                 { value: RoleAdmin.ADMIN, label: "Admin" },
                 { value: RoleAdmin.HR, label: "HR" },
                 { value: RoleAdmin.MANAGER, label: "Manager" },
-                { value: RoleAdmin.STAFF, label: "Staff" },
               ]}
             />
           </Form.Item>
