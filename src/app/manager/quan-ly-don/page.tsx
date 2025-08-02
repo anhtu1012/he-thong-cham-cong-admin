@@ -33,6 +33,7 @@ import {
   Input,
   Card,
   Typography,
+  Image,
 } from "antd";
 import dayjs from "dayjs";
 import { useTranslations } from "next-intl";
@@ -400,7 +401,21 @@ const QuanLiDonPage = () => {
         dataIndex: "file",
         key: "file",
         width: 120,
-        render: (file: string) => (file ? <a href="#">{file}</a> : "-"),
+        render: (file: string) =>
+          file ? (
+            <Image
+              style={{
+                objectFit: "cover",
+                width: 42,
+                height: 42,
+                maxHeight: 150,
+                maxWidth: 150,
+              }}
+              src={file}
+            />
+          ) : (
+            "-"
+          ),
       },
       {
         title: t("thoiGianBatDau"),
@@ -772,6 +787,36 @@ const QuanLiDonPage = () => {
                         }}
                       >
                         {selectedRecord.reason}
+                      </div>
+                    </div>
+                  </div>
+                </Col>
+                <Col span={24}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "flex-start",
+                      marginTop: 8,
+                    }}
+                  >
+                    <FileTextOutlined
+                      style={{ marginRight: 8, color: "#1890ff", marginTop: 4 }}
+                    />
+                    <div>
+                      <Text strong>Tập tin:</Text>
+                      <div>
+                        {selectedRecord.file ? (
+                          <Image
+                            style={{
+                              objectFit: "contain",
+                              maxHeight: 150,
+                              maxWidth: 150,
+                            }}
+                            src={selectedRecord.file}
+                          />
+                        ) : (
+                          "Không có"
+                        )}
                       </div>
                     </div>
                   </div>
