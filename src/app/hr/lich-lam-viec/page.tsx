@@ -393,9 +393,11 @@ const WorkSchedulePage = () => {
           await WorkingScheduleServices.createWorkingSchedule(values);
           toast.success("Tạo lịch làm việc thành công");
           fetchSchedules();
-        } catch (error) {
+        } catch (error: any) {
           console.error("Error creating schedule:", error);
-          toast.error("Không thể tạo lịch làm việc");
+          toast.error(
+            error.response.data.message || "Không thể tạo lịch làm việc"
+          );
         }
       }
       setIsModalVisible(false);
@@ -1105,7 +1107,7 @@ const WorkSchedulePage = () => {
                         fontWeight: 600,
                       }}
                     >
-                      Thời gian ca làm
+                      Thời gian ca làm việc
                     </span>
                     <div
                       style={{
@@ -1340,6 +1342,9 @@ const WorkSchedulePage = () => {
                   format="DD/MM/YYYY"
                   style={{ width: "100%", borderRadius: "8px" }}
                   placeholder="Chọn ngày làm việc"
+                  disabledDate={(current) =>
+                    current && current < dayjs().startOf("day")
+                  }
                 />
               </Form.Item>
 
