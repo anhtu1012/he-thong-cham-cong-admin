@@ -89,9 +89,6 @@ const CaLamForm: React.FC<CaLamFormProps> = ({
           <Form.Item
             name="lunchBreak"
             label={t("lunchBreak")}
-            rules={[
-              { required: true, message: t("vuilongNhapThoiGianNghiTrua") },
-            ]}
             getValueProps={(value) => ({
               value: value ? convertToDateTime(value) : null,
             })}
