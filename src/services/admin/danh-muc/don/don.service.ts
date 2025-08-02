@@ -41,6 +41,27 @@ class DanhMucDonServicesBase extends AxiosService {
     await ValidateBaseClass.validate(formData, UpdateFormSchema);
     return this.put(`${this.basePath}/${id}`, formData);
   }
+  async softDeleteDanhMucDon(
+    id: string | undefined,
+  ): Promise<any> {
+    return this.put(`${this.basePath}/${id}`, {
+      status: "INACTIVE"
+    });
+  }
+  async revertDeletedDanhMucDon(
+    id: string | undefined,
+  ): Promise<any> {
+    return this.put(`${this.basePath}/${id}`, {
+      status: "ACTIVE"
+    });
+  }
+  // async revertDeletedDanhMucDon(
+  //   id: string | undefined,
+  // ): Promise<any> {
+  //   return this.put(`${this.basePath}/${id}`, {
+  //     status: "ACTIVE"
+  //   });
+  // }
 
   async deleteDanhMucDon(id: string): Promise<any> {
     return this.delete(`${this.basePath}/${id}`);

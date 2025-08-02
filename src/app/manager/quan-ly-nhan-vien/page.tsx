@@ -25,6 +25,7 @@ import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import UserContactForm from "../../../components/QuanLiNguoiDungComponents/UserContactForm";
 import UserForm from "./UserForm";
+import { FilterOperationType } from "@chax-at/prisma-filter-common";
 
 interface FormValues {
   role?: string;
@@ -108,10 +109,15 @@ const UserManagementPage = () => {
   ) => {
     setLoading(true);
     try {
-      const searchOwnweFilter: any = [
+      const searchOwnweFilter: any[] = [
         { key: "limit", type: "=", value: limit },
         { key: "offset", type: "=", value: (page - 1) * limit },
       ];
+      searchOwnweFilter.push({
+        key: "roleCode",
+        type: FilterOperationType.NotInStrings,
+        value: ["R1"]
+      })
 
       const result: any = await QlNguoiDungServices.getUser(searchOwnweFilter, {
         ...(quickkSearch ? { quickSearch: quickSearch } : {}),

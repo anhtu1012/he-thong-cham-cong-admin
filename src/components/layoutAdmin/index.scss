@@ -173,10 +173,11 @@
     }
 
     .notification-button {
-      color: #faad14;
+      color: var(--primary-color);
 
       &:hover {
-        color: #ffc53d;
+        scale: 1.2;
+        color: var(--primary-color);
       }
     }
 

@@ -72,21 +72,21 @@ const SiderManagerComponent: React.FC<SiderProps> = ({ collapsed }) => {
       "data-index": 0,
     },
     {
-      key: "/manager/quan-li-nhan-vien",
+      key: "/manager/quan-ly-nhan-vien",
       icon: <UserOutlined />,
       label: "Quản lý nhân viên",
       "data-index": 1,
     },
     {
-      key: "/manager/quan-li-cham-cong",
+      key: "/manager/quan-ly-cham-cong",
       icon: <ClockCircleOutlined />,
       label: "Chấm công nhân viên",
       "data-index": 2,
     },
     {
-      key: "/manager/quan-li-don",
+      key: "/manager/quan-ly-don",
       icon: <FileTextOutlined />,
-      label: "Quản lí đơn",
+      label: "Quản lý đơn",
       "data-index": 3,
     },
     {
