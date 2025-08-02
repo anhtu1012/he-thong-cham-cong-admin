@@ -33,7 +33,7 @@ interface TimelineViewProps {
   selectedEmployees: number[];
   selectedDepartment: string;
   handleEditSchedule: (schedule: any) => void;
-  handleDeleteSchedule?: (id: number) => void;
+  handleDeleteSchedule?: (id: string) => void;
   handleViewSchedule?: (schedule: any) => void;
   getStatusTag: (status: string) => JSX.Element;
 }

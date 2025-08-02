@@ -11,7 +11,7 @@ interface ListViewProps {
   selectedEmployees: number[];
   selectedDepartment: string;
   handleEditSchedule: (schedule: any) => void;
-  handleDeleteSchedule: (id: number) => void;
+  handleDeleteSchedule: (id: string) => void;
   getStatusTag: (status: string) => JSX.Element;
 }
 

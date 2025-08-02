@@ -36,6 +36,10 @@ class WorkingScheduleServicesBase extends AxiosService {
     return this.post(`${this.basePath}/tao-lich-lam`, data);
   }
 
+  async deleteWorkingSchedule(scheduleId: string): Promise<any> {
+    return this.delete(`/v1/working-schedule/${scheduleId}`);
+  }
+
   async updateWorkingSchedule(
     id: string,
     data: {

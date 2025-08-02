@@ -20,7 +20,7 @@ interface DailyViewProps {
   loading: boolean;
   handleViewSchedule: (schedule: any) => void;
   handleEditSchedule: (schedule: any) => void;
-  handleDeleteSchedule: (id: number) => void;
+  handleDeleteSchedule: (id: string) => void;
   getAttendanceTag: (status: string) => JSX.Element;
   getStatusTag: (status: string) => JSX.Element;
 }

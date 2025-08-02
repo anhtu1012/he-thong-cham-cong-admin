@@ -318,15 +318,17 @@ const WorkSchedulePage = () => {
     setDetailView(true);
   };
 
-  const handleDeleteSchedule = async (scheduleId: number) => {
+  const handleDeleteSchedule = async (scheduleId: string) => {
     try {
-      // await deleteScheduleService(scheduleId);
-      setScheduleData(scheduleData.filter((s) => s.id !== scheduleId));
+      await WorkingScheduleServices.deleteWorkingSchedule(scheduleId);
       toast.success("Xóa lịch làm việc thành công");
+      fetchSchedules();
     } catch (error: any) {
       console.log("Error deleting schedule:", error);
 
-      toast.error("Không thể xóa lịch làm việc");
+      toast.error(
+        error.response?.data?.message || "Không thể xóa lịch làm việc"
+      );
     }
   };
 
@@ -416,7 +418,7 @@ const WorkSchedulePage = () => {
       ACTIVE: { color: "green", text: "Đang diễn ra" },
       NOTSTARTED: { color: "#1e40af", text: "Chưa bắt đầu" },
       END: { color: "orange", text: "Hoàn thành" },
-      FORGET: { color: "orange", text: "Hoàn thành (Quên chấm công)" },
+      FORGET: { color: "orange", text: "Hoàn thành (Ghi chú: Quên chấm công)" },
       NOTWORK: { color: "red", text: "Vắng mặt" },
     };
 
