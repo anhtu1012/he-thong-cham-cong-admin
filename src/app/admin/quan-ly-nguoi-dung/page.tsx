@@ -25,6 +25,7 @@ import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import UserContactForm from "../../../components/QuanLiNguoiDungComponents/UserContactForm";
 import UserForm from "./UserForm";
+import Link from "next/link";
 
 interface FormValues {
   role?: string;
@@ -643,15 +644,31 @@ const UserManagementPage = () => {
   const actionColumn = useMemo(
     () => ({
       render: (record: any) => (
-        <ActionButton
-          record={record}
-          onUpdate={() => showModal(record, "update")}
-          tooltips={{
-            view: "Xem thông tin chi tiết",
-            update: "Chỉnh sửa thông tin người dùng",
-            delete: "Xóa người dùng",
-          }}
-        />
+        <>
+          <ActionButton
+            record={record}
+            onUpdate={() => showModal(record, "update")}
+            tooltips={{
+              view: "Xem thông tin chi tiết",
+              update: "Chỉnh sửa thông tin người dùng",
+              delete: "Xóa người dùng",
+            }}
+          />
+          <Link
+            href={`/admin/quan-ly-nguoi-dung/${record?.code}`}
+            style={{ marginLeft: 4 }}
+          >
+            <ActionButton
+              record={record}
+              onView={() => {}}
+              tooltips={{
+                view: "Xem thông tin chi tiết",
+                update: "Chỉnh sửa thông tin người dùng",
+                delete: "Xóa người dùng",
+              }}
+            />
+          </Link>
+        </>
       ),
     }),
     []
@@ -821,7 +838,7 @@ const UserManagementPage = () => {
         fileList={fileList}
         handleUploadChange={handleUploadChange}
       />
-      {/* UserContactForm với các prop đã tối ưu */}
+      {/* UserContractForm*/}
       <UserContactForm
         isViewMode={isViewMode}
         isVisible={isContactModalVisible}

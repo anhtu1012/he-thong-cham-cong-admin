@@ -6,7 +6,6 @@ import { clearAllColumnPreferences } from "@/lib/store/slices/columnPreferencesS
 import { clearAuthData, selectAuthLogin } from "@/lib/store/slices/loginSlice";
 import { toggleDarkMode } from "@/utils/theme-utils";
 import {
-  BellOutlined,
   LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -15,14 +14,14 @@ import {
   SettingOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { Avatar, Badge, Button, Dropdown, Layout, Tooltip, theme } from "antd";
+import { Avatar, Button, Dropdown, Layout, Tooltip, theme } from "antd";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import LocaleSwitcher from "../changeLanguage";
+import NotificationDropdown from "../notficationDropdown/NotificationDropdown";
 import "./index.scss";
-
 const { Header } = Layout;
 
 interface HeaderProps {
@@ -203,23 +202,12 @@ const HeaderComponent: React.FC<HeaderProps> = ({
           <Button
             type="text"
             icon={<QuestionCircleOutlined />}
-            className="icon-button help-button"
+            className="icon-button"
           />
         </Tooltip>
 
         <Tooltip title="Thông báo">
-          <Badge
-            count={5}
-            overflowCount={99}
-            size="small"
-            className="notification-badge"
-          >
-            <Button
-              type="text"
-              icon={<BellOutlined />}
-              className="icon-button notification-button"
-            />
-          </Badge>
+          <NotificationDropdown placement="bottomRight" />
         </Tooltip>
 
         <div className="divider"></div>

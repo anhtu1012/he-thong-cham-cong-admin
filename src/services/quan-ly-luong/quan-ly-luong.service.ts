@@ -18,6 +18,16 @@ class QuanLyLuongServicesBase extends AxiosService {
       params
     );
   }
+  async getQuanLyLuongByUserCode(
+    searchFilter: FilterQueryStringTypeItem[] = [],
+    params?: any
+  ): Promise<PaginatedQuanLyLuongResponse> {
+    return this.getWithFilter(
+      `${this.basePath}/bang-luong`,
+      searchFilter,
+      params
+    );
+  }
 
   async updateQuanLyLuong(
     id: string,

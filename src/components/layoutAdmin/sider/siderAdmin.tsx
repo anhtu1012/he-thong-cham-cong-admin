@@ -83,27 +83,27 @@ const SiderComponent: React.FC<SiderProps> = ({ collapsed }) => {
       "data-index": 0,
     },
     {
-      key: "/admin/quan-li-nguoi-dung",
+      key: "/admin/quan-ly-nguoi-dung",
       icon: <UserOutlined />,
       label: "Quản lý người dùng",
       "data-index": 1,
     },
+    // {
+    //   key: "/admin/quan-ly-cham-cong",
+    //   icon: <ClockCircleOutlined />,
+    //   label: "Quản lý chấm công",
+    //   "data-index": 2,
+    // },
     {
-      key: "/admin/quan-li-cham-cong",
-      icon: <ClockCircleOutlined />,
-      label: "Quản lý chấm công",
-      "data-index": 2,
-    },
-    {
-      key: "/admin/quan-li-don",
+      key: "/admin/quan-ly-don",
       icon: <FileTextOutlined />,
-      label: "Quản lí đơn",
+      label: "Quản lý đơn",
       "data-index": 3,
     },
     {
       key: "/admin/lich-lam-viec",
       icon: <ScheduleOutlined />,
-      label: "Quản lí lịch làm việc",
+      label: "Quản lý lịch làm việc",
       "data-index": 10,
     },
     {

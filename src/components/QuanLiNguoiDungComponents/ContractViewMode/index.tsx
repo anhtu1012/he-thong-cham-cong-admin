@@ -24,6 +24,23 @@ const ContractViewMode: React.FC<ContractViewModeProps> = ({
     return <div>Không có dữ liệu hợp đồng</div>;
   }
 
+  const displayBranchNames = (branchNames: string) => {
+    if (!branchNames.includes(",")) {
+      return (
+        <Tag className="branch-tag" key={data.code || data.id}>
+          <BankOutlined />
+          {data.branchNames || "Chưa xác định"}
+        </Tag>
+      );
+    }
+
+    return branchNames.split(",").map((branch) => (
+      <Tag className="branch-tag" key={data.code || data.id}>
+        <BankOutlined />
+        {branch || "Chưa xác định"}
+      </Tag>
+    ));
+  };
   return (
     <div className="contract-view-mode fade-in">
       <div className="contract-header">
@@ -142,10 +159,7 @@ const ContractViewMode: React.FC<ContractViewModeProps> = ({
             <div className="info-item">
               <div className="label">Chi nhánh làm việc</div>
               <div className="value">
-                <Tag className="branch-tag" key={data.code || data.id}>
-                  <BankOutlined />
-                  {data.branchNames || "Chưa xác định"}
-                </Tag>
+                {displayBranchNames(data.branchNames) || "Chưa xác định"}
               </div>
             </div>
           </Col>

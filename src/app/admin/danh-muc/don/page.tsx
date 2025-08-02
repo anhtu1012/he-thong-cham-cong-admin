@@ -7,13 +7,14 @@ import Ctable from "@/components/basicUI/Ctable";
 import { RoleAdmin } from "@/models/enum";
 import { getChangedValues } from "@/utils/client/compareHelpers";
 import { handleFormErrors } from "@/utils/client/formHelpers";
-import { Form, Tag } from "antd";
+import { Button, Form, Tag } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import DonForm from "./DonForm";
 import { useTranslations } from "next-intl";
 import DanhMucDonServices from "@/services/admin/danh-muc/don/don.service";
 import { FormItem } from "@/dtos/danhMuc/don/don.dto";
+import { FilterOperationType } from "@chax-at/prisma-filter-common";
 
 const DanhMucDonManagementPage = () => {
   const t = useTranslations("DanhMucDon");
@@ -39,6 +40,11 @@ const DanhMucDonManagementPage = () => {
         { key: "limit", type: "=", value: limit },
         { key: "offset", type: "=", value: (page - 1) * limit },
       ];
+      searchFilter.push({
+        key: "status",
+        type: FilterOperationType.Eq,
+        value: "ACTIVE",
+      });
 
       const params: any = {
         ...(quickkSearch ? { quickSearch: quickkSearch } : {}),
@@ -268,7 +274,7 @@ const DanhMucDonManagementPage = () => {
 
   const handleDelete = async (record: any) => {
     try {
-      await DanhMucDonServices.deleteDanhMucDon(record.id);
+      await DanhMucDonServices.softDeleteDanhMucDon(record.id);
       toast.success("Xóa thành công!");
       getData(currentPage, pageSize, quickSearch);
     } catch (error: any) {
@@ -328,6 +334,13 @@ const DanhMucDonManagementPage = () => {
               gap: "12px",
             }}
           >
+            <Button
+              variant="dashed"
+              color="danger"
+              href="/admin/danh-muc/don/da-xoa"
+            >
+              Đơn đã xóa
+            </Button>
             <ActionButton
               onAdd={() => showModal(null, "add")}
               tooltips={{
