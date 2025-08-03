@@ -29,7 +29,6 @@ import {
   Tag,
   Tooltip,
   Modal,
-  Checkbox,
   Input,
   Card,
   Typography,
@@ -37,7 +36,7 @@ import {
 } from "antd";
 import dayjs from "dayjs";
 import { useTranslations } from "next-intl";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import "./index.scss";
@@ -117,7 +116,6 @@ const QuanLiDonPage = () => {
   const [selectedRecord, setSelectedRecord] = useState<QuanLiDonItem | null>(
     null
   );
-  const [isStatusOverTime, setIsStatusOverTime] = useState<boolean>(false);
   const [response, setResponse] = useState<string>("");
 
   const getData = async (
@@ -254,7 +252,6 @@ const QuanLiDonPage = () => {
   // Show approval modal instead of directly approving
   const showApprovalModal = (record: QuanLiDonItem) => {
     setSelectedRecord(record);
-    setIsStatusOverTime(false);
     setResponse("");
     setIsApprovalModalVisible(true);
   };
@@ -263,7 +260,6 @@ const QuanLiDonPage = () => {
   const handleModalCancel = () => {
     setIsApprovalModalVisible(false);
     setSelectedRecord(null);
-    setIsStatusOverTime(false);
     setResponse("");
   };
 
@@ -290,7 +286,7 @@ const QuanLiDonPage = () => {
       // Close modal
       setIsApprovalModalVisible(false);
       setSelectedRecord(null);
-      setIsStatusOverTime(false);
+
       setResponse("");
 
       // Refresh data
@@ -318,12 +314,14 @@ const QuanLiDonPage = () => {
       const currentTime = new Date().toISOString();
 
       // Prepare update data
+
       const updateData = {
         status: "APPROVED",
         approvedTime: currentTime,
         approvedBy: userProfile.code, // Get user code from Redux store
         response: response, // Add approval response
-        statusOvertime: isStatusOverTime,
+        startTime: selectedRecord.startTime,
+        endTime: selectedRecord.endTime,
       };
 
       // Call API to update status
@@ -332,7 +330,7 @@ const QuanLiDonPage = () => {
       // Close modal
       setIsApprovalModalVisible(false);
       setSelectedRecord(null);
-      setIsStatusOverTime(false);
+
       setResponse("");
 
       // Refresh data
@@ -348,9 +346,9 @@ const QuanLiDonPage = () => {
     }
   };
 
-  const handleFormAction = async (record: QuanLiDonItem) => {
+  const handleFormAction = useCallback(async (record: QuanLiDonItem) => {
     showApprovalModal(record);
-  };
+  }, []);
 
   const columns = useMemo(
     () => [
@@ -404,7 +402,8 @@ const QuanLiDonPage = () => {
         width: 120,
         render: (file: string) =>
           file ? (
-            <img
+            <Image
+              alt="Tập tin đính kèm"
               style={{
                 objectFit: "cover",
                 width: 42,
@@ -481,7 +480,7 @@ const QuanLiDonPage = () => {
         );
       },
     }),
-    []
+    [handleFormAction]
   );
 
   const handlePageChange = (page: number, size: number) => {
@@ -771,7 +770,13 @@ const QuanLiDonPage = () => {
                   </div>
                 </Col>
 
-                <Col span={24}>
+                <Col
+                  span={
+                    selectedRecord.reason && selectedRecord.reason.length > 80
+                      ? 24
+                      : 12
+                  }
+                >
                   <div
                     style={{
                       display: "flex",
@@ -782,7 +787,7 @@ const QuanLiDonPage = () => {
                     <FileTextOutlined
                       style={{ marginRight: 8, color: "#1890ff", marginTop: 4 }}
                     />
-                    <div>
+                    <div style={{ flex: 1 }}>
                       <Text strong>Lý do:</Text>
                       <div
                         style={{
@@ -791,6 +796,7 @@ const QuanLiDonPage = () => {
                           borderRadius: 4,
                           border: "1px solid #f0f0f0",
                           marginTop: 4,
+                          wordBreak: "break-word",
                         }}
                       >
                         {selectedRecord.reason}
@@ -798,7 +804,13 @@ const QuanLiDonPage = () => {
                     </div>
                   </div>
                 </Col>
-                <Col span={24}>
+                <Col
+                  span={
+                    selectedRecord.reason && selectedRecord.reason.length > 80
+                      ? 24
+                      : 12
+                  }
+                >
                   <div
                     style={{
                       display: "flex",
@@ -811,18 +823,22 @@ const QuanLiDonPage = () => {
                     />
                     <div>
                       <Text strong>Tập tin:</Text>
-                      <div>
+                      <div style={{ marginTop: 4 }}>
                         {selectedRecord.file ? (
                           <Image
+                            alt="Tập tin đính kèm"
                             style={{
                               objectFit: "contain",
-                              maxHeight: 150,
-                              maxWidth: 150,
+                              maxHeight: 120,
+                              maxWidth: 120,
+                              borderRadius: 4,
                             }}
                             src={selectedRecord.file}
                           />
                         ) : (
-                          "Không có"
+                          <span style={{ color: "#999", fontStyle: "italic" }}>
+                            Không có
+                          </span>
                         )}
                       </div>
                     </div>
@@ -867,29 +883,6 @@ const QuanLiDonPage = () => {
                   selectedRecord.status === "REJECTED"
                 }
               />
-            </div>
-
-            <div
-              style={{
-                backgroundColor: "#e6f7ff",
-                border: "1px solid #91d5ff",
-                borderRadius: 4,
-                padding: 12,
-                display: "flex",
-                alignItems: "center",
-              }}
-            >
-              <Checkbox
-                checked={isStatusOverTime}
-                onChange={(e) => setIsStatusOverTime(e.target.checked)}
-                style={{ marginRight: 8 }}
-                disabled={
-                  selectedRecord &&
-                  (selectedRecord.status === "APPROVED" ||
-                    selectedRecord.status === "REJECTED")
-                }
-              />
-              <Text>Đơn cộng giờ</Text>
             </div>
           </>
         )}
