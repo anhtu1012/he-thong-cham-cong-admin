@@ -1,40 +1,39 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useEffect, useState } from "react";
-import {
-  Card,
-  Avatar,
-  Tag,
-  Typography,
-  Spin,
-  Alert,
-  Row,
-  Col,
-  Divider,
-  DatePicker,
-  Space,
-  Image,
-  Button,
-} from "antd";
-import {
-  UserOutlined,
-  MailOutlined,
-  PhoneOutlined,
-  CalendarOutlined,
-  HomeOutlined,
-  BankOutlined,
-  FileTextOutlined,
-  EyeOutlined,
-} from "@ant-design/icons";
-import { ParamValue } from "next/dist/server/request/params";
+import { selectAuthLogin } from "@/lib/store/slices/loginSlice";
+import QuanLyHopDongServices from "@/services/admin/quan-li-nguoi-dung/quan-li-hop-dong.service";
 import QlNguoiDungServices from "@/services/admin/quan-li-nguoi-dung/quan-li-nguoi-dung.service";
 import QuanLyLuongServices from "@/services/quan-ly-luong/quan-ly-luong.service";
-import QuanLyHopDongServices from "@/services/admin/quan-li-nguoi-dung/quan-li-hop-dong.service";
-import { toast } from "react-toastify";
+import {
+  BankOutlined,
+  CalendarOutlined,
+  FileTextOutlined,
+  HomeOutlined,
+  MailOutlined,
+  PhoneOutlined,
+  UserOutlined
+} from "@ant-design/icons";
+import {
+  Alert,
+  Avatar,
+  Button,
+  Card,
+  Col,
+  DatePicker,
+  Divider,
+  Image,
+  Row,
+  Space,
+  Spin,
+  Tag,
+  Typography,
+} from "antd";
 import dayjs from "dayjs";
+import { ParamValue } from "next/dist/server/request/params";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { selectAuthLogin } from "@/lib/store/slices/loginSlice";
+import { toast } from "react-toastify";
 
 const { Title, Text } = Typography;
 
@@ -739,14 +738,14 @@ function UserDetail({ userCode }: UserDetailProps) {
                     <Col>
                       <Space>
                         {getContractStatusBadge(contract.status)}
-                        <Button
+                        {/* <Button
                           type="text"
                           icon={<EyeOutlined />}
                           size="small"
                           style={{ color: "#1890ff" }}
                         >
                           Xem chi tiết
-                        </Button>
+                        </Button> */}
                       </Space>
                     </Col>
                   </Row>

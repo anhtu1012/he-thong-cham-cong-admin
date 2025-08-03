@@ -399,9 +399,9 @@ const WorkSchedulePage = () => {
           await WorkingScheduleServices.createWorkingSchedule(values);
           toast.success("Tạo lịch làm việc thành công");
           fetchSchedules();
-        } catch (error) {
+        } catch (error: any) {
           console.error("Error creating schedule:", error);
-          toast.error("Không thể tạo lịch làm việc");
+          toast.error(error.response.data?.message || "Không thể tạo lịch làm việc");
         }
       }
       setIsModalVisible(false);
