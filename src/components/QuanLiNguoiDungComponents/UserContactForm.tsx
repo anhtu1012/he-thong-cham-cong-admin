@@ -4,8 +4,9 @@ import {
   FileOutlined,
   FileTextOutlined,
   HistoryOutlined,
+  DownloadOutlined,
 } from "@ant-design/icons";
-import { Button, Modal, Skeleton } from "antd";
+import { Button, Modal, Skeleton, message } from "antd";
 import dayjs from "dayjs";
 import React, { useEffect, useState } from "react";
 import ContractFormView from "./ContractFormView";
@@ -13,6 +14,7 @@ import ContractHistoryModal from "./ContractHistoryModal";
 import ContractViewMode from "./ContractViewMode";
 import { ContractModalView, UserContactFormProps } from "./types";
 import { UserContractItem } from "@/dtos/quan-li-nguoi-dung/contracts/contract.dto";
+import { downloadContract } from "@/utils/client/contractdownload";
 
 const UserContactForm: React.FC<UserContactFormProps> = ({
   form,
@@ -54,6 +56,9 @@ const UserContactForm: React.FC<UserContactFormProps> = ({
   const [selectedContract, setSelectedContract] =
     useState<UserContractItem | null>(null);
 
+  // State for download loading
+  const [isDownloading, setIsDownloading] = useState<boolean>(false);
+
   // Đồng bộ hóa state khi props thay đổi
   useEffect(() => {
     setSyncing(true);
@@ -93,6 +98,30 @@ const UserContactForm: React.FC<UserContactFormProps> = ({
   const handleBackToHistory = () => {
     setContractModalView("history");
     setSelectedContract(null);
+  };
+
+  // Handle contract download
+  const handleDownloadContract = async () => {
+    if (!contactData) {
+      message.error('Không có dữ liệu hợp đồng để tải');
+      return;
+    }
+
+    try {
+      setIsDownloading(true);
+      message.loading('Đang tạo file PDF...', 0);
+      
+      await downloadContract(contactData, ueserDetails?.fullName);
+      
+      message.destroy();
+      message.success('Hợp đồng đã được tạo. Vui lòng chọn "Lưu dưới dạng PDF" trong hộp thoại in.');
+    } catch (error) {
+      console.error('Error downloading contract:', error);
+      message.destroy();
+      message.error('Không thể tải hợp đồng. Vui lòng thử lại sau.');
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   /**
@@ -159,12 +188,26 @@ const UserContactForm: React.FC<UserContactFormProps> = ({
           icon={<HistoryOutlined />}
           onClick={handleShowContractHistory}
           style={{
-            marginRight: "auto",
+            marginRight: 8,
             borderColor: "#1890ff",
             color: "#1890ff",
           }}
         >
           Xem lịch sử hợp đồng
+        </Button>,
+        <Button
+          key="download"
+          type="primary"
+          icon={<DownloadOutlined />}
+          onClick={handleDownloadContract}
+          loading={isDownloading}
+          style={{
+            marginRight: "auto",
+            background: "#52c41a",
+            borderColor: "#52c41a",
+          }}
+        >
+          {isDownloading ? "Đang tải..." : "Tải hợp đồng"}
         </Button>,
         <Button key="cancel" onClick={cancelHandler ?? (() => {})}>
           Đóng
@@ -242,6 +285,7 @@ const UserContactForm: React.FC<UserContactFormProps> = ({
 
       {/* Single Contract History Modal with multiple views */}
       <ContractHistoryModal
+        key={`contract-history-modal-${contactData?.id || 'new'}-${contractModalVisible ? 'visible' : 'hidden'}-${Date.now()}`}
         visible={contractModalVisible}
         onCancel={handleContractModalCancel}
         contractHistory={selectedContactHistory}
