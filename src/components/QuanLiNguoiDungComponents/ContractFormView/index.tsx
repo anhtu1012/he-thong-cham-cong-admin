@@ -36,7 +36,7 @@ const ContractFormView: React.FC<ContractFormViewProps> = ({
   handleUploadChange = () => {},
   ueserDetails,
 }) => {
-  console.log('ContractFormView props:', { fileList, editingContract });
+  console.log("ContractFormView props:", { fileList, editingContract });
   // State cho các chi nhánh được chọn
   const [selectedBranches, setSelectedBranches] = useState<string[]>(
     editingContract?.branchCodes || []
@@ -72,12 +72,19 @@ const ContractFormView: React.FC<ContractFormViewProps> = ({
 
   // Sync fileList with form values when editing contract
   useEffect(() => {
-    if (editingContract && editingContract.contractPdf && (!Array.isArray(fileList) || fileList.length === 0)) {
-      console.log('Setting up fileList for editing contract:', editingContract.contractPdf);
+    if (
+      editingContract &&
+      editingContract.contractPdf &&
+      (!Array.isArray(fileList) || fileList.length === 0)
+    ) {
+      console.log(
+        "Setting up fileList for editing contract:",
+        editingContract.contractPdf
+      );
       const existingFile: UploadFile = {
-        uid: '-1',
-        name: 'contract.pdf',
-        status: 'done',
+        uid: "-1",
+        name: "contract.pdf",
+        status: "done",
         url: editingContract.contractPdf,
       };
       // Update the fileList prop through handleUploadChange
@@ -225,6 +232,20 @@ const ContractFormView: React.FC<ContractFormViewProps> = ({
               label="Ngày bắt đầu"
               rules={[
                 { required: true, message: "Vui lòng chọn ngày bắt đầu!" },
+                // {
+                //   validator: (_, value) => {
+                //     if (!value) return Promise.resolve();
+
+                //     const today = dayjs().startOf("day");
+                //     if (value.isBefore(today)) {
+                //       return Promise.reject(
+                //         new Error("Ngày bắt đầu phải từ hôm nay trở đi!")
+                //       );
+                //     }
+
+                //     return Promise.resolve();
+                //   },
+                // },
               ]}
               getValueProps={(value) => ({
                 value: value ? dayjs(value) : undefined,
@@ -233,6 +254,10 @@ const ContractFormView: React.FC<ContractFormViewProps> = ({
               <DatePicker
                 style={{ width: "100%" }}
                 format="DD/MM/YYYY"
+                disabledDate={(current) => {
+                  return current && current < dayjs().startOf("day");
+                }}
+                disabled={editingContract}
                 placeholder="Chọn ngày bắt đầu"
                 size="large"
                 suffixIcon={<CalendarOutlined style={{ color: "#6b7280" }} />}
@@ -252,10 +277,16 @@ const ContractFormView: React.FC<ContractFormViewProps> = ({
               })}
             >
               <DatePicker
+                disabled={editingContract}
                 style={{ width: "100%" }}
                 format="DD/MM/YYYY"
                 placeholder="Chọn ngày kết thúc"
                 size="large"
+                disabledDate={(current) => {
+                  return (
+                    current && current < dayjs().add(1, "month").startOf("day")
+                  );
+                }}
                 suffixIcon={<CalendarOutlined style={{ color: "#6b7280" }} />}
                 onChange={calculateDuration}
               />
@@ -397,15 +428,15 @@ const ContractFormView: React.FC<ContractFormViewProps> = ({
                 }}
                 beforeUpload={(file) => {
                   // Validate file type
-                  const isPDF = file.type === 'application/pdf';
+                  const isPDF = file.type === "application/pdf";
                   if (!isPDF) {
-                    toast.error('Chỉ chấp nhận file PDF!');
+                    toast.error("Chỉ chấp nhận file PDF!");
                     return false;
                   }
                   // Validate file size (max 10MB)
                   const isLt10M = file.size / 1024 / 1024 < 10;
                   if (!isLt10M) {
-                    toast.error('File phải nhỏ hơn 10MB!');
+                    toast.error("File phải nhỏ hơn 10MB!");
                     return false;
                   }
                   return false; // Prevent auto upload
@@ -414,26 +445,29 @@ const ContractFormView: React.FC<ContractFormViewProps> = ({
                 accept=".pdf"
                 onRemove={() => {
                   // Khi xóa file thì set contractPdf về undefined
-                  form.setFieldValue('contractPdf', undefined);
+                  form.setFieldValue("contractPdf", undefined);
                   return true;
                 }}
               >
-                {(Array.isArray(fileList) ? fileList : []).length >= 1 ? null : uploadButton}
+                {(Array.isArray(fileList) ? fileList : []).length >= 1
+                  ? null
+                  : uploadButton}
               </Upload>
             </Form.Item>
-            {editingContract?.contractPdf && typeof editingContract.contractPdf === "string" && (
-              <div className="pdf-preview-button">
-                <Button
-                  type="link"
-                  icon={<FileOutlined />}
-                  onClick={() =>
-                    window.open(editingContract.contractPdf, "_blank")
-                  }
-                >
-                  Xem hợp đồng
-                </Button>
-              </div>
-            )}
+            {editingContract?.contractPdf &&
+              typeof editingContract.contractPdf === "string" && (
+                <div className="pdf-preview-button">
+                  <Button
+                    type="link"
+                    icon={<FileOutlined />}
+                    onClick={() =>
+                      window.open(editingContract.contractPdf, "_blank")
+                    }
+                  >
+                    Xem hợp đồng
+                  </Button>
+                </div>
+              )}
           </Col>
         </Row>
       </div>
