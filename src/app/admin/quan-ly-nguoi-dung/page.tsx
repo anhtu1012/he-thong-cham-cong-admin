@@ -840,6 +840,7 @@ const UserManagementPage = () => {
       />
       {/* UserContractForm*/}
       <UserContactForm
+        key={`user-contact-form-${ueserDetails?.code || 'new'}-${isContactModalVisible ? 'visible' : 'hidden'}-${selectedContact?.id || 'new'}`}
         isViewMode={isViewMode}
         isVisible={isContactModalVisible}
         onCancel={handleCloseContactModal}

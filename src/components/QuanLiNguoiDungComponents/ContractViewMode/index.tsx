@@ -27,17 +27,17 @@ const ContractViewMode: React.FC<ContractViewModeProps> = ({
   const displayBranchNames = (branchNames: string) => {
     if (!branchNames.includes(",")) {
       return (
-        <Tag className="branch-tag" key={data.code || data.id}>
+        <Tag className="branch-tag" key={`${data.code || data.id}-single-branch`}>
           <BankOutlined />
           {data.branchNames || "Chưa xác định"}
         </Tag>
       );
     }
 
-    return branchNames.split(",").map((branch) => (
-      <Tag className="branch-tag" key={data.code || data.id}>
+    return branchNames.split(",").map((branch, index) => (
+      <Tag className="branch-tag" key={`${data.code || data.id}-branch-${index}-${branch.trim()}`}>
         <BankOutlined />
-        {branch || "Chưa xác định"}
+        {branch.trim() || "Chưa xác định"}
       </Tag>
     ));
   };
