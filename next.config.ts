@@ -4,6 +4,16 @@ import path from "path";
 const withNextIntl = createNextIntlPlugin();
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: "http" as const,
+        hostname: "128.199.119.151",
+        port: "9000",
+        pathname: "/**",
+      },
+    ],
+  },
   sassOptions: {
     includePaths: [path.join(process.cwd(), "src/styles")],
     // Using @use/@forward instead of @import
