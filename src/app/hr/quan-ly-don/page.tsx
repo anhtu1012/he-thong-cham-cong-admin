@@ -42,6 +42,7 @@ import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import "./index.scss";
 import { FilterOperationType } from "@chax-at/prisma-filter-common";
+import Head from "next/head";
 
 const { Title, Text } = Typography;
 
@@ -403,7 +404,7 @@ const QuanLiDonPage = () => {
         width: 120,
         render: (file: string) =>
           file ? (
-            <Image
+            <img
               style={{
                 objectFit: "cover",
                 width: 42,
@@ -500,6 +501,12 @@ const QuanLiDonPage = () => {
 
   return (
     <>
+      <Head>
+        <meta
+          httpEquiv="Content-Security-Policy"
+          content="upgrade-insecure-requests"
+        />
+      </Head>
       {/* Filter Section */}
       <Form
         form={formFilter}
