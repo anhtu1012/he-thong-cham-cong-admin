@@ -376,10 +376,6 @@ const WorkSchedulePage = () => {
           return;
         }
 
-        console.log("Update data:", updateData);
-        console.log("Form values:", values);
-        console.log("Current status:", currentStatus);
-
         try {
           await WorkingScheduleServices.updateWorkingSchedule(
             currentSchedule.id,
@@ -392,9 +388,18 @@ const WorkSchedulePage = () => {
           toast.error("Không thể cập nhật lịch làm việc");
         }
       } else {
-        values.date = dayjs(values.date).toISOString();
+        //láy luôn cái giờ hiện tại
+        const selectedDate = dayjs(values.date);
+        const today = dayjs();
+
+        // Nếu ngày được chọn là hôm nay thì lấy giờ hiện tại, ngược lại lấy đầu ngày
+        if (selectedDate.isSame(today, "day")) {
+          values.date = today.toISOString();
+        } else {
+          values.date = selectedDate.toISOString();
+        }
         try {
-          console.log("Creating new schedule with values:", values);
+          // console.log("Creating new schedule with values:", values);
           await WorkingScheduleServices.createWorkingSchedule(values);
           toast.success("Tạo lịch làm việc thành công");
           fetchSchedules();
