@@ -325,7 +325,7 @@ const generateContractHTML = (data: ContractData): string => {
   `;
 };
 
-const downloadHTMLAsPDF = (htmlContent: string, fileName: string) => {
+const downloadHTMLAsPDF = (htmlContent: string) => {
   const printWindow = window.open('', '_blank');
   if (!printWindow) {
     console.error('Không thể mở cửa sổ in. Vui lòng kiểm tra popup blocker.');
@@ -356,7 +356,7 @@ export const downloadContract = async (contractData: UserContractItem, userFullN
       contractTitle: contractData.title || "HỢP ĐỒNG LAO ĐỘNG",
       contractCode: contractData.code || "N/A",
       employeeName: contractData.fullName || userFullName || "N/A",
-      position: contractData.positionName || "N/A",
+      position: "N/A",
       department: contractData.branchNames || "N/A",
       joinDate: formatDate(contractData.startTime),
       contractEndTime: contractData.endTime ? formatDate(contractData.endTime) : undefined,
@@ -375,11 +375,11 @@ export const downloadContract = async (contractData: UserContractItem, userFullN
     const htmlContent = generateContractHTML(finalContractData);
     
     // Create filename with contract code and timestamp
-    const timestamp = dayjs().format('YYYY-MM-DD');
-    const fileName = `HopDong_${finalContractData.contractCode}_${timestamp}.pdf`;
+    // const timestamp = dayjs().format('YYYY-MM-DD');
+    // const fileName = `HopDong_${finalContractData.contractCode}_${timestamp}.pdf`;
 
     // Use browser's print functionality to save as PDF
-    downloadHTMLAsPDF(htmlContent, fileName);
+    downloadHTMLAsPDF(htmlContent);
     
     console.log('Hợp đồng đã được tạo. Vui lòng chọn "Lưu dưới dạng PDF" trong hộp thoại in.');
 
