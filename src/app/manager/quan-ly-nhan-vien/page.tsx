@@ -122,15 +122,15 @@ const UserManagementPage = () => {
       // });
 
       const result: any = await QlNguoiDungServices.getUser(searchOwnweFilter, 
-      //   {
-      //   ...(quickkSearch ? { quickSearch: quickSearch } : {}),
-      //   ...(value.role ? { role: value.role } : {}),
-      //   ...(value.positionCode ? { positionCode: value.positionCode } : {}),
-      //   ...(value.branchCode ? { branchCode: value.branchCode } : {}),
-      //   ...(typeof value.isActive === "boolean"
-      //     ? { isActive: value.isActive }
-      //     : {}),
-      // }
+        {
+        ...(quickkSearch ? { quickSearch: quickSearch } : {}),
+        ...(value.role ? { role: value.role } : {}),
+        ...(value.positionCode ? { position: value.positionCode } : {}),
+        ...(value.branchCode ? { branch: value.branchCode } : {}),
+        ...(typeof value.isActive === "boolean"
+          ? { isActive: value.isActive }
+          : {}),
+      }
     );
 
       if (result.data) {
