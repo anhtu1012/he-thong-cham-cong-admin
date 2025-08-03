@@ -53,6 +53,7 @@ const UserForm: React.FC<UserFormProps> = ({
   handleUploadChange,
 }) => {
   const [displayFileList, setDisplayFileList] = useState<UploadFile[]>([]);
+  const [ageInfo, setAgeInfo] = useState<string>("");
 
   // Convert faceImg URL to fileList format when editingUser changes
   useEffect(() => {
@@ -78,6 +79,36 @@ const UserForm: React.FC<UserFormProps> = ({
     }
   }, [editingUser, fileList]);
 
+  // Calculate age info when editing existing user
+  useEffect(() => {
+    if (editingUser && editingUser.dob) {
+      const birthDate = dayjs(editingUser.dob);
+      const age = dayjs().diff(birthDate, "year");
+
+      if (age >= 16 && age <= 70) {
+        setAgeInfo(`✓ Tuổi: ${age} (Hợp lệ)`);
+      } else if (age < 16) {
+        setAgeInfo(`✗ Tuổi: ${age} (Quá trẻ - Tối thiểu 16 tuổi)`);
+      } else {
+        setAgeInfo(`✗ Tuổi: ${age} (Quá già - Tối đa 70 tuổi)`);
+      }
+    } else {
+      // Clear age info khi không có editingUser hoặc không có dob
+      setAgeInfo("");
+    }
+  }, [editingUser]);
+
+  // Clear age info when modal opens/closes
+  useEffect(() => {
+    if (isModalVisible && !editingUser) {
+      // Khi mở modal tạo mới, clear age info
+      setAgeInfo("");
+    } else if (!isModalVisible) {
+      // Khi đóng modal, clear age info
+      setAgeInfo("");
+    }
+  }, [isModalVisible, editingUser]);
+
   const uploadButton = (
     <div>
       <PlusOutlined />
@@ -97,7 +128,10 @@ const UserForm: React.FC<UserFormProps> = ({
           </span>
         </div>
       }
-      initialValues={{ dob: dayjs().startOf("day") }}
+      initialValues={{
+        isActive: true,
+        // Không set ngày sinh và role mặc định - để user tự chọn
+      }}
       form={form}
       open={isModalVisible}
       onCancel={handleCancel}
@@ -224,7 +258,62 @@ const UserForm: React.FC<UserFormProps> = ({
           <Form.Item
             name="dob"
             label="Ngày sinh"
-            rules={[{ required: true, message: "Vui lòng chọn ngày sinh!" }]}
+            extra={
+              ageInfo && (
+                <span
+                  style={{
+                    color: ageInfo.startsWith("✓") ? "#52c41a" : "#f5222d",
+                    fontWeight: 500,
+                    fontSize: "12px",
+                  }}
+                >
+                  {ageInfo}
+                </span>
+              )
+            }
+            rules={[
+              { required: true, message: "Vui lòng chọn ngày sinh!" },
+              {
+                validator: (_, value) => {
+                  if (!value) {
+                    setAgeInfo("");
+                    return Promise.resolve();
+                  }
+
+                  const today = dayjs();
+                  const birthDate = dayjs(value);
+                  const age = today.diff(birthDate, "year");
+
+                  // Cập nhật thông tin tuổi
+                  if (age >= 0) {
+                    setAgeInfo(`✓ Tuổi: ${age} (Hợp lệ)`);
+                  }
+
+                  // Kiểm tra ngày sinh không được trong tương lai
+                  if (birthDate.isAfter(today)) {
+                    setAgeInfo("✗ Ngày sinh không thể trong tương lai!");
+                    return Promise.reject(
+                      new Error("Ngày sinh không thể trong tương lai!")
+                    );
+                  }
+
+                  // Kiểm tra tuổi từ 16-70
+                  if (age < 16) {
+                    setAgeInfo(`✗ Tuổi: ${age} (Quá trẻ - Tối thiểu 16 tuổi)`);
+                    return Promise.reject(
+                      new Error("Tuổi phải từ 16 trở lên!")
+                    );
+                  }
+
+                  if (age > 70) {
+                    setAgeInfo(`✗ Tuổi: ${age} (Quá già - Tối đa 70 tuổi)`);
+                    return Promise.reject(new Error("Tuổi không được quá 70!"));
+                  }
+
+                  return Promise.resolve();
+                },
+              },
+            ]}
           >
             <DatePicker
               style={{ width: "100%" }}
@@ -233,6 +322,60 @@ const UserForm: React.FC<UserFormProps> = ({
               size="large"
               className={styles.customDatePicker}
               suffixIcon={<CalendarOutlined style={{ color: "#6b7280" }} />}
+              disabledDate={(current) => {
+                // Chỉ không cho chọn ngày tương lai
+                const today = dayjs().endOf("day");
+                return current && current > today;
+              }}
+              defaultPickerValue={dayjs().subtract(25, "year")} // Mặc định mở ở 25 tuổi
+              showToday={false}
+              allowClear
+              onChange={(date) => {
+                // Hàm validate age helper
+                const validateAndSetAge = (dateValue: any) => {
+                  if (!dateValue) {
+                    setAgeInfo("");
+                    return;
+                  }
+
+                  const age = dayjs().diff(dayjs(dateValue), "year");
+                  const today = dayjs();
+                  const birthDate = dayjs(dateValue);
+
+                  console.log("Validating date:", dateValue, "Age:", age); // Debug
+
+                  if (birthDate.isAfter(today)) {
+                    setAgeInfo("✗ Ngày sinh không thể trong tương lai!");
+                  } else if (age < 16) {
+                    setAgeInfo(`✗ Tuổi: ${age} (Quá trẻ - Tối thiểu 16 tuổi)`);
+                  } else if (age > 70) {
+                    setAgeInfo(`✗ Tuổi: ${age} (Quá già - Tối đa 70 tuổi)`);
+                  } else {
+                    setAgeInfo(`✓ Tuổi: ${age} (Hợp lệ)`);
+                  }
+                };
+
+                validateAndSetAge(date);
+              }}
+              onBlur={() => {
+                // Validate lại khi user blur khỏi input (sau khi gõ trực tiếp)
+                const currentValue = form.getFieldValue("dob");
+                if (currentValue) {
+                  const age = dayjs().diff(dayjs(currentValue), "year");
+                  const today = dayjs();
+                  const birthDate = dayjs(currentValue);
+
+                  if (birthDate.isAfter(today)) {
+                    setAgeInfo("✗ Ngày sinh không thể trong tương lai!");
+                  } else if (age < 16) {
+                    setAgeInfo(`✗ Tuổi: ${age} (Quá trẻ - Tối thiểu 16 tuổi)`);
+                  } else if (age > 70) {
+                    setAgeInfo(`✗ Tuổi: ${age} (Quá già - Tối đa 70 tuổi)`);
+                  } else {
+                    setAgeInfo(`✓ Tuổi: ${age} (Hợp lệ)`);
+                  }
+                }
+              }}
             />
           </Form.Item>
         </Col>
@@ -299,6 +442,7 @@ const UserForm: React.FC<UserFormProps> = ({
               placeholder="Chọn quyền"
               size="large"
               dropdownStyle={{ borderRadius: "10px" }}
+              allowClear
               onChange={() => {
                 // Clear dependent fields when role changes
                 form.setFieldsValue({
@@ -307,7 +451,6 @@ const UserForm: React.FC<UserFormProps> = ({
                 });
               }}
               options={[
-                { value: RoleAdmin.ADMIN, label: "Admin" },
                 { value: RoleAdmin.HR, label: "HR" },
                 { value: RoleAdmin.MANAGER, label: "Manager" },
                 { value: RoleAdmin.STAFF, label: "Staff" },
