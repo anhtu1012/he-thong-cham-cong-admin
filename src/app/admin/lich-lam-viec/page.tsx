@@ -74,7 +74,7 @@ const transformApiScheduleData = (apiData: any[]) => {
 
     // Extract date in YYYY-MM-DD format
     const date = item.date
-      ? new Date(item.date).toISOString().split("T")[0]
+      ? dayjs(item.date).format("YYYY-MM-DD")
       : dayjs().format("YYYY-MM-DD");
 
     // Map API status to our application status
@@ -401,7 +401,9 @@ const WorkSchedulePage = () => {
           fetchSchedules();
         } catch (error: any) {
           console.error("Error creating schedule:", error);
-          toast.error(error.response.data?.message || "Không thể tạo lịch làm việc");
+          toast.error(
+            error.response.data?.message || "Không thể tạo lịch làm việc"
+          );
         }
       }
       setIsModalVisible(false);
