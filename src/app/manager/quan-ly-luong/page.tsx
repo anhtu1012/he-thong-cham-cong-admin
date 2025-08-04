@@ -22,6 +22,7 @@ import {
   Form,
   Modal,
   Row,
+  Select,
   Space,
   Tag,
   Tooltip,
@@ -108,12 +109,11 @@ const QuanLyLuongPage = () => {
           value: filters?.status,
         });
       }
+      // 07/25
       if (filters?.month) {
-        searchFilter.push({
-          key: "month",
-          type: FilterOperationType.Eq,
-          value: filters?.month,
-        });
+        filters.month = filters.month
+          ? dayjs(filters.month, "MM/YYYY").format("MM/YYYY")
+          : dayjs().format("MM/YYYY");
       }
 
       const params: any = {
@@ -152,29 +152,25 @@ const QuanLyLuongPage = () => {
         },
         { key: "offset", type: "=", value: 0 },
       ];
-      if (formFilter.getFieldValue("status")) {
-        searchFilterExport.push({
-          key: "status",
-          type: FilterOperationType.Eq,
-          value: formFilter.getFieldValue("status"),
-        });
+      // if (formFilter.getFieldValue("status")) {
+      //   searchFilterExport.push({
+      //     key: "status",
+      //     type: FilterOperationType.Eq,
+      //     value: formFilter.getFieldValue("status"),
+      //   });
+      // }
+      let month = formFilter.getFieldValue("month");
+      if (month) {
+        month = month
+          ? dayjs(month, "MM/YYYY").format("MM/YYYY")
+          : dayjs().format("MM/YYYY");
       }
-      if (formFilter.getFieldValue("month")) {
-        searchFilterExport.push({
-          key: "month",
-          type: FilterOperationType.Eq,
-          value: formFilter.getFieldValue("month"),
-        });
-      }
-
       const params: any = {
         ...(quickSearch ? { quickSearch: quickSearch } : {}),
         ...(formFilter.getFieldValue("formId")
           ? { formId: formFilter.getFieldValue("formId") }
           : {}),
-        ...(formFilter.getFieldValue("month")
-          ? { month: formFilter.getFieldValue("month") }
-          : {}),
+        ...(formFilter.getFieldValue("month") ? { month: month } : {}),
       };
       const response = await QuanLyLuongServices.getQuanLyLuong(
         searchFilterExport,
@@ -295,11 +291,21 @@ const QuanLyLuongPage = () => {
         key: "totalWorkHour",
         width: 110,
       },
+
+      {
+        title: "Ngày trả",
+        dataIndex: "paidDate",
+        key: "paidDate",
+        width: 130,
+        render: (date: string | null) =>
+          date ? dayjs(date).format("DD/MM/YYYY") : "-",
+      },
       {
         title: "Trạng thái",
         dataIndex: "status",
         key: "status",
         width: 110,
+        fixed: "right" as const,
         render: (status: string) => (
           <Tag
             color={getStatusTagColor(status)}
@@ -315,22 +321,22 @@ const QuanLyLuongPage = () => {
         ),
       },
       {
-        title: "Ngày trả",
-        dataIndex: "paidDate",
-        key: "paidDate",
-        width: 130,
-        render: (date: string | null) =>
-          date ? dayjs(date).format("DD/MM/YYYY") : "-",
-      },
-
-      {
         title: "Tổng lương",
         dataIndex: "totalSalary",
         key: "totalSalary",
-        width: 130,
+        width: 160,
         fixed: "right" as const,
-        render: (value: number) =>
-          value ? value?.toLocaleString("vi-VN") + " VND" : "0 VND",
+        render: (value: number) => (
+          <span
+            style={{
+              fontWeight: "bold",
+              fontSize: "15px",
+              color: "#04832cff",
+            }}
+          >
+            {value ? value?.toLocaleString("vi-VN") + " VND" : "0 VND"}
+          </span>
+        ),
       },
     ],
     []
@@ -411,12 +417,9 @@ const QuanLyLuongPage = () => {
         form={formFilter}
         onFinish={onFinish}
         className="from-quey"
-        initialValues={
-          {
-            // fromDate: dayjs().startOf("day"),
-            // toDate: dayjs().endOf("day"),
-          }
-        }
+        initialValues={{
+          month: dayjs(), // Set default month to current month
+        }}
       >
         <FilterSection
           onReset={resetFilters}
@@ -432,18 +435,19 @@ const QuanLyLuongPage = () => {
                   placeholder="Chọn tháng"
                   style={{ width: "100%", height: "33px" }}
                   format="MM/YYYY"
-                  onChange={(value) => {
-                    // Lưu giá trị dạng 7/25 (tháng/năm 2 số cuối) vào form
-                    formFilter.setFieldValue(
-                      "month",
-                      value
-                        ? `${value.month() + 1}/${value
-                            .year()
-                            .toString()
-                            .slice(-2)}`
-                        : undefined
-                    );
-                  }}
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={6} lg={6}>
+              <Form.Item name="status" label="Trạng thái">
+                <Select
+                  allowClear
+                  options={[
+                    { label: "Chờ thanh toán", value: "NOTPAID" },
+                    { label: "Đang xác nhận", value: "CONFIRM" },
+                    { label: "Đã thanh toán", value: "ACCEPT" },
+                    { label: "Đã tất toán", value: "STOP" },
+                  ]}
                 />
               </Form.Item>
             </Col>
