@@ -392,6 +392,7 @@ const WorkSchedulePage = () => {
         // Nếu ngày được chọn là hôm nay thì lấy giờ hiện tại, ngược lại lấy đầu ngày
         if (selectedDate.isSame(today, "day")) {
           values.date = today.toISOString();
+          values.isToday = true;
         } else {
           values.date = selectedDate.toISOString();
         }

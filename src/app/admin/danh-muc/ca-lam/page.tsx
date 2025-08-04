@@ -47,15 +47,20 @@ const DanhMucCaLamManagementPage = () => {
   ) => {
     setLoading(true);
     try {
+      const searchFilter: any = [
+        { key: "limit", type: "=", value: limit },
+        { key: "offset", type: "=", value: (page - 1) * limit },
+      ];
       const params: any = {
-        page,
-        limit,
         status: "ACTIVE",
       };
       if (quickkSearch && quickkSearch.trim() !== "") {
         params.quickSearch = quickkSearch;
       }
-      const response = await DanhMucCaLamServices.getDanhMucCaLam([], params);
+      const response = await DanhMucCaLamServices.getDanhMucCaLam(
+        searchFilter,
+        params
+      );
       setTableData(response.data || []);
       setTotalItems(response.count);
       setLoading(false);
@@ -72,11 +77,17 @@ const DanhMucCaLamManagementPage = () => {
   const handleBeforeExport = async (): Promise<CaLamItem[]> => {
     setLoading(true);
     try {
-      const params = {
-        page: 1,
-        limit: 1000,
+      const searchFilter: any = [
+        { key: "limit", type: "=", value: 1000 },
+        { key: "offset", type: "=", value: 0 },
+      ];
+      const params: any = {
+        status: "ACTIVE",
       };
-      const response = await DanhMucCaLamServices.getDanhMucCaLam([], params);
+      const response = await DanhMucCaLamServices.getDanhMucCaLam(
+        searchFilter,
+        params
+      );
       setLoading(false);
       return response.data || [];
     } catch (error) {
