@@ -155,6 +155,10 @@ const WorkSchedulePage = () => {
   const userCode = Form.useWatch("userCode", form);
   const [branchList, setBranchList] = useState<SelectOptionsArray[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  
+  // Watch for optionCreate field changes
+  const optionCreateValue = Form.useWatch('optionCreate', form);
+  
   // Get date range based on view type - moved here before it's used
   const getDateRange = () => {
     if (viewType === "day") {
@@ -290,6 +294,13 @@ const WorkSchedulePage = () => {
     }
   }, [userCode]);
 
+  // Clear holidayMode when optionCreate is NGAY
+  useEffect(() => {
+    if (optionCreateValue === "NGAY") {
+      form.setFieldValue("holidayMode", undefined);
+    }
+  }, [optionCreateValue, form]);
+
   const handleAddSchedule = async () => {
     setCurrentSchedule(null);
     console.log("form", form.getFieldsValue());
@@ -400,9 +411,12 @@ const WorkSchedulePage = () => {
           await WorkingScheduleServices.createWorkingSchedule(values);
           toast.success("Tạo lịch làm việc thành công");
           fetchSchedules();
-        } catch (error) {
+        } catch (error: any) {
           console.error("Error creating schedule:", error);
-          toast.error("Không thể tạo lịch làm việc");
+      
+          toast.error(
+            error.response.data.message || "Không thể tạo lịch làm việc"
+          );
         }
       }
       setIsModalVisible(false);
@@ -1408,6 +1422,7 @@ const WorkSchedulePage = () => {
                   style={{ flex: 1, marginLeft: "8px" }}
                 >
                   <Select
+                    disabled={optionCreateValue === "NGAY"}
                     placeholder="Chọn ngày nghỉ"
                     showSearch
                     mode="multiple"
