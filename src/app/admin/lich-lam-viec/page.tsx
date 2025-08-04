@@ -95,7 +95,7 @@ const transformApiScheduleData = (apiData: any[]) => {
 
     // Extract or generate employee ID
     const employeeId = parseInt(item.userCode?.replace("USER", "") || "1");
-
+   
     return {
       id: parseInt(item.id || index + 1),
       employeeId: employeeId,
@@ -155,7 +155,10 @@ const WorkSchedulePage = () => {
   const userCode = Form.useWatch("userCode", form);
   const [branchList, setBranchList] = useState<SelectOptionsArray[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  // Get date range based on view type - moved here before it's used
+  
+  // Watch for optionCreate field changes
+  const optionCreateValue = Form.useWatch('optionCreate', form);
+   
   const getDateRange = () => {
     if (viewType === "day") {
       return {
@@ -289,6 +292,13 @@ const WorkSchedulePage = () => {
       fetchSelectBranchByCode();
     }
   }, [userCode]);
+
+  // Clear holidayMode when optionCreate is NGAY
+  useEffect(() => {
+    if (optionCreateValue === "NGAY") {
+      form.setFieldValue("holidayMode", undefined);
+    }
+  }, [optionCreateValue, form]);
 
   const handleAddSchedule = async () => {
     setCurrentSchedule(null);
@@ -1413,6 +1423,7 @@ const WorkSchedulePage = () => {
                     showSearch
                     mode="multiple"
                     optionFilterProp="label"
+                    disabled={optionCreateValue === "NGAY"}
                     options={[
                       { value: "T2", label: "Thứ 2" },
                       { value: "T3", label: "Thứ 3" },
