@@ -21,7 +21,7 @@ import { EyeFilled } from "@ant-design/icons";
 import { Button, Col, Form, Row, Switch, Tag, Tooltip } from "antd";
 import type { UploadFile } from "antd/es/upload/interface";
 import dayjs from "dayjs";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import UserContactForm from "../../../components/QuanLiNguoiDungComponents/UserContactForm";
 import UserForm from "./UserForm";
@@ -230,7 +230,7 @@ const UserManagementPage = () => {
    * Xử lý hiển thị modal thông tin hợp đồng
    * @param record Thông tin người dùng
    */
-  const handleContact = async (record: UserInfor) => {
+  const handleContact = useCallback(async (record: UserInfor) => {
     try {
       setContactLoading(true);
       setSelectedContact(null); // Reset dữ liệu hợp đồng cũ
@@ -260,7 +260,7 @@ const UserManagementPage = () => {
     } finally {
       setContactLoading(false);
     }
-  };
+  }, []);
 
   const columns = useMemo(
     () => [
@@ -292,17 +292,25 @@ const UserManagementPage = () => {
         dataIndex: "contact",
         key: "contact",
         width: 150,
-        render: (__: any, record: any) => (
-          <Tooltip title="Xem thông tin hợp đồng">
-            <Button
-              type="link"
-              icon={<EyeFilled />}
-              onClick={() => handleContact(record)}
-            >
-              Xem
-            </Button>
-          </Tooltip>
-        ),
+        render: (__: any, record: any) => {
+          // Admin role doesn't have contracts - they are the owner
+          if (record.roleCode === "R1") {
+            return null;
+          }
+
+          // Other roles can have contracts viewable by admin
+          return (
+            <Tooltip title="Xem thông tin hợp đồng">
+              <Button
+                type="link"
+                icon={<EyeFilled />}
+                onClick={() => handleContact(record)}
+              >
+                Xem
+              </Button>
+            </Tooltip>
+          );
+        },
       },
       // {
       //   title: "Chi nhánh",
@@ -398,56 +406,52 @@ const UserManagementPage = () => {
         },
       },
     ],
-    [brands, positions]
+    [handleContact]
   );
 
-  const showModal = async (
-    user: any = null,
-    action: "add" | "update" = "update"
-  ) => {
-    // First, reset the form and file list before opening the modal
-    form.resetFields();
-    setFileList([]);
+  const showModal = useCallback(
+    async (user: any = null, action: "add" | "update" = "update") => {
+      // First, reset the form and file list before opening the modal
+      form.resetFields();
+      setFileList([]);
 
-    // Set editing user state
-    setEditingUser(user);
+      // Set editing user state
+      setEditingUser(user);
 
-    // Open the modal first so the transition appears smoother
-    setIsModalVisible(true);
+      // Open the modal first so the transition appears smoother
+      setIsModalVisible(true);
 
-    if (user && action === "update") {
-      // Load positions for the selected role before setting form values
-      if (user.roleCode) {
-        await loadPositionsByRole(user.roleCode);
+      if (user && action === "update") {
+        // Load positions for the selected role before setting form values
+        if (user.roleCode) {
+          await loadPositionsByRole(user.roleCode);
+        }
+
+        // Use setTimeout to ensure the modal is rendered before populating data
+        setTimeout(() => {
+          form.setFieldsValue({
+            ...user,
+            // Convert date string to dayjs object for DatePicker
+            dob: user.dob ? dayjs(user.dob) : null,
+          });
+        }, 100);
+      } else {
+        // For add action - set default values (không set role mặc định)
+        // Set default values after a small delay to ensure modal is ready
+        setTimeout(() => {
+          form.setFieldsValue({
+            isActive: true,
+            // Không set roleCode mặc định - để user tự chọn
+          });
+        }, 100);
       }
-
-      // Use setTimeout to ensure the modal is rendered before populating data
-      setTimeout(() => {
-        form.setFieldsValue({
-          ...user,
-          // Convert date string to dayjs object for DatePicker
-          dob: user.dob ? dayjs(user.dob) : null,
-        });
-      }, 100);
-    } else {
-      // For add action - set default values
-      const defaultRole = "R1"; // Default to Staff
-
-      // Load positions for the default role
-      await loadPositionsByRole(defaultRole);
-
-      // Set default values after a small delay to ensure modal is ready
-      setTimeout(() => {
-        form.setFieldsValue({
-          roleCode: defaultRole,
-          isActive: true,
-        });
-      }, 100);
-    }
-  };
+    },
+    [form]
+  );
 
   const handleCancel = () => {
     setIsModalVisible(false);
+    setEditingUser(null); // Clear editing user
     form.resetFields();
   };
 
@@ -671,7 +675,7 @@ const UserManagementPage = () => {
         </>
       ),
     }),
-    []
+    [showModal]
   );
 
   const handlePageChange = (page: number, size: number) => {
