@@ -1,16 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React from "react";
-import type { JSX } from "react";
-import { Card, Row, Col, Button, List, Tag } from "antd";
 import {
-  ArrowLeftOutlined,
-  EditOutlined,
-  DeleteOutlined,
-  UserOutlined,
   ApartmentOutlined,
+  ArrowLeftOutlined,
+  DeleteOutlined,
   EnvironmentOutlined,
+  UserOutlined
 } from "@ant-design/icons";
+import { Button, Card, Col, List, Row, Tag } from "antd";
 import dayjs from "dayjs";
+import type { JSX } from "react";
+import React from "react";
 import { getDayNameInVietnamese } from "../../utils/dateLocalization";
 
 interface DetailViewProps {
@@ -32,7 +31,7 @@ const DetailView: React.FC<DetailViewProps> = ({
   employeeList,
   scheduleData,
   setDetailView,
-  handleEditSchedule,
+  // handleEditSchedule,
   handleDeleteSchedule,
   handleViewSchedule,
   getAttendanceTag,
@@ -70,7 +69,7 @@ const DetailView: React.FC<DetailViewProps> = ({
         </Button>
         <h2>Chi tiết lịch làm việc</h2>
         <div className="header-actions">
-          <Button
+          {/* <Button
             icon={<EditOutlined />}
             onClick={() => {
               setDetailView(false);
@@ -79,7 +78,7 @@ const DetailView: React.FC<DetailViewProps> = ({
             style={{ marginRight: 8 }}
           >
             Chỉnh sửa
-          </Button>
+          </Button> */}
           <Button
             danger
             icon={<DeleteOutlined />}
