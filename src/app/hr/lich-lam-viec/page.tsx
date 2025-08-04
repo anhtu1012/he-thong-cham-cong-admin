@@ -1414,7 +1414,6 @@ const WorkSchedulePage = () => {
                     placeholder="Chọn chế độ tạo"
                     showSearch
                     optionFilterProp="label"
-                        disabled={optionCreateValue === "NGAY"}
                     options={[
                       { value: "NGAY", label: "Tạo 1 ngày" },
                       { value: "TUAN", label: "Tạo 1 tuần" },
@@ -1433,6 +1432,7 @@ const WorkSchedulePage = () => {
                     showSearch
                     mode="multiple"
                     optionFilterProp="label"
+                    disabled={optionCreateValue === "NGAY"}
                     options={[
                       { value: "T2", label: "Thứ 2" },
                       { value: "T3", label: "Thứ 3" },
