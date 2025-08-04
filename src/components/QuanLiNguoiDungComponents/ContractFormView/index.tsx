@@ -1,27 +1,23 @@
-import React, { useState, useEffect } from "react";
+import SelectServices from "@/services/select/select.service";
 import {
-  Row,
+  BankOutlined,
+  CalendarOutlined,
+  FileTextOutlined,
+} from "@ant-design/icons";
+import {
   Col,
+  DatePicker,
   Form,
   Input,
+  Row,
   Select,
-  DatePicker,
-  Upload,
-  Button,
-  Tag,
   Spin,
+  Tag
 } from "antd";
 import type { UploadFile } from "antd/es/upload/interface";
-import {
-  FileTextOutlined,
-  CalendarOutlined,
-  PlusOutlined,
-  BankOutlined,
-  FileOutlined,
-} from "@ant-design/icons";
 import dayjs from "dayjs";
+import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import SelectServices from "@/services/select/select.service";
 import { ContractFormViewProps } from "../types";
 
 const { Option } = Select;
@@ -159,15 +155,6 @@ const ContractFormView: React.FC<ContractFormViewProps> = ({
     }
   };
 
-  /**
-   * Nút tải lên cho chức năng upload
-   */
-  const uploadButton = (
-    <div>
-      <PlusOutlined />
-      <div style={{ marginTop: 8 }}>Tải lên</div>
-    </div>
-  );
 
   return (
     <div className="contract-form-view">
@@ -392,7 +379,7 @@ const ContractFormView: React.FC<ContractFormViewProps> = ({
         </Row>
       </div>
 
-      <div className="form-section document-section">
+      {/* <div className="form-section document-section">
         <Row gutter={16}>
           <Col span={24}>
             <Form.Item
@@ -470,7 +457,7 @@ const ContractFormView: React.FC<ContractFormViewProps> = ({
               )}
           </Col>
         </Row>
-      </div>
+      </div> */}
     </div>
   );
 };

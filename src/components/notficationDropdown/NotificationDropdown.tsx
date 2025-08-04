@@ -1,108 +1,38 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState } from 'react';
-import { 
-  Dropdown, 
-  List, 
-  Avatar, 
-  Typography, 
-  Space, 
-  Button, 
-  Empty,
-  Badge
-} from 'antd';
-import { 
+import { NotificationItem } from '@/dtos/notification/notification.response.dto';
+import { selectAuthLogin } from '@/lib/store/slices/loginSlice';
+import { NotificationService } from '@/services/notification/notification.service';
+import {
   BellOutlined,
-  CheckCircleOutlined, 
-  ClockCircleOutlined, 
-  WarningOutlined, 
+  CheckCircleOutlined,
+  CloseCircleOutlined,
   InfoCircleOutlined,
-  SettingOutlined,
-  FileTextOutlined,
-  DollarOutlined,
-  ToolOutlined,
-  GiftOutlined,
-  DownloadOutlined,
-  TeamOutlined
+  WarningOutlined
 } from '@ant-design/icons';
+import {
+  Avatar,
+  Badge,
+  Button,
+  Dropdown,
+  Empty,
+  List,
+  Space,
+  Spin,
+  Typography,
+  message
+} from 'antd';
+import dayjs from 'dayjs';
+import 'dayjs/locale/vi';
+import relativeTime from 'dayjs/plugin/relativeTime';
 import Link from 'next/link';
+import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+
+// Extend dayjs with plugins
+dayjs.extend(relativeTime);
+dayjs.locale('vi');
 
 const { Text, Title } = Typography;
-
-// Mock notifications data
-const mockNotifications = [
-  {
-    id: "1",
-    title: "Chấm công thành công",
-    message: "Bạn đã chấm công thành công lúc 08:00 sáng hôm nay",
-    type: "success",
-    time: "2 phút trước",
-    isRead: false,
-    icon: "check-circle",
-  },
-  {
-    id: "2",
-    title: "Nhắc nhở chấm công",
-    message: "Đừng quên chấm công trước 09:00 sáng",
-    type: "warning",
-    time: "15 phút trước",
-    isRead: false,
-    icon: "clock-circle",
-  },
-  {
-    id: "3",
-    title: "Đơn từ được duyệt",
-    message: "Đơn xin nghỉ phép của bạn đã được phê duyệt",
-    type: "info",
-    time: "1 giờ trước",
-    isRead: false,
-    icon: "file-done",
-  },
-  {
-    id: "4",
-    title: "Lương tháng 12",
-    message: "Lương tháng 12/2024 đã được chuyển vào tài khoản",
-    type: "success",
-    time: "2 giờ trước",
-    isRead: true,
-    icon: "dollar",
-  },
-  {
-    id: "5",
-    title: "Bảo trì hệ thống",
-    message: "Hệ thống sẽ bảo trì từ 22:00 - 06:00 ngày mai",
-    type: "warning",
-    time: "3 giờ trước",
-    isRead: true,
-    icon: "tool",
-  },
-  {
-    id: "6",
-    title: "Chúc mừng sinh nhật",
-    message: "Chúc mừng sinh nhật! Chúc bạn một ngày tuyệt vời",
-    type: "info",
-    time: "1 ngày trước",
-    isRead: true,
-    icon: "gift",
-  },
-  {
-    id: "7",
-    title: "Cập nhật ứng dụng",
-    message: "Phiên bản mới của ứng dụng đã có sẵn",
-    type: "info",
-    time: "2 ngày trước",
-    isRead: true,
-    icon: "download",
-  },
-  {
-    id: "8",
-    title: "Nhắc nhở họp",
-    message: "Cuộc họp tuần sẽ diễn ra lúc 14:00 chiều nay",
-    type: "warning",
-    time: "3 ngày trước",
-    isRead: true,
-    icon: "team",
-  },
-];
 
 interface NotificationDropdownProps {
   placement?: 'bottomLeft' | 'bottomRight' | 'topLeft' | 'topRight';
@@ -111,55 +41,109 @@ interface NotificationDropdownProps {
 const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ 
   placement = 'bottomRight' 
 }) => {
-  const [notifications, setNotifications] = useState(mockNotifications);
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [visible, setVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [markingAsRead, setMarkingAsRead] = useState(false);
+  
+  // Get user data from Redux
+  const authData = useSelector(selectAuthLogin);
+  const userCode = authData.userProfile?.code;
   
   const unreadCount = notifications.filter(notif => !notif.isRead).length;
 
-  const getIcon = (iconType: string) => {
+  // Fetch notifications when component mounts or when dropdown opens
+  const fetchNotifications = async () => {
+    if (!userCode) return;
+    
+    setLoading(true);
+    try {
+      const response = await NotificationService.getMyNotification(userCode);
+      
+      setNotifications(response.data?.reverse() || []);
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+      message.error('Không thể tải thông báo');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch notifications immediately when userCode is available
+  useEffect(() => {
+    if (userCode) {
+      fetchNotifications();
+    }
+  }, [userCode]);
+
+  // Refresh notifications when dropdown opens for latest data
+  useEffect(() => {
+    if (userCode && visible) {
+      fetchNotifications();
+    }
+  }, [visible]);
+
+  const getIcon = (type: string) => {
     const iconStyle = { fontSize: '16px' };
     
-    switch (iconType) {
-      case 'check-circle':
+    switch (type) {
+      case 'SUCCESS':
         return <CheckCircleOutlined style={{ ...iconStyle, color: '#52c41a' }} />;
-      case 'warning':
+      case 'NOTSUCCESS':
+        return <CloseCircleOutlined style={{ ...iconStyle, color: '#ff4d4f' }} />;
+      case 'WARNING':
         return <WarningOutlined style={{ ...iconStyle, color: '#faad14' }} />;
-      case 'info-circle':
+      case 'INFO':
         return <InfoCircleOutlined style={{ ...iconStyle, color: '#1890ff' }} />;
-      case 'clock-circle':
-        return <ClockCircleOutlined style={{ ...iconStyle, color: '#722ed1' }} />;
-      case 'file-done':
-        return <FileTextOutlined style={{ ...iconStyle, color: '#1890ff' }} />;
-      case 'dollar':
-        return <DollarOutlined style={{ ...iconStyle, color: '#52c41a' }} />;
-      case 'tool':
-        return <ToolOutlined style={{ ...iconStyle, color: '#faad14' }} />;
-      case 'gift':
-        return <GiftOutlined style={{ ...iconStyle, color: '#eb2f96' }} />;
-      case 'download':
-        return <DownloadOutlined style={{ ...iconStyle, color: '#1890ff' }} />;
-      case 'team':
-        return <TeamOutlined style={{ ...iconStyle, color: '#722ed1' }} />;
       default:
         return <InfoCircleOutlined style={{ ...iconStyle, color: '#1890ff' }} />;
     }
   };
+  const handleReadOneNoti = async (noti: NotificationItem)=>{
+    if(noti.isRead) return
 
-  const handleMarkAsRead = (id: string) => {
-    setNotifications(prev => 
-      prev.map(notif => 
-        notif.id === id ? { ...notif, isRead: true } : notif
-      )
-    );
+    try {
+      await NotificationService.markOneRead(noti.id)
+      await fetchNotifications();
+    } catch (error) {
+      console.error('Error marking notifications as read:', error);
+    }
+  }
+  const getRelativeTime = (dateString: string) => {
+    return dayjs(dateString).fromNow();
   };
 
-  const handleMarkAllAsRead = () => {
-    setNotifications(prev => 
-      prev.map(notif => ({ ...notif, isRead: true }))
-    );
+  const handleMarkAllAsRead = async () => {
+    if (!userCode) return;
+    
+    setMarkingAsRead(true);
+    try {
+      await NotificationService.markAllAsRead(userCode);
+      // message.success('Đã đánh dấu tất cả thông báo đã đọc');
+      // Refresh notifications
+      await fetchNotifications();
+    } catch (error) {
+      console.error('Error marking notifications as read:', error);
+      message.error('Không thể đánh dấu đã đọc');
+    } finally {
+      setMarkingAsRead(false);
+    }
   };
 
-  const renderNotificationItem = (notification: any) => (
+  const getLinkNoti = (roleCode: string) => {
+    switch (roleCode) {
+      case "R2":
+        return "/hr/thong-bao"
+      case "R3":
+        return "/manager/thong-bao"
+      case "R1":
+        return "/admin/thong-bao"
+      default:
+        break;
+    }
+    return "#"
+  }
+  const renderNotificationItem = (notification: NotificationItem) => (
     <List.Item
       key={notification.id}
       style={{
@@ -171,12 +155,12 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
         cursor: 'pointer',
         transition: 'all 0.2s ease'
       }}
-      onClick={() => !notification.isRead && handleMarkAsRead(notification.id)}
+      onClick={()=>handleReadOneNoti(notification)}
     >
       <List.Item.Meta
         avatar={
           <Avatar 
-            icon={getIcon(notification.icon)}
+            icon={getIcon(notification.type)}
             style={{ 
               backgroundColor: 'transparent',
               border: 'none'
@@ -235,7 +219,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
                 fontStyle: 'italic'
               }}
             >
-              {notification.time}
+              {getRelativeTime(notification.createdAt)}
             </Text>
           </div>
         }
@@ -278,6 +262,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
             type="link"
             size="small"
             onClick={handleMarkAllAsRead}
+            loading={markingAsRead}
             style={{ fontSize: '11px', padding: '0 4px' }}
           >
             Đánh dấu tất cả đã đọc
@@ -291,7 +276,14 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
         overflowY: 'auto',
         padding: '8px'
       }}>
-        {notifications.length > 0 ? (
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '20px 0' }}>
+            <Spin size="small" />
+            <div style={{ marginTop: 8, fontSize: '12px', color: '#8c8c8c' }}>
+              Đang tải thông báo...
+            </div>
+          </div>
+        ) : notifications.length > 0 ? (
           <List
             dataSource={notifications.slice(0, 5)} // Show only first 5 notifications
             renderItem={renderNotificationItem}
@@ -302,7 +294,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
           <Empty 
             description="Không có thông báo nào"
             style={{ padding: '20px 0' }}
-            imageStyle={{ height: 40 }}
+            styles={{ image: { height: 40 } }}
           />
         )}
       </div>
@@ -315,25 +307,15 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
         justifyContent: 'space-between',
         alignItems: 'center'
       }}>
-        <Link href="/thong-bao" style={{ textDecoration: 'none' }}>
-          <Button 
-            type="link" 
+        <Link href={getLinkNoti(authData.userProfile?.roleCode || "")} style={{ textDecoration: 'none' }}>
+          <Button
+            type="text"
             size="small"
-            style={{ fontSize: '12px', padding: 0 }}
-            onClick={() => setVisible(false)}
+            style={{ fontSize: '12px', color: '#1890ff' }}
           >
-            Xem tất cả thông báo
+            Xem tất cả
           </Button>
         </Link>
-        
-        <Button
-          type="text"
-          size="small"
-          icon={<SettingOutlined style={{ fontSize: '12px' }} />}
-          style={{ fontSize: '12px', color: '#8c8c8c' }}
-        >
-          Cài đặt
-        </Button>
       </div>
     </div>
   );
