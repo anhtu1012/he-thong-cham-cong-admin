@@ -1,4 +1,4 @@
-import { BankOutlined, EditOutlined, FileOutlined } from "@ant-design/icons";
+import { BankOutlined, EditOutlined } from "@ant-design/icons";
 import { Button, Col, Row, Tag } from "antd";
 import dayjs from "dayjs";
 import React from "react";
@@ -173,7 +173,7 @@ const ContractViewMode: React.FC<ContractViewModeProps> = ({
             </div>
           </Col>
 
-          {data.contractPdf && (
+          {/* {data.contractPdf && (
             <Col span={24}>
               <div className="info-item pdf-button">
                 <div className="label">Tệp hợp đồng</div>
@@ -191,7 +191,7 @@ const ContractViewMode: React.FC<ContractViewModeProps> = ({
                 </div>
               </div>
             </Col>
-          )}
+          )} */}
 
           <Col span={24}>
             <div className="info-item">
