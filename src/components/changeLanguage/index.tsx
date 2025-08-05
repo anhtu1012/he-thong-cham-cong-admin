@@ -5,7 +5,8 @@ import setLanguageValue from "@/utils/servers/set-language-action";
 import { Select } from "antd";
 import Image from "next/image";
 import "./index.scss";
-
+import vi from "../../../public/assets/image/Flags.png"
+import en from "../../../public/assets/image/FlagsE.png"
 export default function LocaleSwitcher() {
   const [locale, setLocale] = useState<string>("vi"); // Default value
   const [mounted, setMounted] = useState(false);
@@ -54,7 +55,7 @@ export default function LocaleSwitcher() {
                 }}
               >
                 <Image
-                  src="/assets/image/FlagsE.png"
+                  src={en}
                   alt="En"
                   width={35}
                   height={25}
@@ -80,7 +81,7 @@ export default function LocaleSwitcher() {
                 }}
               >
                 <Image
-                  src="/assets/image/Flags.png"
+                  src={vi}
                   alt="Vied"
                   width={35}
                   height={25}
