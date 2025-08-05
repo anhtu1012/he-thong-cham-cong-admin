@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { Typography, Row, Col, Card, Collapse, Image } from "antd";
+import { Typography, Row, Col, Card, Collapse } from "antd";
 import {
   CheckCircleOutlined,
   FileTextOutlined,
@@ -12,7 +12,16 @@ import Link from "next/link";
 import "./index.scss";
 import AOS from "aos";
 import "aos/dist/aos.css";
-
+import Image from "next/image";
+import gg from "../../../public/assets/image/homeimage/English-9.png.webp";
+import apple from "../../../public/assets/image/homeimage/English-10.png.webp";
+import hero from "../../../public/assets/image/homeimage/GPSFR-New-York-833x1024-1.png";
+import instantFaceRecognition from "../../../public/assets/image/homeimage/Instant-face-recognition-768x653.png";
+import faceRecognitionClock from "../../../public/assets/image/homeimage/Face-recognition-time-clock.png";
+import attendanceKiosks from "../../../public/assets/image/homeimage/5-Attendance-kiosks-768x653.png";
+import timeClockApp from "../../../public/assets/image/homeimage/time-clock-app-any-device-768x654.png.webp";
+import timesheetApp from "../../../public/assets/image/homeimage/Kiosk-linked-to-your-timesheet-app-2-768x653.png.webp";
+import reports from "../../../public/assets/image/homeimage/10-Reports-768x653.png.webp";
 const { Title, Text, Paragraph } = Typography;
 
 const features = [
@@ -21,7 +30,7 @@ const features = [
     subtitle: "Nhận diện tức thì, mọi lúc",
     description:
       "Loại bỏ thời gian chờ đợi khi điểm danh. Nhân viên chỉ cần đi ngang qua camera và khuôn mặt của họ được tự động nhận diện, ghi lại thông tin điểm danh với tốc độ nhanh chóng.",
-    image: "/assets/image/homeimage/Instant-face-recognition-768x653.png",
+    image: instantFaceRecognition,
     icon: <CheckCircleOutlined />,
   },
   {
@@ -29,7 +38,7 @@ const features = [
     subtitle: "Độ tin cậy không thể vượt qua",
     description:
       "Thuật toán nhận diện khuôn mặt tiên tiến của chúng tôi xác định chính xác nhân viên khi họ vào hoặc ra khỏi cơ sở. Loại bỏ việc điểm danh hộ và đảm bảo hồ sơ chấm công luôn đáng tin cậy và chính xác.",
-    image: "/assets/image/homeimage/Face-recognition-time-clock.png",
+    image: faceRecognitionClock,
     icon: <CheckCircleOutlined />,
   },
   {
@@ -37,7 +46,7 @@ const features = [
     subtitle: "Quản lý đội ngũ lớn một cách dễ dàng",
     description:
       "Dù bạn có một đội nhỏ hay lực lượng lao động lớn, hệ thống của chúng tôi đều xử lý được tất cả. Nhận diện nhiều khuôn mặt đồng thời, đảm bảo sự khởi đầu suôn sẻ và hiệu quả cho toàn bộ đội ngũ của bạn.",
-    image: "/assets/image/homeimage/5-Attendance-kiosks-768x653.png",
+    image: attendanceKiosks,
     icon: <CheckCircleOutlined />,
   },
   {
@@ -45,7 +54,7 @@ const features = [
     subtitle: "Thông tin bạn cần, ở bất kỳ đâu",
     description:
       "Xem xét dữ liệu điểm danh, thực hiện các điều chỉnh cần thiết và duy trì quyền kiểm soát hoàn toàn đối với hệ thống điểm danh của bạn - dù bạn đang di chuyển với thiết bị di động hay tại bàn làm việc với máy tính.",
-    image: "/assets/image/homeimage/time-clock-app-any-device-768x654.png.webp",
+    image: timeClockApp,
     icon: <GlobalOutlined />,
   },
   {
@@ -53,8 +62,7 @@ const features = [
     subtitle: "Không cần nhập dữ liệu thủ công nữa",
     description:
       "Trải nghiệm quản lý bảng chấm công không rắc rối khi hệ thống tự động thêm bản ghi điểm danh vào bảng chấm công khi nhân viên được nhận diện. Việc tạo bảng chấm công và tính toán lương trở nên dễ dàng cho cả nhân viên và quản lý.",
-    image:
-      "/assets/image/homeimage/Kiosk-linked-to-your-timesheet-app-2-768x653.png.webp",
+    image: timesheetApp,
     icon: <FileTextOutlined />,
   },
   {
@@ -62,7 +70,7 @@ const features = [
     subtitle: "Tiết kiệm thời gian và có được thông tin quý giá",
     description:
       "Tạo báo cáo chi tiết để tối ưu hóa hoạt động, với những hiểu biết có giá trị về mô hình điểm danh của nhân viên, giờ làm việc, làm thêm giờ và vắng mặt.",
-    image: "/assets/image/homeimage/10-Reports-768x653.png.webp",
+    image: reports,
     icon: <BarChartOutlined />,
   },
 ];
@@ -147,12 +155,11 @@ export default function Page() {
                 data-aos-delay="200"
               >
                 <Image
-                  src="/assets/image/homeimage/English-10.png.webp"
+                  src={gg}
                   alt="Google Play"
                   className="store-image"
                   width={180}
                   height={60}
-                  preview={false}
                 />
               </Link>
 
@@ -165,12 +172,11 @@ export default function Page() {
                 data-aos-delay="300"
               >
                 <Image
-                  src="/assets/image/homeimage/English-9.png.webp"
+                  src={apple}
                   alt="App Store"
                   className="store-image"
                   width={180}
                   height={60}
-                  preview={false}
                 />
               </Link>
             </div>
@@ -179,11 +185,8 @@ export default function Page() {
           <div className="hero-image-container" data-aos="fade-left">
             <div className="hero-image-placeholder">
               <Image
-                src="/assets/image/homeimage/GPSFR-New-York-833x1024-1.png"
+                src={hero}
                 alt="Mobile App"
-                width="100%"
-                height="auto"
-                preview={false}
               />
             </div>
           </div>
@@ -250,9 +253,8 @@ export default function Page() {
                 <Image
                   src={feature.image}
                   alt={feature.title}
-                  width="100%"
-                  height="auto"
-                  preview={false}
+                  width={500}
+                height={500}
                 />
               </div>
             </Col>
