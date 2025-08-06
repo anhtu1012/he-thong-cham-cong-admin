@@ -95,7 +95,7 @@ const transformApiScheduleData = (apiData: any[]) => {
 
     // Extract or generate employee ID
     const employeeId = parseInt(item.userCode?.replace("USER", "") || "1");
-   
+
     return {
       id: parseInt(item.id || index + 1),
       employeeId: employeeId,
@@ -155,10 +155,10 @@ const WorkSchedulePage = () => {
   const userCode = Form.useWatch("userCode", form);
   const [branchList, setBranchList] = useState<SelectOptionsArray[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  
+
   // Watch for optionCreate field changes
-  const optionCreateValue = Form.useWatch('optionCreate', form);
-   
+  const optionCreateValue = Form.useWatch("optionCreate", form);
+
   const getDateRange = () => {
     if (viewType === "day") {
       return {
@@ -1253,6 +1253,7 @@ const WorkSchedulePage = () => {
                 ]}
               >
                 <Select
+                  showSearch
                   placeholder="Chọn ca làm việc"
                   options={shiftList}
                   style={{ borderRadius: "8px" }}
