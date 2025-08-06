@@ -155,10 +155,10 @@ const WorkSchedulePage = () => {
   const userCode = Form.useWatch("userCode", form);
   const [branchList, setBranchList] = useState<SelectOptionsArray[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  
+
   // Watch for optionCreate field changes
-  const optionCreateValue = Form.useWatch('optionCreate', form);
-  
+  const optionCreateValue = Form.useWatch("optionCreate", form);
+
   // Get date range based on view type - moved here before it's used
   const getDateRange = () => {
     if (viewType === "day") {
@@ -413,7 +413,7 @@ const WorkSchedulePage = () => {
           fetchSchedules();
         } catch (error: any) {
           console.error("Error creating schedule:", error);
-      
+
           toast.error(
             error.response.data.message || "Không thể tạo lịch làm việc"
           );
@@ -1255,6 +1255,7 @@ const WorkSchedulePage = () => {
                 ]}
               >
                 <Select
+                  showSearch
                   placeholder="Chọn ca làm việc"
                   options={shiftList}
                   style={{ borderRadius: "8px" }}

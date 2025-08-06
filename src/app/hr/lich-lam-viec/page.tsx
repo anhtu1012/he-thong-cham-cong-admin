@@ -159,7 +159,7 @@ const WorkSchedulePage = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const socket = useSocket();
   console.log("Socket initialized:", socket.connected);
-  const optionCreateValue = Form.useWatch('optionCreate', form);
+  const optionCreateValue = Form.useWatch("optionCreate", form);
 
   // Get date range based on view type - moved here before it's used
   const getDateRange = () => {
@@ -197,7 +197,6 @@ const WorkSchedulePage = () => {
     }
   };
 
-  
   // Now use getDateRange after it's defined
   const [dateRange, setDateRange] = useState<[dayjs.Dayjs, dayjs.Dayjs]>(() => {
     // Initialize with current month if not set
@@ -297,7 +296,7 @@ const WorkSchedulePage = () => {
     }
   }, [userCode]);
 
-   // Clear holidayMode when optionCreate is NGAY
+  // Clear holidayMode when optionCreate is NGAY
   useEffect(() => {
     if (optionCreateValue === "NGAY") {
       form.setFieldValue("holidayMode", undefined);
@@ -1258,6 +1257,7 @@ const WorkSchedulePage = () => {
                 ]}
               >
                 <Select
+                  showSearch
                   placeholder="Chọn ca làm việc"
                   options={shiftList}
                   style={{ borderRadius: "8px" }}
