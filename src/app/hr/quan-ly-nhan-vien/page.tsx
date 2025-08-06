@@ -115,7 +115,7 @@ const UserManagementPage = () => {
       ];
 
       const result: any = await QlNguoiDungServices.getUser(searchOwnweFilter, {
-        ...(quickkSearch ? { quickSearch: quickSearch } : {}),
+        ...(quickkSearch ? { quickSearch: quickkSearch } : {}),
         ...(value.positionCode ? { position: value.positionCode } : {}),
         ...(value.branchCode ? { branch: value.branchCode } : {}),
         ...(typeof value.isActive === "boolean"
@@ -430,7 +430,7 @@ const UserManagementPage = () => {
       }, 100);
     } else {
       // For add action - set default values
-      const defaultRole = "R1"; // Default to Staff
+      const defaultRole = "R4"; // Default to Staff
 
       // Load positions for the default role
       await loadPositionsByRole(defaultRole);
