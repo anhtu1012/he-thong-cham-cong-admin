@@ -1376,6 +1376,7 @@ const WorkSchedulePage = () => {
                 >
                   <Select
                     showSearch
+                    optionFilterProp="label"
                     placeholder="Chọn ca làm việc"
                     options={shiftList}
                     style={{ borderRadius: "8px" }}

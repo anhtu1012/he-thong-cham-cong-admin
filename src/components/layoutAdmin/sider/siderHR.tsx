@@ -15,7 +15,7 @@ import "../../layoutAdmin/index.scss";
 const { Sider } = Layout;
 
 interface SiderProps {
-  collapsed: boolean;
+  collapsed: boolean; 
 }
 
 const SiderHrComponent: React.FC<SiderProps> = ({ collapsed }) => {
@@ -131,14 +131,14 @@ const SiderHrComponent: React.FC<SiderProps> = ({ collapsed }) => {
     >
       <div className="sidebar-menu-container">
         {/* New Post Button */}
-        {!collapsed && (
+        {/* {!collapsed && (
           <button
             className="sidebar-new-post-btn"
             onClick={() => router.push("/hr/tao-moi")}
           >
             + Tạo thông báo mới
           </button>
-        )}
+        )} */}
 
         {/* Main Menu */}
         <Menu
