@@ -1380,6 +1380,7 @@ const WorkSchedulePage = () => {
                   style={{ flex: 1, marginRight: "8px" }}
                 >
                   <Select
+                    showSearch
                     placeholder="Chọn ca làm việc"
                     options={shiftList}
                     style={{ borderRadius: "8px" }}
