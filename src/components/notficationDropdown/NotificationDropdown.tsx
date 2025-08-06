@@ -26,6 +26,7 @@ import dayjs from "dayjs";
 import "dayjs/locale/vi";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
@@ -48,6 +49,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
   const [loading, setLoading] = useState(false);
   const [markingAsRead, setMarkingAsRead] = useState(false);
   const socket = useSocket();
+  const router = useRouter();
 
   // Get user data from Redux
   const authData = useSelector(selectAuthLogin);
@@ -140,6 +142,12 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
     try {
       await NotificationService.markOneRead(noti.id);
       await fetchNotifications();
+      
+      
+      const notificationPageUrl = getLinkNoti(authData.userProfile?.roleCode || "");
+      if (notificationPageUrl !== "#") {
+        router.push(notificationPageUrl);
+      }
     } catch (error) {
       console.error("Error marking notifications as read:", error);
     }
