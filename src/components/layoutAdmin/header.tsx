@@ -68,11 +68,6 @@ const HeaderComponent: React.FC<HeaderProps> = ({
 
   const items = [
     {
-      key: "1",
-      label: <Link href="/profile">Thông tin cá nhân</Link>,
-      icon: <UserOutlined />,
-    },
-    {
       key: "2",
       label: (
         <Button
